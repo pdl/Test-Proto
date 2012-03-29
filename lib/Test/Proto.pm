@@ -32,12 +32,12 @@ our $VERSION = '0.01';
 This module simplifies writing tests for deep structures and objects.
 
     use Test::Proto;
-    pSt->like(/^\d+$/)->ok("123", '"123" looks like an integer');
+	
     pAr->contains_only(pSc, pHr)->ok(["",{a=>'b'}], "This arrayref contains a string followed by a hashref");
-	pSr # scalar ref
-		->is_like(qr/^\d+$/, '+ve ints please')
-		->is_unlike(qr/^0\d+$/, 'no leading zeros');
-
+	pSt	->is_like(qr/^\d+$/, '+ve ints please')
+		->is_unlike(qr/^0\d+$/, 'no leading zeros')
+		->ok('123');
+	
 	pOb
 		->is_a('Dung::Spreader')
 		->is_a('Dung::Spreader::Champion')

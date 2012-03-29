@@ -174,7 +174,7 @@ sub _grep
 #		$code $got" !~ m/$expected/};
 		foreach (@$got)
 		{
-			push @$result, ($_) if $code->$_;
+			push @$result, ($_) if &$code($_);
 		}
 		return $expected->validate($result);
 	};

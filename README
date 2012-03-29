@@ -1,15 +1,26 @@
 Test-Proto
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
+This module simplifies writing tests for deep structures and objects.
 
-A README file is required for CPAN modules since CPAN extracts the README
-file from a module distribution so that people browsing the archive
-can use it to get an idea of the module's uses. It is usually a good idea
-to provide version information here so that people can decide whether
-fixes for the module are worth downloading.
+    use Test::Proto;
+	
+    pAr->contains_only(pSc, pHr)->ok(["",{a=>'b'}], "This arrayref contains a string followed by a hashref");
+	pSt	->is_like(qr/^\d+$/, '+ve ints please')
+		->is_unlike(qr/^0\d+$/, 'no leading zeros')
+		->ok('123');
+	
+	pOb
+		->is_a('Dung::Spreader')
+		->is_a('Dung::Spreader::Champion')
+		->can_do('launch', 'Core competency: make it fly for miles')
+		->try_can('smell',pAr->is_empty,)
+		->ok(Dung::Spreader::Champion->new);
+
+The idea behind Test::Proto is that test scripts for code written on modern, OO principles should themselves resemble the target code rather than sequential code. 
+
+Tests for deep structures and objects tend should not be repetitive and should be flexible so that when you decide you need $got->{'wurple'}{'diddle'}{'do'} to look like $got->{'wurple'}->diddle->[$i]{'do'} you can make a much smaller change to your script. Test::Proto is a framework primarily for testing the same thing for multiple conditions, and testing the things it contains/produces in a similar manner. 
+
+The way it works is that you create a "prototype" (using a subclass of Test::Proto::Base), add tests to the prototype, and validate then your string/arryref/object against the prototype. 
 
 
 INSTALLATION

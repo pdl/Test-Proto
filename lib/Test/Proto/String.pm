@@ -8,6 +8,7 @@ sub initialise
 {
 	my ($self) = @_;
 	$self->is_defined;
+	$self->is_a('SCALAR'); # implies we ought to move all the functions which stringify into , as it's legitimate to test what "$object" does.
 }
 sub is_eq
 {
