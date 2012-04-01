@@ -12,13 +12,72 @@ sub is_empty
 sub array_length
 {
 	my ($self, $expected, $why) = @_;
-	$self->add_test('array_length', $expected, $why);
+	$self->add_test(_array_length($expected), $why);
+}
+sub range
+{
+	my ($self, $range, $expected, $why) = @_;
+	$self->add_test(_range($range, $expected), $why);
 }
 
 sub grep
 {
 	my ($self, $code, $expected, $why) = @_;
-	$self->add_test('grep', $code, $expected, $why);
+	$self->add_test(_grep($code, $expected), $why);
 }
+sub map
+{
+	my ($self, $code, $expected, $why) = @_;
+	$self->add_test(_map($code, $expected), $why);
+}
+sub _array_length
+{
+	my ($expected) = @_;
+	return sub{
+		my $got = shift;
+		my $result;
+		eval {$result = ( $expected == scalar (@$got) ? 1 : fail ("$expected != length(@$got)") )};
+		return Test::Proto::Base::fail($@) if $@;
+		return $result;
+	};
+}
+
+sub _grep
+{
+	my ($code, $expected) = @_;
+	return sub{
+		my $got = shift;
+		my $result = [];
+		foreach (@$got)
+		{
+			push @$result, ($_) if &$code($_);
+		}
+		return $expected->validate($result);
+	};
+}
+sub _map
+{
+	my ($code, $expected) = @_;
+	return sub{
+		my $got = shift;
+		my $result = [];
+		foreach (@$got)
+		{
+			push @$result, (&{$code}($_));
+		}
+		return $expected->validate($result);
+	};
+}
+sub _range
+{
+	my ($range, $expected) = @_;
+	return sub{
+		my $got = shift;
+		my $result = [];
+		push (@$result, $_) foreach $got->[$range];
+		return $expected->validate($result);
+	};
+}
+
 1;
 

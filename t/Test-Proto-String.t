@@ -3,7 +3,6 @@ use Test::More;
 use Test::Proto qw(pSt);
 ok (1, 'ok is ok');
 ok (pSt, 'pSt returns an object');
-ok(&Test::Proto::Test::_is_defined('a'), 'T::P::T::_is_defined works');
 pSt->ok('a', '"a" is a string');
 pSt->is_a('SCALAR')->ok('a', '"a" is a scalar string');
 pSt->is_also(pSt)->ok('a', '"a" is really a string');
