@@ -7,6 +7,7 @@ use Test::Deep::NoTest; # provides eq_deeply for _is_deeply. Consider removing t
 use Test::Proto::Test;
 use Test::Proto::Fail;
 use Data::Dumper; # not used in canonical but keep for the moment for development
+our $VERSION = '0.01';
 my $CLASS = __PACKAGE__;
 
 sub initialise

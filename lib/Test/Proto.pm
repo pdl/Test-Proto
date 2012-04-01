@@ -12,7 +12,7 @@ use Test::Proto::Fail; # need we load this here?
 # use Test::Proto::CodeRef; # 
 use Test::Proto::Object;
 use base "Exporter";
-our @EXPORT_OK = qw(&pSt &pOb &pHr &pAr); # symbols to export on request
+our @EXPORT_OK = qw(&pSomething &pSt &pOb &pHr &pAr); # symbols to export on request
 
 =head1 NAME
 
@@ -24,7 +24,7 @@ Version 0.01
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = ${Test::Proto::Base::VERSION};
 
 
 =head1 SYNOPSIS
