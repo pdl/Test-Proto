@@ -74,7 +74,12 @@ sub _range
 	return sub{
 		my $got = shift;
 		my $result = [];
-		push (@$result, $_) foreach $got->[$range];
+		$range =~ s/-(\d+)/$#{$got} + 1 - $1/ge;
+		my @range = eval ("($range)"); # surely there is a better way?
+		foreach my $i (@range)
+		{
+			push (@$result, $_) foreach $got->[$i];
+		}
 		return $expected->validate($result);
 	};
 }

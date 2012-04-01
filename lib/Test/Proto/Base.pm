@@ -7,6 +7,9 @@ use Test::Deep::NoTest; # provides eq_deeply for _is_deeply. Consider removing t
 use Test::Proto::Test;
 use Test::Proto::Fail;
 use Data::Dumper; # not used in canonical but keep for the moment for development
+$Data::Dumper::Indent = 0;
+$Data::Dumper::Terse = 1;
+$Data::Dumper::Sortkeys = 1;
 our $VERSION = '0.01';
 my $CLASS = __PACKAGE__;
 
@@ -187,7 +190,7 @@ sub _is_deeply
 		my $result;
 		eval {$result=eq_deeply ($got, $expected)}; # consider replacing this with something more 'native' later. 
 		return fail($@) if $@;
-		return $result ? 1 : fail("\"$got\" ne \"$expected\"");
+		return $result ? 1 : fail(Dumper ($got). " ne ". Dumper($expected));
 	};
 }
 sub _is_like

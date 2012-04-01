@@ -13,7 +13,7 @@ pAr->is_empty->ok([], '[] is empty');
 pAr->is_empty->ok([], '[] is empty');
 pAr->grep(sub{return 1;}, pAr)->ok(['a'], 'grep is ok');
 pAr->map(sub{shift; return ++$_;}, pAr->is_deeply([2,3,4]))->ok([1,2,3], 'map is ok');
-#pAr->range("0..-1", pAr->is_deeply([2,3]))->ok([1,2,3], 'range is ok'); # failing, not sure why
+pAr->range("0..-1", pAr->is_deeply([1,2,3]))->ok([1,2,3], 'range is ok');
 
 
 done_testing;
