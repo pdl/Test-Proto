@@ -3,6 +3,12 @@ use 5.006;
 use strict;
 use warnings;
 use base 'Test::Proto::Base';
+use Test::Proto::ArrayRef;
+sub is_empty
+{
+	my ($self, $why) = @_;
+	$self->add_test(_keys(Test::Proto::ArrayRef->new()->is_empty), $why);
+}
 
 sub keys
 {
@@ -21,5 +27,31 @@ sub _keys
 	};
 }
 
-1;
+return 1; # module loaded ok
+
+=pod
+=head1 NAME
+
+Test::Proto::HashRef - Test Prototype for Hash References. 
+
+=head1 SYNOPSIS
+
+	Test::Proto::HashRef->new->ok({a=>undef,b=>2,c=>'three'}); # ok
+	Test::Proto::HashRef->new->ok({}); # ok
+	Test::Proto::HashRef->new->is_empty->ok({}); # still ok
+	Test::Proto::HashRef->new->is_deeply({a=>undef,'c'=>"three", b=>2,})->ok({a=>undef,b=>2,c=>'three'}); # also ok
+
+This is a test prototype which requires that the value it is given is defined and is a hashref. It provides methods for interacting with hashrefs. (To test hashes, make them hashrefs and test them with this module)
+
+=head1 METHODS
+
+See L<Test::Proto::Base> for documentation on common methods.
+
+=head3 keys
+
+=head3 is_empty
+
+=head1 OTHER INFORMATION
+
+For author, version, bug reports, support, etc, please see L<Test::Proto>. 
 

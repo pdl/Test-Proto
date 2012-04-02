@@ -6,7 +6,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME                => 'Test::Proto',
     AUTHOR              => q{Daniel Perrett <perrettdl@googlemail.com>},
-    VERSION_FROM        => 'lib/Test/Proto.pm',
+    VERSION_FROM        => 'lib/Test/Proto/Base.pm',
     ABSTRACT_FROM       => 'lib/Test/Proto.pm',
     ($ExtUtils::MakeMaker::VERSION >= 6.3002
       ? ('LICENSE'=> 'perl')

@@ -230,5 +230,50 @@ sub fail
 #	return Test::Proto::Fail->new();
 #}
 
-1;
+return 1; # module loaded ok
+
+=pod
+=head1 NAME
+
+Test::Proto::HashRef - Test Prototype for Hash References. 
+
+=head1 SYNOPSIS
+
+	my $test = Test::Proto::Base->new->is_eq(-5);
+	$test->ok ($temperature) # will fail unless $temperature is -5
+	$test->ok ($score) # you can use the same test multple times
+	ok($test->validate($score)) # If you like your "ok"s first
+
+This is a test prototype which requires that the value it is given is defined and is a hashref. It provides methods for interacting with hashrefs. (To test hashes, make them hashrefs and test them with this module)
+
+=head1 METHODS
+
+=head3 new
+
+=head3 initialise
+
+=head3 add_test
+
+=head3 is_a
+
+=head3 is_also
+
+=head3 is_defined
+
+=head3 is_eq
+
+=head3 is_ne
+
+=head3 is_like
+
+=head3 is_unlike
+
+=head3 validate
+
+=head3 ok
+
+=head1 OTHER INFORMATION
+
+For author, version, bug reports, support, etc, please see L<Test::Proto>. 
+
 

@@ -162,4 +162,4 @@ See http://dev.perl.org/licenses/ for more information.
 
 =cut
 
-1; # End of Test::Proto
+return 1; # module loaded ok

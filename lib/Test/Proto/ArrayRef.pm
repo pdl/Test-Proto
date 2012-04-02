@@ -83,6 +83,41 @@ sub _range
 		return $expected->validate($result);
 	};
 }
+return 1; # module loaded ok
 
-1;
+=pod
+=head1 NAME
+
+Test::Proto::ArrayRef - Test Prototype for Array References. 
+
+=head1 SYNOPSIS
+
+	Test::Proto::ArrayRef->new->ok([1,2,3]); # ok
+	Test::Proto::ArrayRef->new->ok([]); # also ok
+	Test::Proto::ArrayRef->new->is_deeply([1,2,3])->ok([1,2,3]); # ok
+	Test::Proto::ArrayRef->new->is_empty->ok([]); # also ok
+	Test::Proto::ArrayRef->new->ok(undef); # not ok
+	Test::Proto::ArrayRef->new->ok(1,2,3); # not ok
+
+This is a test prototype which requires that the value it is given is defined and is an arrayref. It provides methods for interacting with arrayrefs. (To test lists/arrays, make them arrayrefs and test them with this module)
+
+=head1 METHODS
+
+See L<Test::Proto::Base> for documentation on common methods.
+
+=head3 array_length
+
+=head3 is_empty
+
+=head3 map
+
+=head3 grep
+
+=head3 range
+
+=head3 range
+
+=head1 OTHER INFORMATION
+
+For author, version, bug reports, support, etc, please see L<Test::Proto>. 
 
