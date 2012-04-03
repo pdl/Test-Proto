@@ -4,16 +4,39 @@ use strict;
 use warnings;
 use base 'Test::Proto::Base';
 use Test::Proto::ArrayRef;
+
+sub initialise
+{
+	my ($self) = @_;
+	$self->is_defined;
+	$self->is_a('HASH');
+}
+
 sub is_empty
 {
 	my ($self, $why) = @_;
 	$self->add_test(_keys(Test::Proto::ArrayRef->new()->is_empty), $why);
 }
-
+sub values
+{
+	my ($self, $expected, $why) = @_;
+	$self->add_test(_values($self->upgrade($expected)), $why);
+}
 sub keys
 {
 	my ($self, $expected, $why) = @_;
-	$self->add_test(_keys($expected), $why);
+	$self->add_test(_keys($self->upgrade($expected)), $why);
+}
+sub key_value
+{
+	my ($self, $key, $expected, $why) = @_;
+	$self->add_test(_key_value($key,$self->upgrade($expected)), $why);
+}
+sub key_values
+{
+	my ($self, $expected, $why) = @_;
+	$self->add_test(_key_value($_,$self->upgrade($expected->{$_})), $why) foreach (CORE::keys %{$expected}); # TODO: check $expected is a hashref!
+	return $self;
 }
 sub _keys
 {
@@ -22,6 +45,28 @@ sub _keys
 		my $got = shift;
 		my $result;
 		eval {$result = $expected->validate([CORE::keys %$got])};
+		return Test::Proto::Base::fail($@) if $@;
+		return $result;
+	};
+}
+sub _key_value
+{
+	my ($key, $expected) = @_;
+	return sub{
+		my $got = shift;
+		my $result;
+		eval {$result = $expected->validate($got->{$key})};
+		return Test::Proto::Base::fail($@) if $@;
+		return $result;
+	};
+}
+sub _values
+{
+	my ($expected) = @_;
+	return sub{
+		my $got = shift;
+		my $result;
+		eval {$result = $expected->validate([CORE::values %$got])};
 		return Test::Proto::Base::fail($@) if $@;
 		return $result;
 	};
@@ -48,6 +93,8 @@ This is a test prototype which requires that the value it is given is defined an
 See L<Test::Proto::Base> for documentation on common methods.
 
 =head3 keys
+
+=head3 values
 
 =head3 is_empty
 

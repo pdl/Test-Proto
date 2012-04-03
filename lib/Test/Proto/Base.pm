@@ -125,7 +125,7 @@ sub validate
 sub is_also
 {
 	my ($self, $expected, $why) = @_;
-	$self->add_test(_is_also($expected), $why);
+	$self->add_test(_is_also($self->upgrade($expected)), $why);
 }
 
 sub is_a
@@ -215,6 +215,32 @@ sub _is_unlike
 		return $result ? 1 : fail("\"$got\" =~ /$expected/");
 	};
 }
+sub upgrade
+{
+	my ($self, $expected, $why) = @_;
+	if (&{_is_a('SCALAR')}($expected))
+	{
+		return Test::Proto::Base->new($why)->is_eq($expected);
+	}
+	if (&{_is_a('Test::Proto::Base')}($expected))
+	{
+		return $expected;
+	}
+	if (&{_is_a('ARRAY')}($expected))
+	{
+		return Test::Proto::ArrayRef->new($why)->is_deeply($expected); # iterate?
+	}
+	if (&{_is_a('HASH')}($expected))
+	{
+		return Test::Proto::HashRef->new($why)->is_deeply($expected);
+	}
+	if (ref $expected)
+	{
+		return Test::Proto::Object->new($why)->is_a(ref $expected);
+	}
+	return $expected; # exception?
+}
+
 sub fail
 {
 	# should there be a metasugar module for things like this?
@@ -271,6 +297,8 @@ This is a test prototype which requires that the value it is given is defined an
 =head3 validate
 
 =head3 ok
+
+=head3 upgrade
 
 =head1 OTHER INFORMATION
 

@@ -4,6 +4,13 @@ use strict;
 use warnings;
 use base 'Test::Proto::Base';
 
+sub initialise
+{
+	my ($self) = @_;
+	$self->is_defined;
+	$self->is_a('ARRAY');
+}
+
 sub is_empty
 {
 	my ($self, $why) = @_;
