@@ -234,6 +234,10 @@ sub upgrade
 	{
 		return Test::Proto::HashRef->new($why)->is_deeply($expected);
 	}
+	if (&{_is_a('CODE')}($expected))
+	{
+		return Test::Proto::Base->new($why)->add_test($expected);
+	}
 	if (ref $expected)
 	{
 		return Test::Proto::Object->new($why)->is_a(ref $expected);
