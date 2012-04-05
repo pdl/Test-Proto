@@ -25,7 +25,7 @@ sub _can
 		my $result;
 		eval { $result = $got->CORE::can($method); };
 #?		return fail ($@) if $@;
-		return $result ? $result : fail ('Object cannot '. $method);
+		return $result ? $result : fail('Object cannot '. $method);
 	}
 }
 

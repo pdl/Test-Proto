@@ -222,9 +222,14 @@ sub upgrade
 	{
 		return Test::Proto::Base->new($why)->is_eq($expected);
 	}
+	# returns => implicit elses
 	if (&{_is_a('Test::Proto::Base')}($expected))
 	{
 		return $expected;
+	}
+	if (&{_is_a('Regexp')}($expected))
+	{
+		return Test::Proto::Base->new($why)->is_like($expected);
 	}
 	if (&{_is_a('ARRAY')}($expected))
 	{
@@ -250,7 +255,7 @@ sub fail
 	# should there be a metasugar module for things like this?
 	# More detailed interface to T::P::Fail? (More detailed T::P::F first!)
 	my ($why) = @_;
-	die $why;
+	warn $why; # result sin fals positives, though?
 	return Test::Proto::Fail->new($why);
 }
 
