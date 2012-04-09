@@ -19,13 +19,30 @@ sub can
 
 sub _can
 {
-	my ($method, $why) = @_;
+	my ($method) = @_;
 	return sub{
 		my $got = shift;
 		my $result;
 		eval { $result = $got->CORE::can($method); };
 #?		return fail ($@) if $@;
 		return $result ? $result : fail('Object cannot '. $method);
+	}
+}
+sub try_can
+{
+	my ($self, $method, $args, $expected, $why) = @_;
+	$self->add_test(_try_can($method, $args, $self->upgrade($expected)), $why);
+}
+
+sub _try_can
+{
+	my ($method, $args, $expected) = @_;
+	return sub{
+		my $got = shift;
+		my $result;
+		eval { $result = $expected->validate($got->$method(@$args)); };
+		return $result if defined $result;
+		return fail ($@) if $@;
 	}
 }
 
