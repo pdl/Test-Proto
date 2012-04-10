@@ -14,6 +14,7 @@ t/00-load.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+t/Test-Proto-Base.t
 t/Test-Proto-String.t
 t/Test-Proto-ArrayRef.t
 t/Test-Proto-HashRef.t

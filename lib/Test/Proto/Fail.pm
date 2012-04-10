@@ -2,7 +2,7 @@ package Test::Proto::Fail;
 use 5.006;
 use strict;
 use warnings;
-use overload '""' => \&_to_string, '0+' => 0, fallback => 0;
+use overload '""' => \&_to_string, '0+' => sub{0}, fallback => '0+';
 
 sub new
 {

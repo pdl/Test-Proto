@@ -232,9 +232,14 @@ sub upgrade
 	{
 		return Test::Proto::Base->new($why)->is_eq($expected);
 	}
+	# returns => implicit elses
 	if (&{_is_a('Test::Proto::Base')}($expected))
 	{
 		return $expected;
+	}
+	if (&{_is_a('Regexp')}($expected))
+	{
+		return Test::Proto::Base->new($why)->is_like($expected);
 	}
 	if (&{_is_a('ARRAY')}($expected))
 	{
@@ -243,6 +248,10 @@ sub upgrade
 	if (&{_is_a('HASH')}($expected))
 	{
 		return Test::Proto::HashRef->new($why)->is_deeply($expected);
+	}
+	if (&{_is_a('CODE')}($expected))
+	{
+		return Test::Proto::Base->new($why)->add_test($expected);
 	}
 	if (ref $expected)
 	{
@@ -256,7 +265,7 @@ sub fail
 	# should there be a metasugar module for things like this?
 	# More detailed interface to T::P::Fail? (More detailed T::P::F first!)
 	my ($why) = @_;
-	die $why;
+	warn $why; # result sin fals positives, though?
 	return Test::Proto::Fail->new($why);
 }
 
