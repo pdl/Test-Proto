@@ -25,6 +25,16 @@ sub new
 	}, $class;
 	return $self->initialise;
 }
+
+sub clone
+{
+	my $self = shift;
+	my $new = bless {
+		tests=>$self->{'tests'},
+	}, ref $self;
+	return $new;
+}
+
 sub add_test #???
 {
 	my ($self, $testtype, @args) = @_;
@@ -299,6 +309,8 @@ This is a test prototype which requires that the value it is given is defined an
 =head3 ok
 
 =head3 upgrade
+
+=head3 clone
 
 =head1 OTHER INFORMATION
 
