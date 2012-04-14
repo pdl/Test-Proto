@@ -71,9 +71,9 @@ Test::Proto::Series - Container for test prototypes.
 
 =head1 SYNOPSIS
 
-	#Test::Proto::Series->new()
+	Test::Proto::Series->new(pAr,pHr)
 
-This is a container for test prototypes. To validate arrays/lists, consider using L<Test::Proto::ArrayRef>. 
+This is a container for test prototypes and is used to create groups, repetition, and options in DTD-like validation methods such as C<Test::Proto::ArrayRef::contains_only>. To validate arrays/lists, consider using L<Test::Proto::ArrayRef>. 
 
 =head1 METHODS
 
