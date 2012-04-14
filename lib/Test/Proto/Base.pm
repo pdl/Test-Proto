@@ -17,6 +17,7 @@ sub initialise
 {
 	return $_[0];
 }
+
 sub new
 {
 	my $class = shift;
@@ -233,7 +234,7 @@ sub upgrade
 		return Test::Proto::Base->new($why)->is_eq($expected);
 	}
 	# returns => implicit elses
-	if (&{_is_a('Test::Proto::Base')}($expected))
+	if (&{_is_a('Test::Proto::Base')}($expected) or &{_is_a('Test::Proto::Series')}($expected))
 	{
 		return $expected;
 	}

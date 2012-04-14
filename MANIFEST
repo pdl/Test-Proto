@@ -6,6 +6,7 @@ lib/Test/Proto/ArrayRef.pm
 lib/Test/Proto/HashRef.pm
 lib/Test/Proto/Object.pm
 lib/Test/Proto/Fail.pm
+lib/Test/Proto/Series.pm
 lib/Test/Proto/Test.pm
 Makefile.PL
 MANIFEST			This list of files

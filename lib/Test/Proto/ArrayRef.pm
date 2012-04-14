@@ -37,6 +37,11 @@ sub map
 	my ($self, $code, $expected, $why) = @_;
 	$self->add_test(_map($code, $expected), $why);
 }
+sub contains_only
+{
+	my ($self, $expected, $why) = @_;
+	$self->add_test(_contains_only([map {$self->upgrade($_)} @$expected]), $why);
+}
 sub _array_length
 {
 	my ($expected) = @_;
@@ -48,7 +53,32 @@ sub _array_length
 		return $result;
 	};
 }
-
+sub _contains_only
+{
+	my ($expected) = @_;
+	return sub{
+		my $got = shift;
+		my @got = @$got;
+		# TODO: I think it requires parser-like logic to include series
+		foreach my $expect (@$expected)
+		{
+			
+			if ($expect->can('validate_many'))
+			{
+				my $remainder = $expect->validate_many([@got]); # 
+				return $remainder unless $remainder;
+				@got = @$remainder;
+			}
+			else
+			{
+				my $this = shift @got;
+				my $result = $expect->validate($this);
+				return $result unless $result;
+			}
+		}
+		return 1;
+	};
+}
 sub _grep
 {
 	my ($code, $expected) = @_;
@@ -81,7 +111,7 @@ sub _range
 	return sub{
 		my $got = shift;
 		my $result = [];
-		$range =~ s/-(\d+)/$#{$got} + 1 - $1/ge;
+		$range =~ s/-(\d+)/$#{$got} + 1 - $1/ge; # really also need to do some validating of range.	
 		my @range = eval ("($range)"); # surely there is a better way?
 		foreach my $i (@range)
 		{
