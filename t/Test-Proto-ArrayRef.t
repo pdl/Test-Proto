@@ -17,6 +17,8 @@ pAr->range("0..-1", pAr->is_deeply([1,2,3]))->ok([1,2,3], 'range is ok');
 pAr->contains_only([1,pSomething,3])->ok([1,2,3], 'contains_only is ok for serial lists');
 pAr->contains_only([pSeries(1,pSomething,3)])->ok([1,2,3], 'contains_only is ok for simple pSeries');
 pAr->contains_only([pSeries(pSeries(1,pSomething),3)])->ok([1,2,3], 'contains_only is ok for nested pSeries');
+pAr->contains_only([pSeries(pSeries(1,2)->repeat(1,5),3)])->ok([1,2,1,2,3], 'contains_only is ok for nested pSeries');
+pAr->contains_only([pSeries(pSeries(1,2)->repeat(1,5),3)])->ok([1,2,1,2,4], 'contains_only is ok for nested pSeries');
 
 
 done_testing;

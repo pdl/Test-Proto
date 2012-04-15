@@ -154,7 +154,8 @@ sub ok
 	my($self, $got, $why) = @_;
 	my $tb = $CLASS->builder;
 	my $result = $self->validate($got);
-	# output failure?
+	# output failure:
+	$tb->diag($result) unless $result;
 	return $tb->ok($result, $why);
 }
 sub is_eq
@@ -266,7 +267,7 @@ sub fail
 	# should there be a metasugar module for things like this?
 	# More detailed interface to T::P::Fail? (More detailed T::P::F first!)
 	my ($why) = @_;
-	warn $why; # result sin fals positives, though?
+	# warn $why; # results in false positives
 	return Test::Proto::Fail->new($why);
 }
 

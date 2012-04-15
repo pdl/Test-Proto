@@ -13,6 +13,8 @@ sub new
 	my $class = shift;
 	my $self = bless {
 		contents=>[@_],
+		repeat_min=>1,
+		repeat_max=>1,
 	}, $class;
 	return $self->initialise;	
 }
@@ -29,14 +31,50 @@ sub clone
 sub set_contents
 {
 	my ($self, $contents) = @_;
-	$self->{'contents'} = $contents;
+	$self->{'contents'} = $contents if defined $contents;
+	return $self;
+}
+
+sub repeat
+{
+	my ($self, $min, $max) = @_;
+	$self->{'repeat_min'} = $min;
+	$self->{'repeat_max'} = $max; # test $max
+	return $self;
 }
 
 sub validate_many
 {
 	my ($self, $got) = @_;
+	my $remainder = [@$got];
+	$self->{'contents'} = [map {$self->upgrade($_)} @{$self->{'contents'}}];
+	my $i;
+	if ($self->{'repeat_min'})
+	{
+		for ($i = 1; $i <= $self->{'repeat_min'}; $i++)
+		{
+			$remainder = $self->_validate_many($remainder);
+			return $remainder unless $remainder; # catches fails
+		}
+	}
+	my $successful_remainder = $remainder;
+	if ($self->{'repeat_max'} > $self->{'repeat_min'})
+	{
+		for (1; $i <= $self->{'repeat_max'}; $i++)
+		{
+			$remainder = $self->_validate_many($remainder);
+			return $successful_remainder unless $remainder; # catches fails
+			return $successful_remainder unless @$remainder; # catches empty returns
+			$successful_remainder = [@$remainder]; # 
+		}
+	}
+	return $successful_remainder;
+}
+sub _validate_many
+{
+	my ($self, $got) = @_;
 	my @got = @$got;
-	foreach my $expect (map {$self->upgrade($_)} @{$self->{'contents'}})
+	foreach my $expect (@{$self->{'contents'}})
 	{
 		if ($expect->can('validate_many'))
 		{
