@@ -19,23 +19,28 @@ sub is_empty
 sub array_length
 {
 	my ($self, $expected, $why) = @_;
-	$self->add_test(_array_length($expected), $why);
+	$self->add_test(_array_length($self->upgrade($expected)), $why);
 }
 sub range
 {
 	my ($self, $range, $expected, $why) = @_;
-	$self->add_test(_range($range, $expected), $why);
+	$self->add_test(_range($range, $self->upgrade($expected)), $why);
 }
 
 sub grep
 {
 	my ($self, $code, $expected, $why) = @_;
-	$self->add_test(_grep($code, $expected), $why);
+	$self->add_test(_grep($code, $self->upgrade($expected)), $why);
 }
 sub map
 {
 	my ($self, $code, $expected, $why) = @_;
-	$self->add_test(_map($code, $expected), $why);
+	$self->add_test(_map($code, $self->upgrade($expected)), $why);
+}
+sub reduce
+{
+	my ($self, $code, $expected, $why) = @_;
+	$self->add_test(_reduce($code, $self->upgrade($expected)), $why);
 }
 sub contains_only
 {
@@ -48,7 +53,7 @@ sub _array_length
 	return sub{
 		my $got = shift;
 		my $result;
-		eval {$result = ( $expected == scalar (@$got) ? 1 : fail ("$expected != length(@$got)") )};
+		eval {$result = ( $expected->validate(@$got ? length(@$got): 0) ? 1 : Test::Proto::Base::fail ("$expected != length(@$got)") )};
 		return Test::Proto::Base::fail($@) if $@;
 		return $result;
 	};
@@ -103,6 +108,21 @@ sub _map
 			push @$result, (&{$code}($_));
 		}
 		return $expected->validate($result);
+	};
+}
+sub _reduce
+{
+	my ($code, $expected) = @_;
+	return sub{
+		my $got = shift;
+		my $result = [];
+		my $current = $got->[0];
+		return fail ('reduce requires length of > 1') if $#$got == 0; 
+		for (my $i = 1; $i<=$#$got; $i++)
+		{
+			$current = &{$code}($current,$got->[$i]);
+		}
+		return $expected->validate($current);
 	};
 }
 sub _range

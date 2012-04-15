@@ -7,13 +7,17 @@ use overload '""' => \&_to_string, '0+' => sub{0}, fallback => '0+';
 sub new
 {
 	my $class = shift;
+	my $warning = shift;
+	
 	bless {
+		simple_warning => $warning,
 	}, $class;
 }
 
 sub _to_string
 {
-	return "Test Prototype failure"; # TODO: make this more verbose
+	my $self = shift;
+	return "Test Prototype Failure:".(defined $self->{'simple_warning'} ? "\n".$self->{'simple_warning'} : ''); # TODO: make this more verbose
 }
 
 1;
