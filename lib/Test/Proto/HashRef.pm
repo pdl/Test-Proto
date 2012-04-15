@@ -32,9 +32,23 @@ sub key_value
 	my ($self, $key, $expected, $why) = @_;
 	$self->add_test(_key_value($key,$self->upgrade($expected)), $why);
 }
-sub key_values
+sub key_values # cf. Test::Deep::superhashof
 {
 	my ($self, $expected, $why) = @_;
+	$self->add_test(_key_value($_,$self->upgrade($expected->{$_})), $why) foreach (CORE::keys %{$expected}); # TODO: check $expected is a hashref!
+	return $self;
+}
+sub allow_only # cf. Test::Deep::subhashof
+{
+	my ($self, $expected, $why) = @_;
+	$self->add_test(_keys($self->upgrade([CORE::keys %$expected])), $why);
+	$self->add_test(_key_value($_,$self->upgrade($expected->{$_}, 1)), $why) foreach (CORE::keys %{$expected}); # TODO: check $expected is a hashref!
+	return $self;
+}
+sub only_key_values # cf. Test::Deep::cmp_deeply
+{
+	my ($self, $expected, $why) = @_;
+	$self->add_test(_keys($self->upgrade([CORE::keys %$expected])), $why);
 	$self->add_test(_key_value($_,$self->upgrade($expected->{$_})), $why) foreach (CORE::keys %{$expected}); # TODO: check $expected is a hashref!
 	return $self;
 }
@@ -51,12 +65,20 @@ sub _keys
 }
 sub _key_value
 {
-	my ($key, $expected) = @_;
+	my ($key, $expected, $optional) = @_;
 	return sub{
 		my $got = shift;
 		my $result;
-		eval {$result = $expected->validate($got->{$key})};
-		return Test::Proto::Base::fail($@) if $@;
+		if ($optional)
+		{
+			eval {$result = $expected->validate($got->{$key})} if exists $got->{$key};
+			return Test::Proto::Base::fail($@) if $@;
+		}
+		else
+		{
+			eval {$result = $expected->validate($got->{$key})};
+			return Test::Proto::Base::fail($@) if $@;
+		}
 		return $result;
 	};
 }
@@ -95,6 +117,14 @@ See L<Test::Proto::Base> for documentation on common methods.
 =head3 keys
 
 =head3 values
+
+=head3 key_value
+
+=head3 key_values
+
+=head3 allow_only
+
+=head3 only_key_values
 
 =head3 is_empty
 

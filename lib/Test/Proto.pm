@@ -10,10 +10,10 @@ use Test::Proto::HashRef;
 use Test::Proto::Series;
 use Test::Proto::ArrayRef;
 use Test::Proto::Fail; # need we load this here?
-# use Test::Proto::CodeRef; # 
+use Test::Proto::CodeRef;
 use Test::Proto::Object;
 use base "Exporter";
-our @EXPORT_OK = qw(&pSomething &pSt &pOb &pHr &pAr &pSeries); # symbols to export on request
+our @EXPORT_OK = qw(&pSomething &pSt &pOb &pHr &pAr &pSeries &pCr); # symbols to export on request
 
 =head1 NAME
 
@@ -102,6 +102,16 @@ Returns a hashref prototype. See L<Test::Proto::HashRef>.
 
 sub pHr {
 	return Test::Proto::HashRef->new();
+}
+
+=head2 pCr
+
+Returns a coderef prototype. See L<Test::Proto::CodeRef>.
+
+=cut
+
+sub pCr {
+	return Test::Proto::CodeRef->new();
 }
 
 =head2 pSeries

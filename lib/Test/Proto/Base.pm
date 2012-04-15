@@ -227,6 +227,23 @@ sub _is_unlike
 		return $result ? 1 : fail("\"$got\" =~ /$expected/");
 	};
 }
+
+sub try
+{
+	my ($self, $code, $why) = @_;
+	$self->add_test(_try($code), $why);
+}
+sub _try
+{
+	my ($code) = @_;
+	return sub{
+		my $got = shift;
+		my $result;
+		eval {$result = &{$code}($got)};
+		return fail($@) if $@;
+		return $result ? 1 : fail("try returned ".$result);
+	};
+}
 sub upgrade
 {
 	my ($self, $expected, $why) = @_;
