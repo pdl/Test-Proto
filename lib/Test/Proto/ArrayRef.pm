@@ -172,7 +172,11 @@ See L<Test::Proto::Base> for documentation on common methods.
 
 =head3 range
 
-=head3 range
+=head3 is_empty
+
+=head3 reduce
+
+=head3 contains_only
 
 =head1 OTHER INFORMATION
 
