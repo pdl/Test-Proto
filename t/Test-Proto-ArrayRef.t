@@ -15,6 +15,8 @@ pAr->map(sub{shift; return ++$_;}, pAr->is_deeply([2,3,4]))->ok([1,2,3], 'map is
 pAr->range("0..1", pAr->is_deeply([1,2]))->ok([1,2,3], 'range is ok');
 pAr->range("0..-1", pAr->is_deeply([1,2,3]))->ok([1,2,3], 'range of -1 is ok');
 pAr->contains_only([1,pSomething,3])->ok([1,2,3], 'contains_only is ok for serial lists');
+ok(pAr->contains_only([1,pSomething,3])->validate([1,2,3,4])==0, 'contains_only fails if there are subsequent items');
+ok(pAr->begins_with([1,pSomething,3])->validate([1,2,3,4])==1, 'begins_with does not fail if there are subsequent items');
 pAr->contains_only([pSeries(1,pSomething,3)])->ok([1,2,3], 'contains_only is ok for simple pSeries');
 pAr->contains_only([pSeries(pSeries(1,pSomething),3)])->ok([1,2,3], 'contains_only is ok for nested pSeries');
 pAr->contains_only([pSeries(pSeries(1,2)->repeat(1,5),3)])->ok([1,2,1,2,3], 'contains_only is ok for nested pSeries with repeats');

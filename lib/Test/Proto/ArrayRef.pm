@@ -45,7 +45,13 @@ sub reduce
 sub contains_only
 {
 	my ($self, $expected, $why) = @_;
-	$self->add_test(_contains_only([map {$self->upgrade($_)} @$expected]), $why);
+	$self->add_test(_pull([map {$self->upgrade($_)} @$expected], Test::Proto::ArrayRef->new->is_empty), $why);
+}
+sub begins_with
+{
+	my ($self, $expected, $allowed_remainder, $why) = @_;
+	$allowed_remainder = Test::Proto::ArrayRef->new unless defined $allowed_remainder;
+	$self->add_test(_pull([map {$self->upgrade($_)} @$expected], $self->upgrade($allowed_remainder)), $why);
 }
 sub _array_length
 {
@@ -58,13 +64,13 @@ sub _array_length
 		return $result;
 	};
 }
-sub _contains_only
+sub _pull
 {
-	my ($expected) = @_;
+	my ($expected, $allowed_remainder) = @_;
 	return sub{
 		my $got = shift;
 		my @got = @$got;
-		# TODO: I think it requires parser-like logic to include series
+		# TODO: rewrite to enable backtracking
 		foreach my $expect (@$expected)
 		{
 			
@@ -79,9 +85,10 @@ sub _contains_only
 				my $this = shift @got;
 				my $result = $expect->validate($this);
 				return $result unless $result;
+
 			}
 		}
-		return 1;
+		return $allowed_remainder->validate([@got]);
 	};
 }
 sub _grep
@@ -177,6 +184,8 @@ See L<Test::Proto::Base> for documentation on common methods.
 =head3 reduce
 
 =head3 contains_only
+
+=head3 begins_with
 
 =head1 OTHER INFORMATION
 
