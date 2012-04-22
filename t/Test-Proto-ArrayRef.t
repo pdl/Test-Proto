@@ -21,13 +21,22 @@ pAr->contains_only([pSeries(1,pSomething,3)])->ok([1,2,3], 'contains_only is ok 
 pAr->contains_only([pSeries(pSeries(1,pSomething),3)])->ok([1,2,3], 'contains_only is ok for nested pSeries');
 pAr->contains_only([pSeries(pSeries(1,2)->repeat(1,5),3)])->ok([1,2,1,2,3], 'contains_only is ok for nested pSeries with repeats');
 pAr->reduce(sub{return $_[0]+$_[1];},6)->ok([1,2,3], 'reduce by addition: [1,2,3] = 6');
-# pAr->dedupe(cNum,[1,2,3])->ok([1,2,3,'3'], 'pAr->dedupe');
+# pAr->uniq(cNum,[1,2,3])->ok([1,2,3,'3'], 'pAr->uniq');
 # pAr->has_at_least([1,2,3])->ok([1,2,3,3], 'pAr->has_at_least'); # set and bag I found confusing names. Use dedupe where appropriate.
-# pAr->has_at_most([1,2,3])->ok([1,2], 'pAr->has_at_most'); 
-# pAr->has_exactly([1,2,3])->ok([1,2], 'pAr->has_at_most'); 
+# pAr->has_at_most([1,2,3])->ok([1,2], 'pAr->has_at_most');
+# ok(pAr->has_at_most([1,2,3])->ok([1,2,3,4])==0, 'pAr->has_at_most fails correctly');
+# ok(pAr->has_at_least([1,2,3])->ok([1,2])==0, 'pAr->has_at_least fails correctly');
+# pAr->has_exactly([1,2,3])->ok([1,2], 'pAr->has_exactly'); # 
 # pAr->sort(cNum,[1,2,3])->ok([3,1,2], 'pAr->sort');
 # pAr->sort(cNum->reverse,[3,2,1])->ok([3,1,2], 'pAr->sort with reverse');
 # pAr->schwartz(cStr, sub{lc $_[0]}, ['A','b','C'])->ok(['C','A','b'], 'pAr->schwartz');
+# pAr->first(sub {$_[0]>1},2)->ok([1,2,3], 'first works');
+# pAr->min(cNum,1)->ok([1,2,3], 'min works');
+# pAr->max(cNum,3)->ok([1,2,3], 'max works');
+# pAr->after([2],[3,4,5])->ok([1,2,3,4,5], 'after works');
+# pAr->after_include([2,3],[2,3,4,5])->ok([1,2,3,4,5], 'after_include works');
+# pAr->before([4],[1,2,3])->ok([1,2,3,4,5], 'before works');
+# pAr->before_include([3,4],[1,2,3,4])->ok([1,2,3,4,5], 'before_include works');
 
 done_testing;
 
