@@ -3,6 +3,7 @@ lib/Test/Proto.pm
 lib/Test/Proto/ArrayRef.pm
 lib/Test/Proto/Base.pm
 lib/Test/Proto/CodeRef.pm
+lib/Test/Proto/Compare.pm
 lib/Test/Proto/Fail.pm
 lib/Test/Proto/HashRef.pm
 lib/Test/Proto/Object.pm
@@ -20,5 +21,6 @@ t/Test-Proto-ArrayRef.t
 t/Test-Proto-Base.t
 t/Test-Proto-HashRef.t
 t/Test-Proto-CodeRef.t
+t/Test-Proto-Compare.t
 t/Test-Proto-String.t
 
