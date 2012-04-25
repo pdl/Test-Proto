@@ -13,6 +13,7 @@ sub new
 		'code'=>$code,
 	}, $class;
 }
+
 sub compare
 {
 	my ($self, $A, $B) = @_;
@@ -25,6 +26,7 @@ sub compare
 		return &{$self->{'code'}}($A, $B)
 	}
 }
+
 sub _as_code
 {
 	my ($self) = @_;
@@ -39,10 +41,18 @@ sub _as_code
 	}
 }
 
+sub reverse
+{
+	my ($self) = @_;
+	$self->{'reverse'} = !$self->{'reverse'};
+	return $self;
+}
+
 1;
 
 
 =pod
+
 =head1 NAME
 
 Test::Proto::Compare - base class for comparisons.
@@ -51,13 +61,27 @@ Test::Proto::Compare - base class for comparisons.
 
 	Test::Proto::Compare->new->compare('aaa', 'aab'); # 1
 
-This is a test prototype which requires that the value it is given is defined and is a scalar. It provides methods for interacting with strings.
+This is a base class for comparison functions. 
 
 =head1 METHODS
 
+=head3 new
 
+	Test::Proto::Compare->new(sub{lc shift cmp lc shift;});
+
+The new function takes an argument, the coderef which is used to do the comparison. It is optional, and defaults to C<cmp>. 
+
+=head3 compare
+
+This method will compare two arguments and return the result. 
+
+=head3 reverse
+
+Calling this method will reverse the order in which the arguments are fed to the comparison functions.
 
 =head1 OTHER INFORMATION
 
 For author, version, bug reports, support, etc, please see L<Test::Proto>. 
+
 =cut
+
