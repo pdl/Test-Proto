@@ -4,17 +4,19 @@ This module simplifies writing tests for deep structures and objects.
 
     use Test::Proto;
 	
-    pAr->contains_only(pSc, pHr)->ok(["",{a=>'b'}], "This arrayref contains a string followed by a hashref");
-	pSt	->is_like(qr/^\d+$/, '+ve ints please')
+    pAr	->contains_only('', pHr)
+		->ok(["", {a=>'b'}], "This arrayref contains an empty string followed by a hashref");
+
+	pSt	->is_like(qr/^\d+$/, 'looks like a positive integer')
 		->is_unlike(qr/^0\d+$/, 'no leading zeros')
 		->ok('123');
 	
-	pOb
-		->is_a('Dung::Spreader')
-		->is_a('Dung::Spreader::Champion')
-		->can_do('launch', 'Core competency: make it fly for miles')
-		->try_can('smell',pAr->is_empty,)
-		->ok(Dung::Spreader::Champion->new);
+	pOb	->is_a('XML::LibXML::Node', 'must inherit from XML::LibXML::Node')
+		->is_a('XML::LibXML::Element', 'what it really is')
+		->can_do('findnodes', 'must have the findnodes method')
+		->try_can('localName', [], 'li')
+		->ok(XML::LibXML::Element->new('li'));
+
 
 The idea behind Test::Proto is that test scripts for code written on modern, OO principles should themselves resemble the target code rather than sequential code. 
 

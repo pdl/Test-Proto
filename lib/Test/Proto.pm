@@ -11,9 +11,11 @@ use Test::Proto::Series;
 use Test::Proto::ArrayRef;
 use Test::Proto::Fail; # need we load this here?
 use Test::Proto::CodeRef;
+use Test::Proto::Compare;
+use Test::Proto::Compare::Numeric;
 use Test::Proto::Object;
 use base "Exporter";
-our @EXPORT_OK = qw(&pSomething &pSt &pOb &pHr &pAr &pSeries &pCr); # symbols to export on request
+our @EXPORT_OK = qw(&p &pSomething &pSt &pOb &pHr &pAr &pSeries &pCr &c &cNum); # symbols to export on request
 
 =head1 NAME
 
@@ -34,17 +36,18 @@ This module simplifies writing tests for deep structures and objects.
 
     use Test::Proto;
 	
-    pAr->contains_only(pSc, pHr)->ok(["",{a=>'b'}], "This arrayref contains a string followed by a hashref");
-	pSt	->is_like(qr/^\d+$/, '+ve ints please')
+    pAr	->contains_only('', pHr)
+		->ok(["", {a=>'b'}], "This arrayref contains an empty string followed by a hashref");
+
+	pSt	->is_like(qr/^\d+$/, 'looks like a positive integer')
 		->is_unlike(qr/^0\d+$/, 'no leading zeros')
 		->ok('123');
 	
-	pOb
-		->is_a('Dung::Spreader')
-		->is_a('Dung::Spreader::Champion')
-		->can_do('launch', 'Core competency: make it fly for miles')
-		->try_can('smell',pAr->is_empty,)
-		->ok(Dung::Spreader::Champion->new);
+	pOb	->is_a('XML::LibXML::Node', 'must inherit from XML::LibXML::Node')
+		->is_a('XML::LibXML::Element', 'what it really is')
+		->can_do('findnodes', 'must have the findnodes method')
+		->try_can('localName', [], 'li')
+		->ok(XML::LibXML::Element->new('li'));
 
 The idea behind Test Proto is that test scripts for code written on modern, OO principles should themselves resemble the target code rather than sequential code. 
 
@@ -54,14 +57,24 @@ The way it works is that you create a "prototype" (using a subclass of L<Test::P
 
 =head1 FUNCTIONS
 
+=head2 p
+
+Returns a basic prototype. See L<Test::Proto::Base>.
+
+=cut
+
+sub p {
+	return Test::Proto::Base->new();
+}
+
 =head2 pSomething
 
-Returns a string prototype. See L<Test::Proto::String>.
+Returns a defined prototype. See L<Test::Proto::Base>.
 
 =cut
 
 sub pSomething {
-	return Test::Proto::Base->new();
+	return Test::Proto::Base->new()->is_defined;
 }
 
 =head2 pSt
@@ -122,6 +135,26 @@ Returns a series. See L<Test::Proto::Series>.
 
 sub pSeries {
 	return Test::Proto::Series->new(@_);
+}
+
+=head2 c
+
+Returns a comparison object. See L<Test::Proto::Compare>.
+
+=cut
+
+sub c {
+	return Test::Proto::Compare->new(@_);
+}
+
+=head2 cNum
+
+Returns a numeric comparison object. See L<Test::Proto::Compare::Numeric>.
+
+=cut
+
+sub cNum {
+	return Test::Proto::Compare::Numeric->new(@_);
 }
 
 =head1 AUTHOR

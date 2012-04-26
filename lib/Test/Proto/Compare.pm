@@ -59,7 +59,7 @@ Test::Proto::Compare - base class for comparisons.
 
 =head1 SYNOPSIS
 
-	Test::Proto::Compare->new->compare('aaa', 'aab'); # 1
+	Test::Proto::Compare->new->compare('aaa', 'aab'); # -1
 
 This is a base class for comparison functions. 
 

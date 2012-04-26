@@ -1,12 +1,13 @@
 #!perl -T
 use Test::More;
+use Test::Proto  qw(c cNum);
 use Test::Proto::Compare;
-sub pCmp {Test::Proto::Compare->new}
 ok (1, 'ok is ok');
-ok (defined pCmp, 'pCmp returns an object');
+ok (defined c, 'c returns an object');
 is ('aaa' cmp 'aab',-1, 'aaa cmp aab == -1');
-is (pCmp->compare('aaa', 'aab'),-1, 'pCmp aaa aab == -1');
-is (pCmp->reverse->compare('aaa', 'aab'),1, 'pCmp->reverse aaa aab == 1');
-is (pCmp->reverse->reverse->compare('aaa', 'aab'),-1, 'pCmp->reverse->->reverse aaa aab == -1');
-
+is (c->compare('aaa', 'aab'),-1, 'c aaa aab == -1');
+is (c->reverse->compare('aaa', 'aab'),1, 'c->reverse aaa aab == 1');
+is (c->reverse->reverse->compare('aaa', 'aab'),-1, 'c->reverse->->reverse aaa aab == -1');
+is (0 <=> 1,-1, '0 <=> 1 == -1');
+is (cNum->compare(0, 1),-1, 'c 0 1 == -1');
 done_testing();

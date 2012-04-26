@@ -4,6 +4,7 @@ lib/Test/Proto/ArrayRef.pm
 lib/Test/Proto/Base.pm
 lib/Test/Proto/CodeRef.pm
 lib/Test/Proto/Compare.pm
+lib/Test/Proto/Compare/Numeric.pm
 lib/Test/Proto/Fail.pm
 lib/Test/Proto/HashRef.pm
 lib/Test/Proto/Object.pm
