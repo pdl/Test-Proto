@@ -37,6 +37,17 @@ sub map
 	my ($self, $code, $expected, $why) = @_;
 	$self->add_test(_map($code, $self->upgrade($expected)), $why);
 }
+sub sort
+{
+	my ($self, $cmp, $expected, $why) = @_;
+	$self->add_test(_sort($cmp, $self->upgrade($expected)), $why);
+}
+sub schwartz
+{
+	my ($self, $cmp, $norm, $expected, $why) = @_;
+	$self->add_test(_schwartz($cmp, $norm, $self->upgrade($expected)), $why);
+}
+
 sub reduce
 {
 	my ($self, $code, $expected, $why) = @_;
@@ -117,6 +128,29 @@ sub _map
 		return $expected->validate($result);
 	};
 }
+sub _sort
+{
+	my ($cmp, $expected) = @_;
+	return sub{
+		my $got = shift;
+		my $result = [sort {&{$cmp}($a,$b)} @$got];
+		return $expected->validate($result);
+	};
+}
+sub _schwartz
+{
+	my ($cmp, $norm, $expected) = @_;
+	return sub{
+		my $got = shift;
+		my $result = [
+			map {$_->[0]}
+			sort {&{$cmp}($a->[1],$b->[1])}
+			map {[$_, &{$norm}($_)]}
+		@$got ];
+		return $expected->validate($result);
+	};
+}
+
 sub _reduce
 {
 	my ($code, $expected) = @_;
@@ -186,6 +220,10 @@ See L<Test::Proto::Base> for documentation on common methods.
 =head3 contains_only
 
 =head3 begins_with
+
+=head3 sort
+
+=head3 schwartz
 
 =head1 OTHER INFORMATION
 

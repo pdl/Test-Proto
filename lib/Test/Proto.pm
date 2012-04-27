@@ -36,8 +36,9 @@ This module simplifies writing tests for deep structures and objects.
 
     use Test::Proto;
 	
-    pAr	->contains_only('', pHr)
-		->ok(["", {a=>'b'}], "This arrayref contains an empty string followed by a hashref");
+    pAr	->contains_only('', pHr, 
+			"ArrayRef must contain only an empty string followed by a hashref")
+		->ok(["", {a=>'b'}]);
 
 	pSt	->is_like(qr/^\d+$/, 'looks like a positive integer')
 		->is_unlike(qr/^0\d+$/, 'no leading zeros')
@@ -168,8 +169,6 @@ the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Proto
 automatically be notified of progress on your bug as I make changes.
 
 
-
-
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
@@ -201,6 +200,7 @@ L<http://search.cpan.org/dist/Test-Proto/>
 
 
 =head1 ACKNOWLEDGEMENTS
+
 
 
 =head1 LICENSE AND COPYRIGHT
