@@ -30,7 +30,7 @@ sub range
 sub grep
 {
 	my ($self, $code, $expected, $why) = @_;
-	$self->add_test(_grep($code, $self->upgrade($expected)), $why);
+	$self->add_test(_grep($self->upgrade($code), $self->upgrade($expected)), $why);
 }
 sub map
 {
@@ -110,7 +110,7 @@ sub _grep
 		my $result = [];
 		foreach (@$got)
 		{
-			push @$result, ($_) if &$code($_);
+			push @$result, ($_) if $code->validate($_);
 		}
 		return $expected->validate($result);
 	};
