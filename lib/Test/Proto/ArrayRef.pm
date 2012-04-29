@@ -32,6 +32,13 @@ sub grep
 	my ($self, $code, $expected, $why) = @_;
 	$self->add_test(_grep($self->upgrade($code), $self->upgrade($expected)), $why);
 }
+
+sub all
+{
+	my ($self, $code, $why) = @_;
+	$self->add_test(_all($self->upgrade($code)), $why);
+}
+
 sub map
 {
 	my ($self, $code, $expected, $why) = @_;
@@ -133,6 +140,19 @@ sub _grep
 			push @$result, ($_) if $code->validate($_);
 		}
 		return $expected->validate($result);
+	};
+}
+sub _all
+{
+	my ($code) = @_;
+	return sub{
+		my $got = shift;
+		foreach (@$got)
+		{
+			my $result = $code->validate($_);
+			return $result unless $result;
+		}
+		return 1;
 	};
 }
 sub _map
@@ -285,6 +305,8 @@ See L<Test::Proto::Base> for documentation on common methods.
 =head3 map
 
 =head3 grep
+
+=head3 all
 
 =head3 range
 
