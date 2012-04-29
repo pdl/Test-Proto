@@ -26,7 +26,8 @@ pAr->sort(cNum,[1,2,3])->ok([3,1,2], 'pAr->sort');
 pAr->sort(cNum->reverse,[3,2,1])->ok([3,1,2], 'pAr->sort with reverse');
 pAr->schwartz(cNum, sub{return shift;}, [1,2,3])->ok([3,1,2], 'pAr->schwartz');
 pAr->schwartz(c, sub{lc $_[0];}, ['A','b','C'])->ok(['C','A','b'], 'pAr->schwartz with lc');
-# pAr->uniq(cNum,[1,2,3])->ok([1,2,3,'3'], 'pAr->uniq');
+pAr->uniq(cNum,[1,2,3])->ok([1,2,3,'3'], 'pAr->uniq');
+ok(pAr->uniq(cNum,[1,2,3])->validate([1,2,3,4])==0, 'pAr->uniq fails correctly');
 # pAr->has_at_least([1,2,3])->ok([1,2,3,3], 'pAr->has_at_least'); # set and bag I found confusing names. Use dedupe where appropriate.
 # pAr->has_at_most([1,2,3])->ok([1,2], 'pAr->has_at_most');
 # ok(pAr->has_at_most([1,2,3])->ok([1,2,3,4])==0, 'pAr->has_at_most fails correctly');

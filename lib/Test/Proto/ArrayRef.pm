@@ -47,7 +47,11 @@ sub schwartz
 	my ($self, $cmp, $norm, $expected, $why) = @_;
 	$self->add_test(_schwartz($cmp, $norm, $self->upgrade($expected)), $why);
 }
-
+sub uniq
+{
+	my ($self, $cmp, $expected, $why) = @_;
+	$self->add_test(_uniq($cmp, $self->upgrade($expected)), $why);
+}
 sub reduce
 {
 	my ($self, $code, $expected, $why) = @_;
@@ -150,6 +154,19 @@ sub _schwartz
 		return $expected->validate($result);
 	};
 }
+sub _uniq
+{
+	my ($cmp, $expected) = @_;
+	return sub{
+		my $got = shift;
+		my $result = [];
+		foreach my $g (@$got)
+		{
+			push @$result, $g if (!grep { !&{ $cmp }( $_, $g) } @$result);
+		}
+		return $expected->validate($result);
+	};
+}
 
 sub _reduce
 {
@@ -224,6 +241,8 @@ See L<Test::Proto::Base> for documentation on common methods.
 =head3 sort
 
 =head3 schwartz
+
+=head3 uniq
 
 =head1 OTHER INFORMATION
 
