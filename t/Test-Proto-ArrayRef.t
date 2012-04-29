@@ -25,7 +25,7 @@ pAr->range("0..1", pAr->is_deeply([1,2]))->ok([1,2,3], 'range is ok');
 pAr->range("0..-1", pAr->is_deeply([1,2,3]))->ok([1,2,3], 'range of -1 is ok');
 # pAr->first_match(sub {$_[0]>1},2)->ok([1,2,3], 'first_match works');
 # pAr->last_match(sub {$_[0]>1},2)->ok([1,2,3], 'last_match works');
-# pAr->enumerate([[1,'a'],[2,'b'],[3,'c']])->ok(['a','b','c'], 'enumerate works');
+pAr->enumerate([[0,'a'],[1,'b'],[2,'c']])->ok(['a','b','c'], 'enumerate works');
 
 
 # Tests which use comparison functions, see Test::Proto::Compare.

@@ -62,6 +62,12 @@ sub min
 	my ($self, $cmp, $expected, $why) = @_;
 	$self->add_test(_min($cmp, $self->upgrade($expected)), $why);
 }
+
+sub enumerate
+{
+	my ($self, $expected, $why) = @_;
+	$self->add_test(_enumerate($self->upgrade($expected)), $why);
+}
 sub reduce
 {
 	my ($self, $code, $expected, $why) = @_;
@@ -161,6 +167,21 @@ sub _schwartz
 			sort {&{$cmp}($a->[1],$b->[1])}
 			map {[$_, &{$norm}($_)]}
 		@$got ];
+		return $expected->validate($result);
+	};
+}
+sub _enumerate
+{
+	my ($expected) = @_;
+	return sub{
+		my $got = shift;
+		my $result;
+		my $i = 0;
+		foreach my $g (@$got)
+		{
+			push @$result, [$i, $g];
+			$i++;
+		}
 		return $expected->validate($result);
 	};
 }
@@ -284,6 +305,8 @@ See L<Test::Proto::Base> for documentation on common methods.
 =head3 min
 
 =head3 max
+
+=head3 enumerate
 
 =head1 OTHER INFORMATION
 
