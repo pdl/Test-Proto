@@ -24,8 +24,8 @@ pAr->map(sub{shift; return ++$_;}, pAr->is_deeply([2,3,4]))->ok([1,2,3], 'map is
 pAr->range("0..1", pAr->is_deeply([1,2]))->ok([1,2,3], 'range is ok');
 pAr->range("0..-1", pAr->is_deeply([1,2,3]))->ok([1,2,3], 'range of -1 is ok');
 pAr->all(qr/^[abc]$/)->ok(['a','b','c'], 'all works');
-# pAr->first_match(sub {$_[0]>1},2)->ok([1,2,3], 'first_match works');
-# pAr->last_match(sub {$_[0]>1},2)->ok([1,2,3], 'last_match works');
+pAr->first_match(sub {$_[0]>1},2)->ok([1,2,3], 'first_match works');
+pAr->last_match(sub {$_[0]<3},2)->ok([1,2,3], 'last_match works');
 pAr->enumerate([[0,'a'],[1,'b'],[2,'c']])->ok(['a','b','c'], 'enumerate works');
 
 

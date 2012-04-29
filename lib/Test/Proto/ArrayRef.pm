@@ -33,6 +33,17 @@ sub grep
 	$self->add_test(_grep($self->upgrade($code), $self->upgrade($expected)), $why);
 }
 
+sub first_match
+{
+	my ($self, $code, $expected, $why) = @_;
+	$self->add_test(_first_match($self->upgrade($code), $self->upgrade($expected)), $why);
+}
+sub last_match
+{
+	my ($self, $code, $expected, $why) = @_;
+	$self->add_test(_last_match($self->upgrade($code), $self->upgrade($expected)), $why);
+}
+
 sub all
 {
 	my ($self, $code, $why) = @_;
@@ -142,6 +153,33 @@ sub _grep
 		return $expected->validate($result);
 	};
 }
+sub _first_match
+{
+	my ($code, $expected) = @_;
+	return sub{
+		my $got = shift;
+		foreach my $g (@$got)
+		{
+			my $result = $code->validate($g);
+			return $expected->validate($g) if $result;
+		}
+		return Test::Proto::fail('No matches');
+	};
+}
+sub _last_match
+{
+	my ($code, $expected) = @_;
+	return sub{
+		my $got = shift;
+		foreach my $g (reverse @$got)
+		{
+			my $result = $code->validate($g);
+			return $expected->validate($g) if $result;
+		}
+		return Test::Proto::fail('No matches');
+	};
+}
+
 sub _all
 {
 	my ($code) = @_;
