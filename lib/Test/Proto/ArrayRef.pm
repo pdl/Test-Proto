@@ -52,6 +52,16 @@ sub uniq
 	my ($self, $cmp, $expected, $why) = @_;
 	$self->add_test(_uniq($cmp, $self->upgrade($expected)), $why);
 }
+sub max
+{
+	my ($self, $cmp, $expected, $why) = @_;
+	$self->add_test(_max($cmp, $self->upgrade($expected)), $why);
+}
+sub min
+{
+	my ($self, $cmp, $expected, $why) = @_;
+	$self->add_test(_min($cmp, $self->upgrade($expected)), $why);
+}
 sub reduce
 {
 	my ($self, $code, $expected, $why) = @_;
@@ -168,6 +178,33 @@ sub _uniq
 	};
 }
 
+sub _max
+{
+	my ($cmp, $expected) = @_;
+	return sub{
+		my $got = shift;
+		my $result = $got->[1] if @$got;
+		foreach my $g (@$got)
+		{
+			$result = $g if &{ $cmp }( $result, $g) == -1;
+		}
+		return $expected->validate($result);
+	};
+}
+sub _min
+{
+	my ($cmp, $expected) = @_;
+	return sub{
+		my $got = shift;
+		my $result = $got->[1] if @$got;
+		foreach my $g (@$got)
+		{
+			$result = $g if &{ $cmp }( $result, $g) == 1;
+		}
+		return $expected->validate($result);
+	};
+}
+
 sub _reduce
 {
 	my ($code, $expected) = @_;
@@ -243,6 +280,10 @@ See L<Test::Proto::Base> for documentation on common methods.
 =head3 schwartz
 
 =head3 uniq
+
+=head3 min
+
+=head3 max
 
 =head1 OTHER INFORMATION
 
