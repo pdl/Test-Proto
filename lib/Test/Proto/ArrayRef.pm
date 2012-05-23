@@ -334,21 +334,55 @@ This is a test prototype which requires that the value it is given is defined an
 
 =head1 METHODS
 
-See L<Test::Proto::Base> for documentation on common methods.
+See L<Test::Proto::Base> for documentation on common methods. All methods which add a test return the prototype and the last argument is optional and contains the reason for running the test (for the output). The thing which is being tested is unaffected except where noted.
 
 =head3 array_length
 
+	$prototype->array_length(3, 'is 3 elements long')->ok([1,2,3]);
+
+This method adds a test equivalent to Perl's builtin C<scalar>. The first argument is upgraded and validated with the result of the C<scalar> operation. 
+
 =head3 is_empty
+
+	$prototype->is_empty->ok([]);
+
+This method adds a test which passes if the arrayref is empty.
 
 =head3 map
 
+	$prototype->map(sub{ord($_[0])}, [97,98,99])->ok(['a','b','c']);
+
+This method adds a test in which each arrayref element is passed into the coderef provided and the output added to a new arrayref which is tested against the prototype. It functions like Perl's C<map>.
+
 =head3 grep
+
+	$prototype->grep(sub{ord($_[0])>97}, [98,99])->ok(['a','b','c']);
+
+This method adds a test in which each arrayref element is passed into the test provided (if it is a coderef, it will be upgraded) and, if successful, the arrayref element will be added to a new arrayref which is tested against the prototype. It functions like Perl's C<grep>.
 
 =head3 all
 
+	$prototype->all(sub{ord($_[0])>96})->ok(['a','b','c']);
+
+This method adds a test in which each arrayref element is passed into the test provided (if it is a coderef, it will be upgraded). The test will pass if all elements pass the test.
+
+=head3 first_match
+
+	$prototype->first_match(sub{ord($_[0])>97},'b')->ok(['a','b','c']);
+
+This method adds a test in which each arrayref element is passed into the test provided (if it is a coderef, it will be upgraded). The first element which passes this test will then be passed into the second test.
+
+=head3 last_match
+
+	$prototype->last_match(sub{ord($_[0])>97},'c')->ok(['a','b','c']);
+
+This method adds a test in which each arrayref element is passed into the test provided (if it is a coderef, it will be upgraded). The last element which passes this test will then be passed into the second test.
+
 =head3 range
 
-=head3 is_empty
+	$prototype->range('1..3', [9,8,7])->ok([10..1]);
+
+This method selects a subrange and passes that to a new test. 
 
 =head3 reduce
 
@@ -358,15 +392,45 @@ See L<Test::Proto::Base> for documentation on common methods.
 
 =head3 sort
 
+	$prototype->sort(sub{lc $_[0] cmp lc $_[1]}, ['a','B','c'])->ok(['B','a','c']);
+
+This method sorts the arrayref using the first argument as the comparison code and passes the result to a new test.
+
 =head3 schwartz
+
+	$prototype->sort(sub{$_[0] cmp $_[1]}, sub {lc $_[0]}, ['a','B','c'])->ok(['B','a','c']);
+
+This method sorts the arrayref using a schwarzian transform using the first argument as the comparison code and the second as the normaliser, and passes the result to a new test.
 
 =head3 uniq
 
+	$prototype->uniq(sub{lc $_[0] cmp lc $_[1]}, ['B','c'])->ok(['B','b','c']);
+
+This method reduces the arrayref to only those elements which are not repeated, and passes the result to a new test.
+
+The first argument is a comparison operator which should return 0 if both arguments are identical for this purpose. For any matching pairs found, the first element is always kept, and the order is unchanged.
+
 =head3 min
+
+	$prototype->min(sub{lc $_[0] cmp lc $_[1]}, 'a')->ok(['B','a','c']);
+
+This method picks the element with the lowest value (according to the comparison operator provided).
+
+For any matching pairs found, the first element is used.
 
 =head3 max
 
+	$prototype->max(sub{lc $_[0] cmp lc $_[1]}, 'a')->ok(['B','a','c']);
+
+This method picks the element with the highest value (according to the comparison operator provided).
+
+For any matching pairs found, the first element is used.
+
 =head3 enumerate
+
+	$prototype->enumerate( [[1,'a'],[2,'B'],[3,'c']])->ok(['a','B','c']);
+
+This method turns each element of the arrayref into an arrayref containing the index and the value and passes the result to a new test.
 
 =head1 OTHER INFORMATION
 

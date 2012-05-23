@@ -52,25 +52,46 @@ sub fail
 }
 
 =pod
+
 =head1 NAME
 
 Test::Proto::Object - Test Prototype for objects.
 
 =head1 SYNOPSIS
 
-	Test::Proto::Object->new->ok('123'); # ok
-	Test::Proto::String->new->ok(undef); # not ok
-	Test::Proto::String->new->ok([1,2,3]); # not ok
+	Test::Proto::Object->new->ok($object); # ok
+	Test::Proto::Object->new->ok('1'); # not ok
+	Test::Proto::Object
+		->new->try_can(
+			'toString', [], ['<div/>'], 'Element div toString returns <div/>'
+		)->ok($object);
 
 This is a test prototype which requires that the value it is given is defined and is a scalar. It provides methods for interacting with strings.
 
 =head1 METHODS
 
-Currently, all methods are inherited from L<Test::Proto::Base>. 
+See L<Test::Proto::Base> for documentation on common methods.
+
+=head3 can
+
+	$prototype->can('toString', 'has a toString method')->ok($object);
+
+This method adds a test equivalent to Perl's builtin C<can>, i.e. tests if an object has a method with the given name. It does not actually execute this method. 
+
+=head3 try_can
+
+	$prototype->try_can('toString', [], ['<div/>'], 'Element div toString returns <div/>')->ok($object);
+	# is_deeply($object->toString   (), ['<div/>'], 'Element div toString returns <div/>');
+
+This method allows you to make method calls to your object and test the result. Arguments are: 1) the method name; 2) an arrayref containing the arguments you want to pass to the method call; 3) an arrayref containing the results; 4) Optionally, the reason for the test. 
+
+NB: Results are evaluated in list context and what is available for testing is always an arrayref. 
 
 =head1 OTHER INFORMATION
 
 For author, version, bug reports, support, etc, please see L<Test::Proto>. 
+
 =cut
+
 1;
 
