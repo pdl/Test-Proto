@@ -69,6 +69,44 @@ sub _can_be_string
 		return 1;
 	};
 }
+sub as_string
+{
+	my ($self, $expected, $why) = @_;
+	$self->add_test(_as_string($self->upgrade($expected)), $why);
+}
+
+sub _as_string
+{
+	my ($expected) = @_;
+	return sub{
+		return $expected->validate("$_[0]");
+	};
+}
+sub as_number
+{
+	my ($self, $expected, $why) = @_;
+	$self->add_test(_as_number($self->upgrade($expected)), $why);
+}
+sub _as_number
+{
+	my ($expected) = @_;
+	return sub{
+		return $expected->validate(0+$_[0]);
+	};
+}
+sub as_bool
+{
+	my ($self, $expected, $why) = @_;
+	$self->add_test(_as_bool($self->upgrade($expected)), $why);
+}
+sub _as_bool
+{
+	my ($expected) = @_;
+	return sub{
+		return $expected->validate($_[0] ? 1 : 0);
+	};
+}
+
 sub _is_a
 {
 	my ($type) = @_;
@@ -339,6 +377,13 @@ This is a test prototype which requires that the value it is given is defined an
 =head3 upgrade
 
 =head3 clone
+
+=head3 as_string
+
+=head3 as_number
+
+=head3 as_bool
+
 
 =head1 OTHER INFORMATION
 
