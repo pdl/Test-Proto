@@ -6,6 +6,7 @@ use base 'Test::Builder::Module';
 use Test::Deep::NoTest; # provides eq_deeply for _is_deeply. Consider removing this dependency.
 use Test::Proto::Test;
 use Test::Proto::Fail;
+use Test::Proto::Exception;
 use Data::Dumper; # not used in canonical but keep for the moment for development
 $Data::Dumper::Indent = 0;
 $Data::Dumper::Terse = 1;
@@ -325,6 +326,13 @@ sub fail
 	# warn $why; # results in false positives
 	return Test::Proto::Fail->new($why);
 }
+
+sub exception
+{
+	my ($why) = @_;
+	return Test::Proto::Exception->new($why);
+}
+
 
 #sub fail
 #{

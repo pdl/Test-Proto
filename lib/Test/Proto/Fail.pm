@@ -9,7 +9,7 @@ sub new
 	my $class = shift;
 	my $warning = shift;
 	my $because = shift;
-	return $warning if ref $warning eq 'Test::Proto::Fail';
+	return $warning if ref $warning and $warning->isa('Test::Proto::Fail');
 	return $because if $because;
 	bless {
 		simple_warning => $warning,

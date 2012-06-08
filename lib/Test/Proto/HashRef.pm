@@ -59,7 +59,7 @@ sub _keys
 		my $got = shift;
 		my $result;
 		eval {$result = $expected->validate([CORE::keys %$got])};
-		return Test::Proto::Base::fail($@) if $@;
+		return Test::Proto::Base::exception($@) if $@;
 		return $result;
 	};
 }
@@ -72,12 +72,12 @@ sub _key_value
 		if ($optional)
 		{
 			eval {$result = $expected->validate($got->{$key})} if exists $got->{$key};
-			return Test::Proto::Base::fail($@) if $@;
+			return Test::Proto::Base::exception($@) if $@;
 		}
 		else
 		{
 			eval {$result = $expected->validate($got->{$key})};
-			return Test::Proto::Base::fail($@) if $@;
+			return Test::Proto::Base::exception($@) if $@;
 		}
 		return $result;
 	};
@@ -89,7 +89,7 @@ sub _values
 		my $got = shift;
 		my $result;
 		eval {$result = $expected->validate([CORE::values %$got])};
-		return Test::Proto::Base::fail($@) if $@;
+		return Test::Proto::Base::exception($@) if $@;
 		return $result;
 	};
 }

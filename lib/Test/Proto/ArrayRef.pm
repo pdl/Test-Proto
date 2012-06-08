@@ -109,7 +109,7 @@ sub _array_length
 		my $got = shift;
 		my $result;
 		eval {$result = ( $expected->validate(@$got ? length(@$got): 0) ? 1 : Test::Proto::Base::fail ("$expected != length(@$got)") )};
-		return Test::Proto::Base::fail($@) if $@;
+		return Test::Proto::Base::exception($@) if $@;
 		return $result;
 	};
 }

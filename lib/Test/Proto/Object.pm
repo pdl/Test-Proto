@@ -42,7 +42,7 @@ sub _try_can
 		my $result;
 		eval { $result = $expected->validate($got->$method(@$args)); };
 		return $result if defined $result;
-		return fail ($@) if $@;
+		return Test::Proto::Base::exception ($@) if $@;
 	}
 }
 
