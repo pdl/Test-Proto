@@ -197,6 +197,37 @@ sub ok
 	$tb->diag($result) unless $result;
 	return $tb->ok($result, $why);
 }
+sub eq
+{
+	my ($self, $cmp, $expected, $why) = @_;
+	$self->add_test(_cmp($cmp, 'eq', $expected), $why);
+}
+sub ne
+{
+	my ($self, $cmp, $expected, $why) = @_;
+	$self->add_test(_cmp($cmp, 'ne', $expected), $why);
+}
+sub gt
+{
+	my ($self, $cmp, $expected, $why) = @_;
+	$self->add_test(_cmp($cmp, 'gt', $expected), $why);
+}
+sub ge
+{
+	my ($self, $cmp, $expected, $why) = @_;
+	$self->add_test(_cmp($cmp, 'ge', $expected), $why);
+}
+sub lt
+{
+	my ($self, $cmp, $expected, $why) = @_;
+	$self->add_test(_cmp($cmp, 'lt', $expected), $why);
+}
+sub le
+{
+	my ($self, $cmp, $expected, $why) = @_;
+	$self->add_test(_cmp($cmp, 'le', $expected), $why);
+}
+
 sub is_eq
 {
 	my ($self, $expected, $why) = @_;
@@ -233,6 +264,30 @@ sub _is_eq
 		return $result ? 1 : fail("\"$got\" ne \"$expected\"");
 	};
 }
+sub _cmp
+{
+	my ($cmp, $type, $expected) = @_;
+	return sub{
+		my $got = shift;
+		my $result;
+		my $success=0;
+		eval {$result = &{$cmp}($got,$expected)};
+		return fail($@) if $@;
+		if ($result > 0 and $type =~ /ge|gt|ne/)
+		{
+			$success = 1;
+		}
+		elsif ($result == 0 and $type =~ /ge|le|eq/)
+		{
+			$success = 1;
+		}
+		elsif ($result < 0 and $type =~ /lt|le|ne/)
+		{
+			$success = 1;
+		}
+		return $success ? 1 : fail("\"$got\" !$type \"$expected\"");
+	};
+}
 sub _is_deeply
 {
 	my ($expected) = @_;
@@ -241,7 +296,7 @@ sub _is_deeply
 		my $result;
 		eval {$result=eq_deeply ($got, $expected)}; # consider replacing this with something more 'native' later. 
 		return fail($@) if $@;
-		return $result ? 1 : fail(Dumper ($got). " ne ". Dumper($expected));
+		return $result ? 1 : fail(Dumper ($got). " !is_deeply ". Dumper($expected));
 	};
 }
 sub _is_like

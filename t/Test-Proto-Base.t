@@ -1,6 +1,6 @@
 #!perl -T
 use Test::More;
-use Test::Proto qw(p);
+use Test::Proto qw(p cNum c);
 
 # TODO: All test scripts should consider not eating own dogfood.
 
@@ -21,6 +21,13 @@ is_deeply($to_clone->clone, $to_clone, 'cloning works');
 ok (p->as_string(qr/ARRAY/)->ok([]), 'as_string is ok');
 ok (p->as_bool(1)->ok('2'), 'as_bool is ok');
 ok (p->as_number(2)->ok(' 2 '), 'as_number is ok');
+ok (p->ge(cNum,2)->ok(3), '3 ge 2 is ok');
+ok (p->ge(cNum,3)->ok(3), '3 ge 3 is ok');
+ok (p->ne(cNum,2)->ok(3), '3 ne 2 is ok');
+ok (p->eq(cNum,3)->ok(3), '3 eq 3 is ok');
+ok (p->le(cNum,4)->ok(3), '3 le 4 is ok');
+ok (p->ne(cNum,4)->ok(3), '3 ne 4 is ok');
+ok (p->ne(c,'2 ')->ok(' 2'), '"2 " ne " 2" is ok');
 
 done_testing;
 
