@@ -66,7 +66,7 @@ sub _can_be_string
 {
 	return sub{
 		eval {$_[0] .= ''};
-		return fail($@) if $@;
+		return exception($@) if $@;
 		return 1;
 	};
 }
@@ -146,7 +146,7 @@ sub _is_ne
 		my $got = shift;
 		my $result;
 		eval {$result = "$got" ne "$expected"};
-		return fail($@) if $@;
+		return exception($@) if $@;
 		return $result ? 1 : fail("\"$got\" eq \"$expected\"");
 	};
 }
@@ -157,7 +157,7 @@ sub _is_also
 		my $got = shift;
 		my $result;
 		eval {$result = $expected->validate($got)};
-		return fail($@) if $@;
+		return exception($@) if $@;
 		return $result;
 	};
 }
@@ -260,7 +260,7 @@ sub _is_eq
 		my $got = shift;
 		my $result;
 		eval {$result = "$got" eq "$expected"};
-		return fail($@) if $@;
+		return exception($@) if $@;
 		return $result ? 1 : fail("\"$got\" ne \"$expected\"");
 	};
 }
@@ -272,7 +272,7 @@ sub _cmp
 		my $result;
 		my $success=0;
 		eval {$result = &{$cmp}($got,$expected)};
-		return fail($@) if $@;
+		return exception($@) if $@;
 		if ($result > 0 and $type =~ /ge|gt|ne/)
 		{
 			$success = 1;
@@ -295,7 +295,7 @@ sub _is_deeply
 		my $got = shift;
 		my $result;
 		eval {$result=eq_deeply ($got, $expected)}; # consider replacing this with something more 'native' later. 
-		return fail($@) if $@;
+		return exception($@) if $@;
 		return $result ? 1 : fail(Dumper ($got). " !is_deeply ". Dumper($expected));
 	};
 }
@@ -306,7 +306,7 @@ sub _is_like
 		my $got = shift;
 		my $result;
 		eval {$result = "$got" =~ m/$expected/};
-		return fail($@) if $@;
+		return exception($@) if $@;
 		return $result ? 1 : fail("\"$got\" !~ /$expected/");
 	};
 }
@@ -317,7 +317,7 @@ sub _is_unlike
 		my $got = shift;
 		my $result;
 		eval {$result = "$got" !~ m/$expected/};
-		return fail($@) if $@;
+		return exception($@) if $@;
 		return $result ? 1 : fail("\"$got\" =~ /$expected/");
 	};
 }
@@ -334,7 +334,7 @@ sub _try
 		my $got = shift;
 		my $result;
 		eval {$result = &{$code}($got)};
-		return fail($@) if $@;
+		return exception($@) if $@;
 		return $result ? 1 : fail("try returned ".$result);
 	};
 }
