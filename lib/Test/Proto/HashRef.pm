@@ -97,6 +97,7 @@ sub _values
 return 1; # module loaded ok
 
 =pod
+
 =head1 NAME
 
 Test::Proto::HashRef - Test Prototype for Hash References. 
@@ -116,19 +117,49 @@ See L<Test::Proto::Base> for documentation on common methods.
 
 =head3 keys
 
+	pHr->keys(['a'])->ok({a=>1}, 'Keys of {a=>1} returns ['a']');
+
+Gets the keys of the hash, and validates them as an arrayref. Note that the keys are not likely to be sorted in nay particular order.
+
 =head3 values
+
+	pHr->values([1])->ok({a=>1}, 'Keys of {a=>1} returns [1]');
+
+Gets the values of the hash, and validates them as an arrayref. Note that the values are not likely to be sorted in nay particular order.
 
 =head3 key_value
 
+	pHr->key_value('a', pSt->is_eq('b'))->ok({a=>'b',c=>4});
+
+Gets the value of a particular hash key, and validates it, upgrading the expected value as necessary.
+
 =head3 key_values
+
+	pHr->key_value({'a' => pSt->is_eq('b'), c=>4})->ok({a=>'b',c=>4, e=>'VI'});
+
+Gets the value of several hash keys, and validates them against the value, upgrading the expected value as necessary. Extra hash keys are ignored. 
 
 =head3 allow_only
 
+	pHr->key_value({'a' => pSt->is_eq('b'), c=>4, g=>'eight'})->ok({a=>'b',c=>4, e=>'VI'});
+
+Like C<key_values> but all values in the prototype hash are optional, i.e. 'if present, they must be this'. 
+
 =head3 only_key_values
 
+	pHr->key_value({'a' => pSt->is_eq('b'), c=>4})->ok({a=>'b',c=>4});
+
+Like C<key_values> but no keys are permitted except those specified. This is effectively a deep equality check for the hash, except the key values can be prototypes rather than values.
+
 =head3 is_empty
+
+	pHr->is_empty->ok({});
+
+Fails if the hash is not empty, otherwise succeeds. 
 
 =head1 OTHER INFORMATION
 
 For author, version, bug reports, support, etc, please see L<Test::Proto>. 
+
+=cut
 

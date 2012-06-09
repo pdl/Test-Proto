@@ -317,6 +317,7 @@ sub _range
 return 1; # module loaded ok
 
 =pod
+
 =head1 NAME
 
 Test::Proto::ArrayRef - Test Prototype for Array References. 
@@ -386,9 +387,21 @@ This method selects a subrange and passes that to a new test.
 
 =head3 reduce
 
+	$prototype->reduce(sub {$_[0] .= $_[1] }, 'abc')->ok(['a','b','c']);
+
+Reduce works by passing elements to a function sequentially and always in pairs; the result of the last function plus the next item in the array, like L<List::Util>'s C<reduce>.
+
 =head3 contains_only
 
+	$prototype->contains_only([pSeries(pSeries(1,2)->repeat(1,5),3)])->ok([1,2,1,2,3]);
+
+This method allows DTD-like validation of an arrayref. See also L<Test::Proto::Series>.
+
 =head3 begins_with
+
+	$prototype->begins_with([pSeries(1,2)])->ok([1,2,1,2,3]);
+
+As C<contains_only>, but only checks the beginning of an array.
 
 =head3 sort
 
@@ -435,4 +448,6 @@ This method turns each element of the arrayref into an arrayref containing the i
 =head1 OTHER INFORMATION
 
 For author, version, bug reports, support, etc, please see L<Test::Proto>. 
+
+=cut
 

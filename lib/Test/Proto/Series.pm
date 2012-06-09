@@ -103,6 +103,7 @@ sub upgrade {Test::Proto::Base::upgrade(@_);}
 return 1; # module loaded ok
 
 =pod
+
 =head1 NAME
 
 Test::Proto::Series - Container for test prototypes.
@@ -119,14 +120,23 @@ This is a container for test prototypes and is used to create groups, repetition
 
 =head3 validate
 
+=head3 initialise
+
+=head3 repeat
+
 =head3 set_contents
 
 =head3 new
 
 =head3 clone
 
+=head3 upgrade
+
+Works like C<Test::Proto::Base::Upgrade>
+
 =head1 OTHER INFORMATION
 
 For author, version, bug reports, support, etc, please see L<Test::Proto>. 
 
+=cut
 

@@ -398,6 +398,7 @@ sub exception
 return 1; # module loaded ok
 
 =pod
+
 =head1 NAME
 
 Test::Proto::HashRef - Test Prototype for Hash References. 
@@ -415,41 +416,108 @@ This is a test prototype which requires that the value it is given is defined an
 
 =head3 new
 
+Creates a new Test::Proto::Base object. 
+
 =head3 initialise
 
-=head3 add_test
-
-=head3 is_a
-
-=head3 is_also
-
-=head3 is_defined
-
-=head3 is_eq
-
-=head3 is_ne
-
-=head3 is_like
-
-=head3 is_unlike
+When C<new> is called, C<initialise> is called on the object just before it is returned. This mostly exists so that subclasses wishing to add initial tests do not have to overload C<new>.
 
 =head3 validate
 
+Runs through the tests in the prototype and checks that they all pass. If they do, returns true. If not, returns the appropriate fail or exception object. 
+
 =head3 ok
+
+Like validate but attached to L<Test::Builder>, like L<Test::More>'s C<ok>.
+
+=head3 add_test
+
+Adds a test to the end of the list of tests to be performed when C<validate> or C<ok> is called.
 
 =head3 upgrade
 
+Upgrading is an internal funciton but is documented here as it as an important concept. Basically, it is a Do What I Mean function for parameters to many arguments, e.g. if you require an array value to be C<qr/^[a-z]+$/>, then rather than expecting an identical regex object, the regex is 'upgraded' to a Test::Proto::Base object with a single test: C<is_like(qr/^[a-z]+$/)>. This works for strings, arrayrefs and hashrefs too.
+
+=head3 is_a
+
+	p->is_a('SCALAR')->ok('String');
+	p->is_a('HASH')->ok({a=>1});
+	p->is_a('XML::LibXML::Node')->ok(XML::LibXML::Element->new());
+	p->is_a('XML::LibXML::Element')->ok(XML::LibXML::Element->new());
+
+Like Perl's C<ref> and C<isa> rolled into one.
+
+=head3 is_also
+
+	my $nonempty = p->is_like(qr/\w+/);
+	my $lowercase = p->is_unlike(qr/[A-Z]/)->is_also($nonempty);
+
+Allows you to effectively import all the tests of another prototype. 
+
+This is not to be confused with C<is_a>!
+
+=head3 is_defined
+
+Succeeds unless the value is C<undef>. 
+
+=head3 is_eq
+
+Tests for string equality.
+
+=head3 is_ne
+
+Tests for string inequality.
+
+=head3 is_deeply
+
+Recursively test using C<Test::More::is_deeply>
+
+=head3 is_like
+
+Tests if the value matches a regex.
+
+=head3 is_unlike
+
+Tests if the value fails to match a regex.
+
 =head3 clone
+
+Creates a clone of the current C<Test::Proto::Base> object. Child tests are not recursively cloned, they remain references, but the list of tests can be added to independently. 
 
 =head3 as_string
 
+Coerces the value to a string, then tests the result against the prototpye which is the first argument.
+
 =head3 as_number
+
+Coerces the value to a number, then tests the result against the prototpye which is the first argument.
 
 =head3 as_bool
 
+Coerces the value to a boolean, then tests the result against the prototpye which is the first argument. 
+
+=head3 eq, ne, gt, lt, ge, lt, le
+
+	p->ge(c, 'a')->ok('b');
+	p->ge(cNum, 2)->ok(10);
+
+Tests sort order against a comparator. The first argument is a comparison function, see C<Test::Proto::Compare>. The second argument is the comparator.
+
+=head3 try
+
+Execute arbitrary code.
+
+=head3 fail
+
+This is a subroutine which is an alias for C<Test::Proto::Fail->new()>.
+
+=head3 exception
+
+This is a subroutine which is an alias for C<Test::Proto::Exception->new()>.
 
 =head1 OTHER INFORMATION
 
 For author, version, bug reports, support, etc, please see L<Test::Proto>. 
 
+=cut
 

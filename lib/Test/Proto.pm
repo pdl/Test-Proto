@@ -54,7 +54,7 @@ The idea behind Test Proto is that test scripts for code written on modern, OO p
 
 Tests for deep structures and objects tend should not be repetitive and should be flexible so that when you decide you need C<< $got->{'wurple'}{'diddle'}{'do'} >> to look like C<< $got->{'wurple'}->diddle->[$i]{'do'} >> you can make a much smaller change to your script. Test::Proto is a framework primarily for testing the same thing for multiple conditions, and testing the things it contains/produces in a similar manner. 
 
-The way it works is that you create a "prototype" (using a subclass of L<Test::Proto::Base>), add tests to the prototype, and validate then your string/arryref/object against the prototype. 
+The way it works is that you create a "prototype" (using a subclass of L<Test::Proto::Base>), add tests to the prototype, and validate then your string/arryref/object/etc. against the prototype. 
 
 =head1 FUNCTIONS
 

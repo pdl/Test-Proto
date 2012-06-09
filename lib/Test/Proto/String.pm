@@ -14,6 +14,7 @@ sub initialise
 return 1; # module loaded ok
 
 =pod
+
 =head1 NAME
 
 Test::Proto::String - Test Prototype for strings.
@@ -34,4 +35,5 @@ Currently, all methods are inherited from L<Test::Proto::Base>.
 
 For author, version, bug reports, support, etc, please see L<Test::Proto>. 
 
+=cut
 
