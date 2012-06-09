@@ -116,19 +116,35 @@ This is a container for test prototypes and is used to create groups, repetition
 
 =head1 METHODS
 
+=head3 new
+
+Constructor. Arguments become contents.
+
 =head3 validate_many
+
+Tries to match all the elements in the argumnent withe the contents previously specified. It will return the remaining elements, or the first failure it runs into. 
 
 =head3 validate
 
+Near-alias for C<validate_many>, but wraps the first argument in an arrayref.
+
 =head3 initialise
+
+When C<new> is called, C<initialise> is called on the object just before it is returned. This mostly exists so that subclasses wishing to add initial tests do not have to overload C<new>.
 
 =head3 repeat
 
+	pSeries($valid_key, $integer)->repeat(1,10);
+
+Sets the minimum and maximum repeats allowed. 
+
 =head3 set_contents
 
-=head3 new
+Sets the contents allowed in the series. 
 
 =head3 clone
+
+Creates a copy of the series. Individual contents remain references.
 
 =head3 upgrade
 
