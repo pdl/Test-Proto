@@ -23,6 +23,7 @@ t/Test-Proto-ArrayRef.t
 t/Test-Proto-Base.t
 t/Test-Proto-HashRef.t
 t/Test-Proto-Fail.t
+t/Test-Proto-Exception.t
 t/Test-Proto-CodeRef.t
 t/Test-Proto-Compare.t
 t/Test-Proto-String.t
