@@ -122,9 +122,13 @@ Constructor. Arguments become contents.
 
 =head3 validate_many
 
+	my $remainder = $series->validate_many(['ONION', 'TURNIP', 'SALT']);
+
 Tries to match all the elements in the argumnent withe the contents previously specified. It will return the remaining elements, or the first failure it runs into. 
 
 =head3 validate
+
+	my $remainder = $series->validate('ONION');
 
 Near-alias for C<validate_many>, but wraps the first argument in an arrayref.
 
@@ -140,15 +144,20 @@ Sets the minimum and maximum repeats allowed.
 
 =head3 set_contents
 
-Sets the contents allowed in the series. 
+	$series->set_contents([$valid_key, $integer]);
+
+Sets the contents allowed in the series. Returns the series.
 
 =head3 clone
+
+	my $series = pSeries($valid_key, $integer)->repeat(1,10);
+	$series->clone->repeat(1,20)->validate_many($long_key_list);
 
 Creates a copy of the series. Individual contents remain references.
 
 =head3 upgrade
 
-Works like C<Test::Proto::Base::Upgrade>
+Works like C<Test::Proto::Base::Upgrade>, s.v.
 
 =head1 OTHER INFORMATION
 

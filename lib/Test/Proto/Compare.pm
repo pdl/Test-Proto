@@ -73,9 +73,14 @@ The new function takes an argument, the coderef which is used to do the comparis
 
 =head3 compare
 
+	$c->compare($a,$b);
+
 This method will compare two arguments and return the result. 
 
 =head3 reverse
+
+	$c->reverse->compare($a,$b);
+	# i.e.   $c->compare($b,$a);
 
 Calling this method will reverse the order in which the arguments are fed to the comparison functions.
 

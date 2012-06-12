@@ -58,9 +58,9 @@ Test::Proto::Fail - indicates the test has failed, and why
 
 =head1 SYNOPSIS
 
-	$turnip_result = @turnips ? 1 : Test::Proto::Fail('Out of turnips');
-	$broth_result = Test::Proto::Fail('No broth', $turnip_result)
-	# i.e. $broth_result = $turnip_result ? 1 : Test::Proto::Fail('No broth')->because($turnip_result);
+	$turnip_result = @turnips ? 1 : Test::Proto::Fail->new('Out of turnips');
+	$broth_result = Test::Proto::Fail->new('No broth', $turnip_result)
+	# i.e. $broth_result = $turnip_result ? 1 : Test::Proto::Fail->new('No broth')->because($turnip_result);
 	print $broth_result;
 
 Prints either 1 (if you have turnips) or an object which stringifies to:
@@ -76,13 +76,17 @@ NB: Do not confuse with C<Test::More::fail> - this is more like C<carp>-like fun
 
 =head3 new
 
+	Test::Proto::Fail->new('Out of turnips')
+
 Creats a new failure. The warning you give is the reason for the failure. Optionally, add the failure which caused this failure as a third argument (if this is boolean true, then it will return true instead).
 
 =head3 because
 
+	$fail->because($turnip_result);
+
 Set the triggering failure and return the failure. If the triggering failure is boolean true, then return that instead.
 
-=head3 can
+=head3 Other methods
 
 Currently all other public methods are via overloading:
 

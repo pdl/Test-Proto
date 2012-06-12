@@ -35,19 +35,23 @@ A bit like L<Test::Proto::Fail>, but with exceptions that return undef, not zero
 
 =head3 new
 
+	Test::Proto::Exception->new('Cannot access garden');
+
 Creats a new exception. The warning you give is the reason for the exception. Optionally, add the failure which caused this failure as a third argument (if this is boolean true, then it will return true instead).
 
 =head3 because
 
+	$exception->because($original_sin);
+
 Set the triggering exception/failure and return the exception. If the triggering exception/failure is boolean true, then return that instead.
 
-=head3 can
+=head3 Other methods
 
 Currently all other public methods are via overloading:
 
 All numeric operators treat Test::Proto::Exception objects as undef. 
 
-When stringified, however, Test::Proto::Exception objects return the explanation for the failure.
+When stringified, however, Test::Proto::Exception objects return the explanation.
 
 =head1 OTHER INFORMATION
 
