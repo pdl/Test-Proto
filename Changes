@@ -1,5 +1,8 @@
 Revision history for Test-Proto
 
+0.011	2012-06-14
+		Fixed prerequisites.
+
 0.010	2012-06-12
 		First release: Hopefully ready for CPAN!
 		This first release is a usable version of Test::Proto. The main components will be functional enough to write reasonably complex tests for native data structures, run method calls on objects, and execute arbitrary code within the framework. Failure and Exception behaviour is not thoroughly tested. There will no doubt be some API changes later on.

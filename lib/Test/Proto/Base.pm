@@ -11,7 +11,7 @@ use Data::Dumper; # not used in canonical but keep for the moment for developmen
 $Data::Dumper::Indent = 0;
 $Data::Dumper::Terse = 1;
 $Data::Dumper::Sortkeys = 1;
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 my $CLASS = __PACKAGE__;
 
 sub initialise
