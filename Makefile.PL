@@ -17,6 +17,13 @@ WriteMakefile(
 		'Data::Dumper' => 0,
 		'Test::Deep::NoTest' => 0
     },
+	META_MERGE => {
+		resources => {
+			repository => 'http://github.com/pdl/Test-Proto',
+			bugtracker => 'http://github.com/pdl/Test-Proto/issues',
+			homepage   => 'http://github.com/pdl/Test-Proto',
+		},
+	},
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Test-Proto-*' },
 );

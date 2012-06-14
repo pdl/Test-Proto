@@ -547,11 +547,11 @@ Execute arbitrary code.
 
 =head3 fail
 
-This is a subroutine which is an alias for C<Test::Proto::Fail->new()>.
+This is a subroutine which is an alias for C<< Test::Proto::Fail->new() >>.
 
 =head3 exception
 
-This is a subroutine which is an alias for C<Test::Proto::Exception->new()>.
+This is a subroutine which is an alias for C<< Test::Proto::Exception->new() >>.
 
 =head1 OTHER INFORMATION
 
