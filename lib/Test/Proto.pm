@@ -23,7 +23,7 @@ Test::Proto - OO test script golf sugar
 
 =head1 VERSION
 
-Version 0.01
+Version 0.011
 
 =cut
 
@@ -34,12 +34,12 @@ our $VERSION = ${Test::Proto::Base::VERSION};
 
 This module simplifies writing tests for deep structures and objects.
 
-    use Test::Proto;
+	use Test::Proto;
 	
-    pAr	->contains_only('', pHr, 
+	pAr	->contains_only('', pHr, 
 			"ArrayRef must contain only an empty string followed by a hashref")
 		->ok(["", {a=>'b'}]);
-
+	
 	pSt	->is_like(qr/^\d+$/, 'looks like a positive integer')
 		->is_unlike(qr/^0\d+$/, 'no leading zeros')
 		->ok('123');
