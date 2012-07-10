@@ -20,7 +20,7 @@ sub new
 
 =head1 NAME
 
-Test::Proto::Compare::Numeric - class for numeric comparison.
+Test::Proto::Compare::Numeric - Class for numeric comparison
 
 =head1 SYNOPSIS
 

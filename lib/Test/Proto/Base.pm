@@ -401,7 +401,7 @@ return 1; # module loaded ok
 
 =head1 NAME
 
-Test::Proto::HashRef - Test Prototype for Hash References. 
+Test::Proto::Base - Base Class for Test Prototypes 
 
 =head1 SYNOPSIS
 

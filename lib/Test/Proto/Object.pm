@@ -55,7 +55,7 @@ sub fail
 
 =head1 NAME
 
-Test::Proto::Object - Test Prototype for objects.
+Test::Proto::Object - Test Prototype for objects
 
 =head1 SYNOPSIS
 

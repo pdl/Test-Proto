@@ -54,7 +54,7 @@ sub because
 
 =head1 NAME
 
-Test::Proto::Fail - indicates the test has failed, and why
+Test::Proto::Fail - Indicates the test has failed, and why
 
 =head1 SYNOPSIS
 

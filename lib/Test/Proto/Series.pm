@@ -106,7 +106,7 @@ return 1; # module loaded ok
 
 =head1 NAME
 
-Test::Proto::Series - Container for test prototypes.
+Test::Proto::Series - Container for validating test prototypes sequentially
 
 =head1 SYNOPSIS
 

@@ -100,7 +100,7 @@ return 1; # module loaded ok
 
 =head1 NAME
 
-Test::Proto::HashRef - Test Prototype for Hash References. 
+Test::Proto::HashRef - Test Prototype for hash references
 
 =head1 SYNOPSIS
 

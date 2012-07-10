@@ -42,7 +42,7 @@ sub run
 
 =head1 NAME
 
-Test::Proto::Test - container for test and test-related information
+Test::Proto::Test - Container for test and test-related information
 
 =head1 SYNOPSIS
 

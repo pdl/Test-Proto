@@ -55,7 +55,7 @@ sub reverse
 
 =head1 NAME
 
-Test::Proto::Compare - base class for comparisons.
+Test::Proto::Compare - Base class for comparisons
 
 =head1 SYNOPSIS
 

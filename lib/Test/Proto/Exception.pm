@@ -25,7 +25,7 @@ sub _to_string
 
 =head1 NAME
 
-Test::Proto::Exception - indicates the test has broken, and, if possible, why
+Test::Proto::Exception - Indicates the test has broken, and, if possible, why
 
 =head1 SYNOPSIS
 

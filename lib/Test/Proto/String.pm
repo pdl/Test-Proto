@@ -17,7 +17,7 @@ return 1; # module loaded ok
 
 =head1 NAME
 
-Test::Proto::String - Test Prototype for strings.
+Test::Proto::String - Test Prototype for strings
 
 =head1 SYNOPSIS
 

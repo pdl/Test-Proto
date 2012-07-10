@@ -320,7 +320,7 @@ return 1; # module loaded ok
 
 =head1 NAME
 
-Test::Proto::ArrayRef - Test Prototype for Array References. 
+Test::Proto::ArrayRef - Test Prototype for array references
 
 =head1 SYNOPSIS
 
