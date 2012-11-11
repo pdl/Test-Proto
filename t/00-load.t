@@ -17,6 +17,7 @@ BEGIN {
 		Test::Proto::Series
 		Test::Proto::String
 		Test::Proto::Test
+		Test::Proto::TestRunner
 	))
 	{
     	use_ok( $_ ) || print "Bail out!\n";
