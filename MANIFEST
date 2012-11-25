@@ -2,6 +2,7 @@ Changes
 lib/Test/Proto.pm
 lib/Test/Proto/ArrayRef.pm
 lib/Test/Proto/Base.pm
+lib/Test/Proto/Base2.pm
 lib/Test/Proto/CodeRef.pm
 lib/Test/Proto/Compare.pm
 lib/Test/Proto/Compare/Numeric.pm
@@ -23,6 +24,7 @@ t/pod-coverage.t
 t/pod.t
 t/Test-Proto-ArrayRef.t
 t/Test-Proto-Base.t
+t/Test-Proto-Base2.t
 t/Test-Proto-HashRef.t
 t/Test-Proto-Fail.t
 t/Test-Proto-Exception.t
