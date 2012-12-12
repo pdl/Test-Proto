@@ -35,8 +35,8 @@ sub add_test{
 
 sub run_test{
 	my ($self, $test, $subject, $context) = @_;
-	print ref $context;
-	print "\n- ".(defined $_ ? $_: '[undefined]') foreach @$test;
+	print ref ($context)."\n";
+	print "- ".(defined $_ ? $_: '[undefined]')."\n" foreach @$test;
 	my $package = ref $self;
 	$defined_tests->{$test->[0]}
 		->($context, $subject, @$test);
@@ -44,7 +44,10 @@ sub run_test{
 }
 
 sub defined_tests {
+	# my ($package, $filename, $line) = caller;
+	# return ${$package."::defined_tests"}; 
 	return $defined_tests;
+
 }
 
 sub run_tests{
@@ -57,7 +60,7 @@ sub run_tests{
 sub define_test{
 	my ($testName, $testSub) = @_;
 	my ($package, $filename, $line) = caller;
-	$defined_tests->{$testName} = $testSub;
+	defined_tests->{$testName} = $testSub;
 	# return value of this not specified 
 }
 
@@ -69,16 +72,15 @@ sub is {
 
 define_test is => sub {
 	my ($self, $subject, $test, $expected, $reason) = @_; # self is the context, NOT the prototype
-	if($subject eq $expected) o{
+	if($subject eq $expected) {
 		return $self->test_pass($subject, $test, $expected, $reason); 
 	}
 	else {
 		return $self->test_fail($subject, $test, $expected, $reason);
 	}
-};
+}; 
 
-sub validate
-{
+sub validate {
 	my ($self, $subject, $context) = @_;
 	if (!defined $context or !ref $context){ # if context is not a TestRunner
 		$context = Test::Proto::TestRunner->new($context);

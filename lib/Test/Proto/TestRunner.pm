@@ -30,12 +30,12 @@ sub test_location {
 
 sub results {
 	my $self = shift;
-	return [grep { (!ref $_) or ($_->isa('Test::Proto::Info')) } $self->{'results'}];
+	return [grep { (!ref $_) or ($_->isa('Test::Proto::RunnerEvent') and $_->is_result) or (!$_->isa('Test::Proto::RunnerEvent')) } @{$self->{'log'}}];
 }
 sub _boolean_result {
 	my $self = shift;
-	foreach (@{$self->results}) {
-		return 0 unless $_;
+	foreach my $item (@{$self->results}) {
+		return 0 unless $item;
 	}
 	return 1;
 }

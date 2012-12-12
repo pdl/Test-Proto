@@ -7,6 +7,7 @@ use base 'Test::Proto::RunnerEvent';
 sub value {1;}
 
 sub is_result{1;}
+
 sub _to_string
 {
 	my $self = shift;

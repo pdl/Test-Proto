@@ -2,25 +2,16 @@ package Test::Proto::Fail;
 use 5.006;
 use strict;
 use warnings;
-use overload '""' => \&_to_string,  '0+' => sub{0}, fallback => '0+';
+use base 'Test::Proto::RunnerEvent';
+use overload '""' => \&_to_string,  '0+' => \&value, fallback => '0+';
 
-sub new
-{
-	my $class = shift;
-	my $warning = shift;
-	my $because = shift;
-	return $warning if ref $warning and $warning->isa('Test::Proto::Fail');
-	return $because if $because;
-	bless {
-		simple_warning => $warning,
-		trigger=>$because,
-	}, $class;
-}
+sub value {0;}
 
-sub _to_string
-{
+sub is_result{1;}
+
+sub _to_string {
 	my $self = shift;
-	my $return = "\nTest Prototype Failure:";
+	my $return = "\nTest Prototype Failed:";
 	my @why = @{$self->_why};
 	$return .= "\n\t" . shift @why;
 	foreach my $reason (@why)
@@ -29,18 +20,18 @@ sub _to_string
 	}
 	return $return;
 }
-sub _why
-{
+
+# this code is poor and needs replacing.
+sub _why {
 	my $self = shift;
-	my $return = [defined $self->{'simple_warning'} ? $self->{'simple_warning'} : '']; 
+	my $return = [defined $self->{'data'}{'simple_warning'} ? $self->{'data'}{'simple_warning'} : '']; 
 	if (defined $self->{'trigger'})
 	{
 		$return = [@$return,@{$self->{'trigger'}->_why}]
 	}
 	return $return;
 }
-sub because
-{
+sub because {
 	my $self = shift;
 	my $trigger = shift;
 	$self->{'trigger'} = $trigger;
