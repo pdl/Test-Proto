@@ -20,24 +20,6 @@ sub _to_string
 	}
 	return $return;
 }
-sub _why
-{
-	my $self = shift;
-	my $return = [defined $self->{'data'}{'simple_warning'} ? $self->{'simple_warning'} : '']; 
-	if (defined $self->{'trigger'})
-	{
-		$return = [@$return,@{$self->{'trigger'}->_why}]
-	}
-	return $return;
-}
-sub because
-{
-	my $self = shift;
-	my $trigger = shift;
-	$self->{'trigger'} = $trigger;
-	return $trigger if $trigger;
-	return $self;
-}
 
 1;
 
@@ -45,13 +27,13 @@ sub because
 
 =head1 NAME
 
-Test::Proto::Fail - Indicates the test has failed, and why
+Test::Proto::Pass - Indicates the test has failed, and why
 
 =head1 SYNOPSIS
 
-	$turnip_result = @turnips ? 1 : Test::Proto::Fail->new('Out of turnips');
-	$broth_result = Test::Proto::Fail->new('No broth', $turnip_result)
-	# i.e. $broth_result = $turnip_result ? 1 : Test::Proto::Fail->new('No broth')->because($turnip_result);
+	$turnip_result = Test::Proto::Pass->new('We have turnips') if @turnips;
+	$broth_result = Test::Proto::Pass->new('Broth is possible', $turnip_result);
+	$broth_result = Test::Proto::Pass->new($testRunner, 'Broth is possible', $turnip_result);
 	print $broth_result;
 
 Prints either 1 (if you have turnips) or an object which stringifies to:

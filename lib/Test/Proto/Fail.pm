@@ -21,24 +21,6 @@ sub _to_string {
 	return $return;
 }
 
-# this code is poor and needs replacing.
-sub _why {
-	my $self = shift;
-	my $return = [defined $self->{'data'}{'simple_warning'} ? $self->{'data'}{'simple_warning'} : '']; 
-	if (defined $self->{'trigger'})
-	{
-		$return = [@$return,@{$self->{'trigger'}->_why}]
-	}
-	return $return;
-}
-sub because {
-	my $self = shift;
-	my $trigger = shift;
-	$self->{'trigger'} = $trigger;
-	return $trigger if $trigger;
-	return $self;
-}
-
 1;
 
 =pod
