@@ -2,18 +2,9 @@ package Test::Proto::Diag;
 use 5.006;
 use strict;
 use warnings;
-use overload '""' => \&_to_string,  '0+' => sub{1}, fallback => '0+';
+use base 'Test::Proto::RunnerEvent';
 
-sub new
-{
-	my $class = shift;
-	my $warning = shift;
-	my $because = shift;
-	return bless {
-		simple_warning => $warning,
-		trigger=>$because,
-	}, $class;
-}
+sub is_info{1;}
 
 sub _to_string
 {

@@ -2,7 +2,9 @@ package Test::Proto::Info;
 use 5.006;
 use strict;
 use warnings;
-use overload '""' => \&_to_string,  '0+' => sub{1}, fallback => '0+';
+use base 'Test::Proto::RunnerEvent';
+
+sub is_info{1;}
 
 sub _to_string
 {
