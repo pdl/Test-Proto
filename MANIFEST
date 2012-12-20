@@ -9,11 +9,13 @@ lib/Test/Proto/Compare/Numeric.pm
 lib/Test/Proto/Diag.pm
 lib/Test/Proto/Exception.pm
 lib/Test/Proto/Fail.pm
+lib/Test/Proto/Formatter.pm
 lib/Test/Proto/HashRef.pm
 lib/Test/Proto/Info.pm
 lib/Test/Proto/Object.pm
 lib/Test/Proto/Pass.pm
 lib/Test/Proto/RunnerEvent.pm
+lib/Test/Proto/RunnerState.pm
 lib/Test/Proto/Series.pm
 lib/Test/Proto/String.pm
 lib/Test/Proto/Test.pm
@@ -33,6 +35,7 @@ t/Test-Proto-Compare.t
 t/Test-Proto-Diag.t
 t/Test-Proto-Exception.t
 t/Test-Proto-Fail.t
+t/Test-Proto-Formatter.t
 t/Test-Proto-HashRef.t
 t/Test-Proto-Info.t
 t/Test-Proto-HashRef.t

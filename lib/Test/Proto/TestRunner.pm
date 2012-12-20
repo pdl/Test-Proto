@@ -6,6 +6,7 @@ use Test::Proto::Fail;
 use Test::Proto::Pass;
 use Test::Proto::Exception;
 use Test::Proto::Diag;
+use Test::Proto::Formatter;
 use Data::Dumper; # not used in canonical but keep for the moment for development
 $Data::Dumper::Indent = 0;
 $Data::Dumper::Terse = 1;
@@ -75,6 +76,12 @@ sub current_state {
 		location=>$self->test_location
 	}
 }
+sub formatter {
+	my $self = shift;
+	$self->{'formatter'} = Test::Proto::Formatter->new() unless defined $self->{'formatter'};
+	return $self->{'formatter'};
+}
+
 
 
 return 1; # end of Test::Proto::TestRunner

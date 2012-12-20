@@ -1,5 +1,8 @@
 Revision history for Test-Proto
 
+Unreleased Changes	Undated
+		Rewritten the underlying logic of running the tests: this is now done by a TestRunner; refactored Pass/Fail objects as RunnerEvents; created a more robust DSL for defining prototype classes. 
+
 0.011	2012-06-14
 		Fixed prerequisites.
 

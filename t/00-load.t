@@ -10,10 +10,15 @@ BEGIN {
 		Test::Proto::CodeRef
 		Test::Proto::Compare
 		Test::Proto::Compare::Numeric
+		Test::Proto::Diag
 		Test::Proto::Exception
 		Test::Proto::Fail
+		Test::Proto::Formatter
 		Test::Proto::HashRef
+		Test::Proto::Info
 		Test::Proto::Object
+		Test::Proto::RunnerEvent
+		Test::Proto::RunnerState
 		Test::Proto::Series
 		Test::Proto::String
 		Test::Proto::Test
