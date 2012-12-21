@@ -6,19 +6,27 @@ use warnings;
 sub new
 {
 	my ($class, $testRunner, $args) = @_;
+	return undef unless ((ref $testRunner) and $testRunner->isa('Test::Proto::TestRunner'));
 	$args = {} unless (defined $args) and ((ref $args) eq ref {});
 	bless {
 		runner=>$testRunner,
+		location=>$testRunner->current_location,
 		data=>$args
 	}, $class;
 	# Use Weaken on runner parent?
 }
 
-sub runner{
+sub runner {
 	my ($self, $newRunner) = @_;
 	$self->{runner} = $newRunner if (defined $newRunner);
 	return $self->{runner};
 }
+
+sub location {
+	my ($self) = @_;
+	return $self->{location};
+}
+
 sub data {
 	my ($self, $newData) = @_;
 	if (defined $newData and ref $newData eq ref {}) {
@@ -46,6 +54,11 @@ This minimal formatter does precisely nothing.
 
 =head1 METHODS
 
+=head3 runner
+
+=head3 data
+
+=head3 location
 
 =head1 OTHER INFORMATION
 

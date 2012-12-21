@@ -26,6 +26,5 @@ $fail_runner->test_pass();
 $fail_runner->test_fail();
 ok($fail_runner?0:1, 'A runner with a pass then a fail still fails');
 
-# runner->test_location();
 done_testing;
 

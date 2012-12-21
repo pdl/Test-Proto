@@ -7,6 +7,7 @@ use Test::Proto::Pass;
 use Test::Proto::Exception;
 use Test::Proto::Diag;
 use Test::Proto::Formatter;
+use Test::Proto::RunnerState;
 use Data::Dumper; # not used in canonical but keep for the moment for development
 $Data::Dumper::Indent = 0;
 $Data::Dumper::Terse = 1;
@@ -24,17 +25,17 @@ sub new
 	}, $class;
 	return $self;
 }
-sub test_location {
-	my $self = shift;
+sub current_location {
+	my ($self) = @_;
 	return $self->{'location'};
 }
 
 sub results {
-	my $self = shift;
+	my ($self) = @_;
 	return [grep { (!ref $_) or ($_->isa('Test::Proto::RunnerEvent') and $_->is_result) or (!$_->isa('Test::Proto::RunnerEvent')) } @{$self->{'log'}}];
 }
 sub _boolean_result {
-	my $self = shift;
+	my ($self) = @_;
 	foreach my $item (@{$self->results}) {
 		return 0 unless $item;
 	}
@@ -71,18 +72,27 @@ sub test_exception {
 	return $self->test_result(Test::Proto::Exception->new(@_));
 }
 sub current_state {
-	my $self = shift;
-	return {
-		location=>$self->test_location
-	}
+	my ($self) = @_;
+	return Test::Proto::RunnerState->new($self)
 }
 sub formatter {
-	my $self = shift;
+	my ($self) = @_;
 	$self->{'formatter'} = Test::Proto::Formatter->new() unless defined $self->{'formatter'};
 	return $self->{'formatter'};
 }
 
 
+sub descend {
+	my ($self, $step) = @_;
+	push @{$self->current_location}, $step;
+	return $self;
+}
+
+sub ascend {
+	my ($self, $step) = @_;
+	pop @{$self->current_location};
+	return $self;
+}
 
 return 1; # end of Test::Proto::TestRunner
 
@@ -93,15 +103,13 @@ Test::Proto::TestRunner - Run through a prototype, record the results, and pass 
 =head1 SYNOPSIS
 
 	my $runner = Test::Runner->new;
-	my $child = $runner->new_subtest('/id');
+	# my $child = $runner->new_subtest('/id');
 	
 	$runner->test_fail();
 
 	$runner->test_pass();
 	$runner->test_diag();
 	$runner->test_note();
-
-	$runner->test_location();
 
 	$runner->report();
 	
