@@ -17,6 +17,7 @@ BEGIN {
 		Test::Proto::HashRef
 		Test::Proto::Info
 		Test::Proto::Object
+		Test::Proto::Pass
 		Test::Proto::RunnerEvent
 		Test::Proto::RunnerState
 		Test::Proto::Series
