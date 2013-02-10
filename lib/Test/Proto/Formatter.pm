@@ -44,7 +44,7 @@ Test::Proto::Formatter - handles output, formatting of RunnerEvents.
 
 	my $formatter = Test::Proto::Formatter->new();
 	$formatter->begin($testRunner); #? -> current_state?
-	$formatter->format($_) foreach @runnerEvents;
+	$formatter->format($_) foreach @runnerEvents; # no, this doesn't look right
 	$formatter->end($testRunner);
 
 The formatter is only used by the L<Test::Proto::TestRunner> class. There is no reason to call it anywhere else. However, if you are writing a test script you might want to write your own formatter to give it to the TestRunner. 
