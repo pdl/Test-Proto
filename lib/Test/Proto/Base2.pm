@@ -3,6 +3,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::Proto::TestRunner;
+use Moo;
 
 our $defined_tests = {};
 sub initialise
@@ -10,15 +11,26 @@ sub initialise
 	return $_[0];
 }
 
-sub new
-{
-	my $class = shift;
-	my $self = bless {
-		script=>[],
-	}, $class;
-	return $self->initialise;
-}
+has natural_type => (
+	is=>'rw',
+	default=>sub{''},,
+); # roughly corresponds to ref.
+has natural_script => (
+	is=>'rw',
+	default=>sub{[]},
+); # check if it is a bona fide X where X is the natural_type. Useful to avoid repeated ref checking.
+has user_script => (
+	is=>'rw',
+	default=>sub{[]},
+);
 
+sub script {
+	my $self = shift;
+	return [
+		@{ $self->natural_script },
+		@{ $self->user_script },
+	];
+}
 sub clone
 {
 	my $self = shift;
@@ -29,14 +41,14 @@ sub clone
 }
 sub add_test{
 	my $self = shift;
-	push $self->{script}, [@_];
+	push @{ $self->user_script }, [@_];
 	return $self;
 }
 
 sub run_test{
 	my ($self, $test, $subject, $context) = @_;
-	print ref ($context)."\n";
-	print "- ".(defined $_ ? $_: '[undefined]')."\n" foreach @$test;
+	print ref ($context)."\n"; # Huh?
+	print "- ".(defined $_ ? $_: '[undefined]')."\n" foreach @$test; # Huh?
 	my $package = ref $self;
 	$defined_tests->{$test->[0]}
 		->($context, $subject, @$test);
@@ -52,7 +64,7 @@ sub defined_tests {
 
 sub run_tests{
 	my ($self, $subject, $context) = @_;
-	foreach my $test (@{$self->{script}}){
+	foreach my $test (@{ $self->script }){
 		run_test($self, $test, $subject, $context);
 	}
 }
