@@ -6,7 +6,25 @@ use Test::Proto::TestRunner;
 use Moo;
 use Sub::Name;
 
-our $defined_tests = {};
+=pod
+
+=head1 NAME
+
+Test::Proto::Base2 - Base Class for Test Prototypes (Temporary name for replacement for Test::Proto::Base)
+
+=head1 SYNOPSIS
+
+	my $p = Test::Proto::Base2->new->is_eq(-5);
+	$p->ok ($temperature) # will fail unless $temperature is -5
+	$p->ok ($score) # you can use the same test multple times
+	ok($p->validate($score)) # If you like your "ok"s first
+
+This is a base class for test prototypes. 
+
+Note that it is a Moo class.
+
+=cut
+
 sub initialise
 {
 	return $_[0];
@@ -109,22 +127,15 @@ sub run_test{
 	print ref ($context)."\n"; # Huh?
 	print "- ".(defined $_ ? $_: '[undefined]')."\n" foreach @$test; # Huh?
 	my $package = ref $self;
-	#$defined_tests->{$test->[0]}
-	#	->($context, $subject, @$test);
 	{
 		no strict 'refs';
 		my $testMethodName = $package.'::TEST_'.$test->[0];
-		&{$testMethodName} ($context, $subject, @$test);
+		eval { &{$testMethodName} ($context, $subject, @$test); };
+		$context->text_exception($@) if $@;
 	}
 	return $self;
 }
 
-sub defined_tests {
-	# my ($package, $filename, $line) = caller;
-	# return ${$package."::defined_tests"}; 
-	return $defined_tests;
-
-}
 
 =head3 run_tests
 
@@ -162,7 +173,7 @@ sub define_test{
 	{
 		no strict 'refs';
 		my $fullName = $package.'::TEST_'.$testName;
-		*$fullName = subname ('TEST_'.$testName , $testSub);
+		*$fullName = subname ('TEST_'.$testName , $testSub); # Consider Sub::Install here, per Khisanth on irc.freenode.net#perl
 	}
 	# return value of this not specified 
 }
@@ -174,7 +185,6 @@ sub define_test{
 This test method adds a test which checks that the test subject is identical to the expected value. It uses the C<eq> comparison operator.
 
 =cut
-
 
 sub is {
 	my ($self, $expected, $reason) = @_;
@@ -191,6 +201,37 @@ define_test is => sub {
 		return $self->test_fail($subject, $test, $expected, $reason);
 	}
 }; 
+
+=head3 eq, ne, gt, lt, ge, lt, le
+
+	p->ge(c, 'a')->ok('b');
+	p->ge(cNum, 2)->ok(10);
+
+Tests sort order against a comparator. The first argument is a comparison function, see C<Test::Proto::Compare>. The second argument is the comparator.
+
+=cut
+
+define_test _cmp => sub {
+	# todo: implement the logic (!)
+	return sub {
+		my ($self, $subject, $test, $expected, $reason) = @_; # self is the context, NOT the prototype
+		if($subject le $expected) {
+			return $self->test_pass($subject, $test, $expected, $reason); 
+		}
+		else {
+			return $self->test_fail($subject, $test, $expected, $reason);
+		}
+	}
+}; 
+
+sub le
+{
+	my ($self, $cmp, $expected, $reason) = @_;
+	$self->add_test('le', _cmp($cmp, 'le', $expected), $reason);
+}
+
+
+#todo
 
 =head3 validate
 
@@ -213,4 +254,10 @@ sub validate {
 	run_tests($self, $subject, $context);
 	return $context;
 }
+
+=head1 OTHER INFORMATION
+
+For author, version, bug reports, support, etc, please see L<Test::Proto>. 
+
+=cut
 
