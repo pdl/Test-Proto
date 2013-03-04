@@ -160,7 +160,11 @@ sub cNum {
 
 =head1 AUTHOR
 
-Daniel Perrett, C<< <perrettdl at googlemail.com> >>
+Begin by Daniel Perrett, C<< <perrettdl at googlemail.com> >>
+
+=head1 CONTRIBUTORS
+
+Michael Schwern
 
 =head1 BUGS
 
@@ -197,9 +201,6 @@ L<http://cpanratings.perl.org/d/Test-Proto>
 L<http://search.cpan.org/dist/Test-Proto/>
 
 =back
-
-
-=head1 ACKNOWLEDGEMENTS
 
 
 
