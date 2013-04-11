@@ -2,7 +2,7 @@ package Test::Proto::Base2;
 use 5.006;
 use strict;
 use warnings;
-use Test::Proto::TestRunner;
+use Test::Proto::TestRunner2;
 use Moo;
 use Sub::Name;
 
@@ -124,15 +124,15 @@ This is documented for information purposes only and is not intended to be used 
 
 sub run_test{
 	my ($self, $test, $subject, $context) = @_;
-	print ref ($context)."\n"; # Huh?
-	print "- ".(defined $_ ? $_: '[undefined]')."\n" foreach @$test; # Huh?
+	my $runner =  $context->subtest(test_case=>$test, subject=>$subject);
 	my $package = ref $self;
 	{
 		no strict 'refs';
 		my $testMethodName = $package.'::TEST_'.$test->[0];
-		eval { &{$testMethodName} ($context, $subject, @$test); };
-		$context->text_exception($@) if $@;
+		eval { &{$testMethodName} ($runner, $subject, @$test); };
+		$runner->exception($@) if $@;
 	}
+	$runner->done;
 	return $self;
 }
 
@@ -141,7 +141,7 @@ sub run_test{
 
 	$self->run_tests($subject, $context);
 
-This method runs all the tests in the prototype object's script (simply calling the C<< ->run_tests >> method on each), and returns the prototype object. 
+This method runs all the tests in the prototype object's script (simply calling the C<< ->run_test >> method on each), and returns the prototype object. 
 
 This is documented for information purposes only and is not intended to be used except in the maintainance of C<Test::Proto> itself.
 
@@ -149,9 +149,11 @@ This is documented for information purposes only and is not intended to be used 
 
 sub run_tests{
 	my ($self, $subject, $context) = @_;
+	my $runner = $context->subtest(test_case=>$self);
 	foreach my $test (@{ $self->script }){
-		run_test($self, $test, $subject, $context);
+		run_test($self, $test, $subject, $runner);
 	}
+	$runner->done;
 	return $self;
 }
 
@@ -188,17 +190,17 @@ This test method adds a test which checks that the test subject is identical to 
 
 sub is {
 	my ($self, $expected, $reason) = @_;
-	$self->add_test('is', $expected, $reason);
+	$self->add_test('is', { expected => $expected }, $reason);
 	return $self;
 };
 
 define_test is => sub {
-	my ($self, $subject, $test, $expected, $reason) = @_; # self is the context, NOT the prototype
-	if($subject eq $expected) {
-		return $self->test_pass($subject, $test, $expected, $reason); 
+	my ($self, $subject, $test, $data, $reason) = @_; # self is the context, NOT the prototype
+	if($subject eq $data->{expected}) {
+		return $self->pass; 
 	}
 	else {
-		return $self->test_fail($subject, $test, $expected, $reason);
+		return $self->fail;
 	}
 }; 
 
@@ -216,10 +218,10 @@ define_test _cmp => sub {
 	return sub {
 		my ($self, $subject, $test, $expected, $reason) = @_; # self is the context, NOT the prototype
 		if($subject le $expected) {
-			return $self->test_pass($subject, $test, $expected, $reason); 
+			return $self->pass($subject, $test, $expected, $reason); 
 		}
 		else {
-			return $self->test_fail($subject, $test, $expected, $reason);
+			return $self->fail($subject, $test, $expected, $reason);
 		}
 	}
 }; 
@@ -249,9 +251,10 @@ If you have an existing TestRunner, you can pass it that as well;
 sub validate {
 	my ($self, $subject, $context) = @_;
 	if (!defined $context or !ref $context){ # if context is not a TestRunner
-		$context = Test::Proto::TestRunner->new($context);
+		$context = Test::Proto::TestRunner2->new(subject=>$subject);
 	}
 	run_tests($self, $subject, $context);
+	$context->done;
 	return $context;
 }
 

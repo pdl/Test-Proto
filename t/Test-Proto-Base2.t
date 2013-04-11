@@ -21,6 +21,5 @@ sub p { Test::Proto::Base2->new(); }
 is_a_good_pass(p->is('a')->validate('a'), "'a' is 'a' should pass");
 is_a_good_fail(p->is('a')->validate('b'), "'a' is 'b' should fail");
 
-
 done_testing;
 
