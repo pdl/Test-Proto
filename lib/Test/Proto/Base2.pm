@@ -3,6 +3,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::Proto::TestRunner2;
+use Test::Proto::TestCase;
 use Moo;
 use Sub::Name;
 
@@ -107,8 +108,24 @@ This is documented for information purposes only and is not intended to be used 
 =cut
 
 sub add_test{
-	my $self = shift;
-	push @{ $self->user_script }, [@_];
+	my ($self, $name, $data, $reason)  = @_;
+	my $package = ref $self;
+	my $testMethodName = $package.'::TEST_'.$name;
+	my $code = sub {
+		my $runner = shift;
+		my $subject = $runner->subject;
+		{
+			no strict 'refs';
+			eval { &{$testMethodName} ($runner, $subject, $data, $reason); };
+			$runner->exception($@) if $@;
+		}
+	};
+	push @{ $self->user_script }, Test::Proto::TestCase->new(
+		name=>$name,
+		code=>$code,
+		data=>$data,
+		reason=>$reason,
+	);
 	return $self;
 }
 
@@ -125,13 +142,7 @@ This is documented for information purposes only and is not intended to be used 
 sub run_test{
 	my ($self, $test, $subject, $context) = @_;
 	my $runner =  $context->subtest(test_case=>$test, subject=>$subject);
-	my $package = ref $self;
-	{
-		no strict 'refs';
-		my $testMethodName = $package.'::TEST_'.$test->[0];
-		eval { &{$testMethodName} ($runner, $subject, @$test); };
-		$runner->exception($@) if $@;
-	}
+	$test->code->($runner);
 	$runner->done;
 	return $self;
 }
@@ -195,7 +206,7 @@ sub is {
 };
 
 define_test is => sub {
-	my ($self, $subject, $test, $data, $reason) = @_; # self is the context, NOT the prototype
+	my ($self, $subject, $data, $reason) = @_; # self is the context, NOT the prototype
 	if($subject eq $data->{expected}) {
 		return $self->pass; 
 	}

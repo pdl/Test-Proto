@@ -21,5 +21,8 @@ sub p { Test::Proto::Base2->new(); }
 is_a_good_pass(p->is('a')->validate('a'), "'a' is 'a' should pass");
 is_a_good_fail(p->is('a')->validate('b'), "'a' is 'b' should fail");
 
+# use Data::Dumper;
+# diag (Dumper p->is('a')->validate('a'));
+
 done_testing;
 
