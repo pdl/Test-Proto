@@ -109,7 +109,8 @@ This is documented for information purposes only and is not intended to be used 
 
 sub add_test{
 	my ($self, $name, $data, $reason)  = @_;
-	my $package = ref $self;
+	my $package = ref $self; 
+  
 	my $testMethodName = $package.'::TEST_'.$name;
 	my $code = sub {
 		my $runner = shift;
@@ -117,7 +118,7 @@ sub add_test{
 		{
 			no strict 'refs';
 			eval { &{$testMethodName} ($runner, $subject, $data, $reason); };
-			$runner->exception($@) if $@;
+			$runner->parent->exception($@) if $@;
 		}
 	};
 	push @{ $self->user_script }, Test::Proto::TestCase->new(
@@ -202,11 +203,10 @@ This test method adds a test which checks that the test subject is identical to 
 sub is {
 	my ($self, $expected, $reason) = @_;
 	$self->add_test('is', { expected => $expected }, $reason);
-	return $self;
 };
 
 define_test is => sub {
-	my ($self, $subject, $data, $reason) = @_; # self is the context, NOT the prototype
+	my ($self, $subject, $data, $reason) = @_; # self is the runner, NOT the prototype
 	if($subject eq $data->{expected}) {
 		return $self->pass; 
 	}
@@ -215,7 +215,7 @@ define_test is => sub {
 	}
 }; 
 
-=head3 eq, ne, gt, lt, ge, lt, le
+=head3 eq, ne, gt, lt, ge, le
 
 	p->ge(c, 'a')->ok('b');
 	p->ge(cNum, 2)->ok(10);
@@ -223,26 +223,44 @@ define_test is => sub {
 Tests sort order against a comparator. The first argument is a comparison function, see C<Test::Proto::Compare>. The second argument is the comparator.
 
 =cut
-
-define_test _cmp => sub {
-	# todo: implement the logic (!)
-	return sub {
-		my ($self, $subject, $test, $expected, $reason) = @_; # self is the context, NOT the prototype
-		if($subject le $expected) {
-			return $self->pass($subject, $test, $expected, $reason); 
-		}
-		else {
-			return $self->fail($subject, $test, $expected, $reason);
-		}
-	}
-}; 
-
-sub le
-{
-	my ($self, $cmp, $expected, $reason) = @_;
-	$self->add_test('le', _cmp($cmp, 'le', $expected), $reason);
+sub eq {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('eq', { expected => $expected }, $reason);
+}
+sub ne {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('ne', { expected => $expected }, $reason);
+}
+sub gt {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('gt', { expected => $expected }, $reason);
+}
+sub lt {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('lt', { expected => $expected }, $reason);
+}
+sub ge {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('ge', { expected => $expected }, $reason);
+}
+sub le {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('le', { expected => $expected }, $reason);
 }
 
+foreach my $dir (qw(eq ne gt lt ge le)){
+	define_test $dir => sub {
+		my ($self, $subject, $data, $reason) = @_; # self is the runner, NOT the prototype
+		my $result;
+		eval "\$result = \$subject $dir \$data->{expected}";
+		if($result) {
+			return $self->pass; 
+		}
+		else {
+			return $self->fail;
+		}
+	}; 
+}
 
 #todo
 
@@ -274,4 +292,4 @@ sub validate {
 For author, version, bug reports, support, etc, please see L<Test::Proto>. 
 
 =cut
-
+1;

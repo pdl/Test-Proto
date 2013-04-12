@@ -121,6 +121,17 @@ has 'children'  =>
 	is => 'rw',
 	default => sub{[]};
 
+=head3 status_message
+
+This is a string which indicates the reason for skipping, exception info, etc.
+
+=cut
+
+has 'status_message'  =>
+	is => 'rw',
+	default => sub{''};
+
+
 =head3 formatter
 
 Returns the formatter used.
@@ -140,12 +151,13 @@ Declares the test run is complete. It is intended that this is only called by th
 =cut
 
 sub complete {
-	my ($self, $value) = @_;
+	my ($self, $value, $message) = @_;
 	if ($self->is_complete){
 		warn "Tried to complete something that was already complete.";
 		return $self;
 	}
 	$self->value($value);
+	$self->status_message($message);
 	$self->_set_is_complete(1);
 	$self->inform_formatter('done');
 	return $self;
@@ -196,7 +208,7 @@ Declares that the test run is complete, and determines if the result is a pass o
 =cut
  
 sub done {
-	my $self = shift;
+	my ($self, $message) = @_;
 	$self->complete($self->_count_fails?0:1);
 	return $self;
 }
@@ -230,8 +242,8 @@ Declares that the test run is complete, and declares the result to be a failure,
 =cut
 
 sub fail{
-	my $self = shift;
-	$self->complete(0);
+	my ($self, $message) = @_;
+	$self->complete(0, $message);
 	return $self;
 }
 
@@ -244,7 +256,7 @@ Declares that the test run is complete, and declares that it is not a result but
 =cut
 
 sub diag{
-	my $self = shift;
+	my ($self, $message) = @_;
 	$self->_set_is_info(1);
 	$self->complete(1);
 	return $self;
@@ -259,9 +271,9 @@ Declares that the test run is complete, but that it was skipped.
 =cut
 
 sub skip{
-	my $self = shift;
+	my ($self, $message) = @_;
 	$self->_set_is_skipped(1);
-	$self->complete(1);
+	$self->complete(1, $message);
 	return $self;
 }
 
@@ -274,9 +286,9 @@ Declares that the test run is complete, and declares the result to be an excepti
 =cut
 
 sub exception{
-	my $self = shift;
+	my ($self, $message) = @_;
 	$self->_set_is_exception(1);
-	$self->complete(0);
+	$self->complete(0, $message);
 	return $self;
 }
 
