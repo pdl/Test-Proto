@@ -117,7 +117,7 @@ sub add_test{
 		my $subject = $runner->subject;
 		{
 			no strict 'refs';
-			eval { &{$testMethodName} ($runner, $subject, $data, $reason); };
+			eval { &{$testMethodName} ($runner, $data, $reason); };
 			$runner->parent->exception($@) if $@;
 		}
 	};
@@ -206,8 +206,8 @@ sub is {
 };
 
 define_test is => sub {
-	my ($self, $subject, $data, $reason) = @_; # self is the runner, NOT the prototype
-	if($subject eq $data->{expected}) {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	if($self->subject eq $data->{expected}) {
 		return $self->pass; 
 	}
 	else {
@@ -250,11 +250,11 @@ sub le {
 
 foreach my $dir (qw(eq ne gt lt ge le)){
 	define_test $dir => sub {
-		my ($self, $subject, $data, $reason) = @_; # self is the runner, NOT the prototype
+		my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
 		my $result;
-		eval "\$result = \$subject $dir \$data->{expected}";
+		eval "\$result = \$self->subject $dir \$data->{expected}";
 		if($result) {
-			return $self->pass; 
+			return $self->pass;
 		}
 		else {
 			return $self->fail;
