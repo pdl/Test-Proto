@@ -5,24 +5,8 @@ use Test::More;
 BEGIN {
 	foreach (qw(
 		Test::Proto
-		Test::Proto::ArrayRef
 		Test::Proto::Base
-		Test::Proto::CodeRef
-		Test::Proto::Compare
-		Test::Proto::Compare::Numeric
-		Test::Proto::Diag
-		Test::Proto::Exception
-		Test::Proto::Fail
-		Test::Proto::Formatter
-		Test::Proto::HashRef
-		Test::Proto::Info
-		Test::Proto::Object
-		Test::Proto::Pass
-		Test::Proto::RunnerEvent
-		Test::Proto::RunnerState
-		Test::Proto::Series
-		Test::Proto::String
-		Test::Proto::Test
+		Test::Proto::TestCase
 		Test::Proto::TestRunner
 	))
 	{

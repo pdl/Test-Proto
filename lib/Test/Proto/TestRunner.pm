@@ -2,124 +2,304 @@ package Test::Proto::TestRunner;
 use 5.006;
 use strict;
 use warnings;
-use Test::Proto::Fail;
-use Test::Proto::Pass;
-use Test::Proto::Exception;
-use Test::Proto::Diag;
-use Test::Proto::Formatter;
-use Test::Proto::RunnerState;
-use Data::Dumper; # not used in canonical but keep for the moment for development
-$Data::Dumper::Indent = 0;
-$Data::Dumper::Terse = 1;
-$Data::Dumper::Sortkeys = 1;
-use overload 'bool'=> \&_boolean_result;
+use overload 'bool'=> sub{$_[0]->value};
+use Moo;
 
-sub new
-{
-	my $class = shift;
-	my $self = bless {
-		# formatter
-		# format push
-		location=>[],
-		log=>[],
-	}, $class;
-	return $self;
-}
-sub current_location {
-	my ($self) = @_;
-	return $self->{'location'};
-}
-
-sub results {
-	my ($self) = @_;
-	return [grep { (!ref $_) or ($_->isa('Test::Proto::RunnerEvent') and $_->is_result) or (!$_->isa('Test::Proto::RunnerEvent')) } @{$self->{'log'}}];
-}
-sub _boolean_result {
-	my ($self) = @_;
-	foreach my $item (@{$self->results}) {
-		return 0 unless $item;
-	}
-	return 1;
-}
-sub test_result {
-	my ($self, $result) = @_;
-	push (@{$self->{log}}, $result);
-	return $result;
-}
-
-sub test_pass {
-	my ($self) = @_;
-	return $self->test_result(Test::Proto::Pass->new(@_));
-}
-
-sub test_note {
-	my ($self) = @_;
-	return $self->test_result(Test::Proto::Diag->new(@_));
-}
-
-sub test_diag {
-	my ($self) = @_;
-	return $self->test_result(Test::Proto::Diag->new(@_));
-}
-
-sub test_fail {
-	my ($self) = @_;
-	return $self->test_result(Test::Proto::Fail->new(@_));
-}
-
-sub test_exception {
-	my ($self) = @_;
-	return $self->test_result(Test::Proto::Exception->new(@_));
-}
-sub current_state {
-	my ($self) = @_;
-	return Test::Proto::RunnerState->new($self)
-}
-sub formatter {
-	my ($self) = @_;
-	$self->{'formatter'} = Test::Proto::Formatter->new() unless defined $self->{'formatter'};
-	return $self->{'formatter'};
-}
-
-
-sub descend {
-	my ($self, $step) = @_;
-	push @{$self->current_location}, $step;
-	return $self;
-}
-
-sub ascend {
-	my ($self, $step) = @_;
-	pop @{$self->current_location};
-	return $self;
-}
-
-return 1; # end of Test::Proto::TestRunner
+sub zero { sub { 0;} };
 
 =head1 NAME
 
-Test::Proto::TestRunner - Run through a prototype, record the results, and pass them to a formatter. 
+Test::Proto::BaseTestRunner - Embodies a run through a test
 
 =head1 SYNOPSIS
 
-	my $runner = Test::Runner->new;
-	# my $child = $runner->new_subtest('/id');
-	
-	$runner->test_fail();
+		my $runner = Test::Proto::TestRunner->new(test_case=>$testCase);
+		my $subRunner $runner->subtest;
+		$subRunner->pass;
+		$runner->done();
 
-	$runner->test_pass();
-	$runner->test_diag();
-	$runner->test_note();
+Note that it is a Moo class.
 
-	$runner->report();
-	
-
-The TestRunner is designed to be passed into tests in prototypes. Normally, the author of a test script should not even be aware of the TestRunner, unless they want to set its formatter. A Test Prototype author might interact with the TestRunner to pass results or diagnostics into it but does not create it. 
-
-=head1 OTHER INFORMATION
-
-For author, version, bug reports, support, etc, please see L<Test::Proto>. 
+Unless otherwise specified, the return value is itself.
 
 =cut
 
+
+sub BUILD {
+	my $self = shift;
+	$self->inform_formatter('new');
+}
+
+=head2 ATTRIBUTES
+
+=cut
+
+=head3 subject
+
+Returns the test subject
+
+=cut
+
+has 'subject' =>
+	is => 'rw';
+
+=head3 test_case
+
+Returns the test case or the prototype
+
+=cut
+
+has 'test_case' =>
+	is => 'rw';
+
+=head3 parent
+
+Returns the parent of the test.
+
+=cut
+
+has 'parent' =>
+	is => 'rwp';
+
+=head3 is_complete
+
+Returns C<1> if the test run has finished, C<0> otherwise.
+
+=cut
+
+has 'is_complete' =>
+	is => 'rwp',
+	default => zero;
+
+=head3 value
+
+Returns C<0> if the test run has failed or exception, C<1> otherwise.
+
+=cut
+
+has 'value' =>
+	is => 'rw',
+	default => zero;
+
+=head3 is_exception
+
+Returns C<1> if the test run has run into an exception, C<0> otherwise.
+
+=cut
+
+has 'is_exception'  =>
+	is => 'rwp',
+	default => zero;
+
+=head3 is_info
+
+Returns C<1> if the result is for information purposes, C<0> otherwise.
+
+=cut
+
+has 'is_info'  =>
+	is => 'rwp',
+	default => zero; 
+
+=head3 is_skipped
+
+Returns C<1> if the test case was skipped, C<0> otherwise.
+
+=cut
+
+has 'is_skipped'  =>
+	is => 'rwp',
+	default => zero;
+
+=head3 children
+
+Returns an arrayref 
+
+=cut
+
+has 'children'  =>
+	is => 'rw',
+	default => sub{[]};
+
+=head3 status_message
+
+This is a string which indicates the reason for skipping, exception info, etc.
+
+=cut
+
+has 'status_message'  =>
+	is => 'rw',
+	default => sub{''};
+
+
+=head3 formatter
+
+Returns the formatter used.
+
+=cut
+
+has 'formatter' =>
+	is => 'rw'; # Test::Proto::Common::Formatter->new;
+
+
+=head3 complete
+
+	$self->complete(0);
+
+Declares the test run is complete. It is intended that this is only called by the other methods C<done>, C<pass>, C<fail>, C<exception>, C<diag>, C<skip>.
+
+=cut
+
+sub complete {
+	my ($self, $value, $message) = @_;
+	if ($self->is_complete){
+		use Data::Dumper;
+		warn "Tried to complete something that was already complete. (Tried with value=> " . ($value // '[undefined]') . ", message=>". ($message // '[undefined]') .", self=> " .Dumper ($self);
+		return $self;
+	}
+	$self->value($value);
+	$self->status_message($message);
+	$self->_set_is_complete(1);
+	$self->inform_formatter('done');
+	return $self;
+}
+
+=head3 subtest
+
+=cut
+sub subtest{
+	my $self = shift;
+	my $event = __PACKAGE__->new({
+		formatter=> $self->formatter,
+		subject=> $self->subject,
+		test_case=> $self->test_case,
+		parent=>$self,
+		@_
+	});
+	$self->add_event($event);
+	return $event;
+}
+
+=head3 add_event
+
+Adds an event to the runner. 
+
+=cut
+
+sub add_event {
+	my ($self, $event) = @_;
+	if ($self->is_complete){
+		warn "Tried to add an event to a TestRunner which is already complete";
+	}
+	else{
+		unless (defined $event){
+			die('tried to add an undefined event');
+		}
+		push @{$self->children}, $event;
+	}
+	return $self;
+}
+
+=head3 done
+
+	$self->done;
+
+Declares that the test run is complete, and determines if the result is a pass or a fail - if there are any failures, then the result is deemed to be a failure. 
+
+=cut
+ 
+sub done {
+	my ($self, $message) = @_;
+	$self->complete($self->_count_fails?0:1);
+	return $self;
+}
+
+sub _count_fails {
+	my $self = shift;
+	return scalar grep { !$_->value } @{ $self->children() };
+}
+# add_(pass|fail|diag|exception) to spec further
+
+=head3 pass
+
+	$self->pass;
+
+Declares that the test run is complete, and declares the result to be a pass, irrespective of what the results of the subtests were. 
+
+=cut
+
+sub pass{
+	my $self = shift;
+	$self->complete(1);
+	return $self;
+}
+
+=head3 fail
+
+	$self->fail;
+
+Declares that the test run is complete, and declares the result to be a failure, irrespective of what the results of the subtests were. 
+
+=cut
+
+sub fail{
+	my ($self, $message) = @_;
+	$self->complete(0, $message);
+	return $self;
+}
+
+=head3 diag
+
+	$self->diag;
+
+Declares that the test run is complete, and declares that it is not a result but a diagnostic message, irrespective of what the results of the subtests were. 
+
+=cut
+
+sub diag{
+	my ($self, $message) = @_;
+	$self->_set_is_info(1);
+	$self->complete(1);
+	return $self;
+}
+
+=head3 skip
+
+	$self->skip;
+
+Declares that the test run is complete, but that it was skipped.
+
+=cut
+
+sub skip{
+	my ($self, $message) = @_;
+	$self->_set_is_skipped(1);
+	$self->complete(1, $message);
+	return $self;
+}
+
+=head3 exception
+
+	$self->exception;
+
+Declares that the test run is complete, and declares the result to be an exception, irrespective of what the results of the subtests were. 
+
+=cut
+
+sub exception{
+	my ($self, $message) = @_;
+	$self->_set_is_exception(1);
+	$self->complete(0, $message);
+	return $self;
+}
+
+sub inform_formatter{
+	my $self = shift;
+	my $formatter = $self->formatter;
+	if (defined $formatter){ 
+		$formatter->event(@_);
+	}
+}
+
+1;
 

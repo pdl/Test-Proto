@@ -3,19 +3,9 @@ package Test::Proto;
 use 5.006;
 use strict;
 use warnings;
-use Test::Proto::String;
 use Test::Proto::Base;
-# use Test::Proto::Undef;
-use Test::Proto::HashRef;
-use Test::Proto::Series;
-use Test::Proto::ArrayRef;
-use Test::Proto::Fail; # need we load this here?
-use Test::Proto::CodeRef;
-use Test::Proto::Compare;
-use Test::Proto::Compare::Numeric;
-use Test::Proto::Object;
 use base "Exporter";
-our @EXPORT_OK = qw(&p &pSomething &pSt &pOb &pHr &pAr &pSeries &pCr &c &cNum); # symbols to export on request
+our @EXPORT_OK = qw(&p); # symbols to export on request
 
 =head1 NAME
 
@@ -34,13 +24,13 @@ our $VERSION = ${Test::Proto::Base::VERSION};
 
 This module simplifies writing tests for deep structures and objects.
 
-	use Test::Proto;
+	use Test::Proto qw(p);
 	
 	pAr	->contains_only('', pHr, 
 			"ArrayRef must contain only an empty string followed by a hashref")
 		->ok(["", {a=>'b'}]);
 	
-	pSt	->is_like(qr/^\d+$/, 'looks like a positive integer')
+	p	->is_like(qr/^\d+$/, 'looks like a positive integer')
 		->is_unlike(qr/^0\d+$/, 'no leading zeros')
 		->ok('123');
 	
@@ -68,95 +58,6 @@ sub p {
 	return Test::Proto::Base->new();
 }
 
-=head2 pSomething
-
-Returns a defined prototype. See L<Test::Proto::Base>.
-
-=cut
-
-sub pSomething {
-	return Test::Proto::Base->new()->is_defined;
-}
-
-=head2 pSt
-
-Returns a string prototype. See L<Test::Proto::String>.
-
-=cut
-
-sub pSt {
-	return Test::Proto::String->new();
-}
-
-=head2 pOb
-
-Returns an object prototype. See L<Test::Proto::Object>.
-
-=cut
-
-sub pOb {
-	return Test::Proto::Object->new();
-}
-
-=head2 pAr
-
-Returns an arrayref prototype. See L<Test::Proto::ArrayRef>.
-
-=cut
-
-sub pAr {
-	return Test::Proto::ArrayRef->new();
-}
-
-=head2 pHr
-
-Returns a hashref prototype. See L<Test::Proto::HashRef>.
-
-=cut
-
-sub pHr {
-	return Test::Proto::HashRef->new();
-}
-
-=head2 pCr
-
-Returns a coderef prototype. See L<Test::Proto::CodeRef>.
-
-=cut
-
-sub pCr {
-	return Test::Proto::CodeRef->new();
-}
-
-=head2 pSeries
-
-Returns a series. See L<Test::Proto::Series>.
-
-=cut
-
-sub pSeries {
-	return Test::Proto::Series->new(@_);
-}
-
-=head2 c
-
-Returns a comparison object. See L<Test::Proto::Compare>.
-
-=cut
-
-sub c {
-	return Test::Proto::Compare->new(@_);
-}
-
-=head2 cNum
-
-Returns a numeric comparison object. See L<Test::Proto::Compare::Numeric>.
-
-=cut
-
-sub cNum {
-	return Test::Proto::Compare::Numeric->new(@_);
-}
 
 =head1 AUTHOR
 

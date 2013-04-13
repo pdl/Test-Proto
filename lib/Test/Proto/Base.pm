@@ -2,560 +2,353 @@ package Test::Proto::Base;
 use 5.006;
 use strict;
 use warnings;
-use base 'Test::Builder::Module';
-use Test::Deep::NoTest; # provides eq_deeply for _is_deeply. Consider removing this dependency.
-use Test::Proto::Test;
-use Test::Proto::Fail;
-use Test::Proto::Exception;
-use Data::Dumper; # not used in canonical but keep for the moment for development
-$Data::Dumper::Indent = 0;
-$Data::Dumper::Terse = 1;
-$Data::Dumper::Sortkeys = 1;
-our $VERSION = '0.011';
-my $CLASS = __PACKAGE__;
+use Test::Proto::TestRunner;
+use Test::Proto::TestCase;
+use Moo;
+use Sub::Name;
+
+=pod
+
+=head1 NAME
+
+Test::Proto::Base - Base Class for Test Prototypes
+
+=head1 SYNOPSIS
+
+	my $p = Test::Proto::Base2->new->is_eq(-5);
+	$p->ok ($temperature) # will fail unless $temperature is -5
+	$p->ok ($score) # you can use the same test multple times
+	ok($p->validate($score)) # If you like your "ok"s first
+
+This is a base class for test prototypes. 
+
+Note that it is a Moo class.
+
+=cut
 
 sub initialise
 {
 	return $_[0];
 }
 
-sub new
-{
-	my $class = shift;
-	my $self = bless {
-		tests=>[],
-	}, $class;
-	return $self->initialise;
+=head3 natural_type
+
+This roughly corresponds to C<ref>. Useful for indicating what sort of element you're expecting.
+
+This is documented for information purposes only and is not intended to be used except in the maintainance of C<Test::Proto> itself.
+
+=cut
+
+has natural_type => (
+	is=>'rw',
+	default=>sub{''},,
+); # roughly corresponds to ref.
+
+=head3 natural_script
+
+These are tests common to the whole prototype which need not be repeated if two similar scripts are joined together. Normally, this should only be modified by the prototype class.
+
+This is documented for information purposes only and is not intended to be used except in the maintainance of C<Test::Proto> itself.
+
+=cut
+
+has natural_script => (
+	is=>'rw',
+	default=>sub{[]},
+); 
+=head3 user_script
+
+These are the tests which the user (specifically, the test script author) has added by a method call. Normally, these should empty in a class but may be present in an instance of an object.
+
+This is documented for information purposes only and is not intended to be used except in the maintainance of C<Test::Proto> itself.
+
+=cut
+
+
+has user_script => (
+	is=>'rw',
+	default=>sub{[]},
+);
+
+=head3 script
+
+This method returns an arrayref containing the contents of the C<natural_script> and the C<user_script>, i.e. all the tests in the object that are due to be run when C<< ->ok() >> is called.
+
+=cut
+
+sub script {
+	my $self = shift;
+	return [
+		@{ $self->natural_script },
+		@{ $self->user_script },
+	];
 }
+
+=head3 script
+
+This method returns a copy of the current object. The new object can have tests added without affecting the existing test.
+
+=cut
 
 sub clone
 {
 	my $self = shift;
 	my $new = bless {
-		tests=>$self->{'tests'},
+		script=>$self->{'script'}, # that won't work!
 	}, ref $self;
 	return $new;
 }
 
-sub add_test #???
-{
-	my ($self, $testtype, @args) = @_;
-	my $test = Test::Proto::Test->new($testtype, @args);
-
-	if (defined $test)
-	{
-		push @{$self->{'tests'}}, $test;
-	}
-	else
-	{
-		warn 'Failed to create test!'; # exception?
-		return undef;
-	}
-
-	return $self;
-}
-sub _is_defined
-{
-	return sub{
-		my $got = shift;
-		return fail('undef') unless defined $got;
-		return 1;
-	};
-}
-sub _can_be_string
-{
-	return sub{
-		eval {$_[0] .= ''};
-		return exception($@) if $@;
-		return 1;
-	};
-}
-sub as_string
-{
-	my ($self, $expected, $why) = @_;
-	$self->add_test(_as_string($self->upgrade($expected)), $why);
-}
-
-sub _as_string
-{
-	my ($expected) = @_;
-	return sub{
-		return $expected->validate("$_[0]");
-	};
-}
-sub as_number
-{
-	my ($self, $expected, $why) = @_;
-	$self->add_test(_as_number($self->upgrade($expected)), $why);
-}
-sub _as_number
-{
-	my ($expected) = @_;
-	return sub{
-		return $expected->validate(0+$_[0]);
-	};
-}
-sub as_bool
-{
-	my ($self, $expected, $why) = @_;
-	$self->add_test(_as_bool($self->upgrade($expected)), $why);
-}
-sub _as_bool
-{
-	my ($expected) = @_;
-	return sub{
-		return $expected->validate($_[0] ? 1 : 0);
-	};
-}
-
-sub _is_a
-{
-	my ($type) = @_;
-	return sub{
-		my $got = shift;
-		$type = ref $type if (ref $type);
-		unless (ref $got)
-		{
-			return 'SCALAR' eq $type ? 1 : fail('SCALAR ne '.$type) ;
-		}
-		foreach (qw(
-		SCALAR
-		ARRAY
-		HASH
-		CODE
-		REF
-		GLOB
-		LVALUE
-		FORMAT
-		IO
-		VSTRING
-		Regexp))
-		{
-			if (ref $got eq $_)
-			{
-				return $_ eq $type ? 1 : fail ("$_ ne $type");
-			}
-		}
-		return $got->isa($type);
-	}
-}
-sub _is_ne
-{
-	my ($expected) = @_;
-	return sub{
-		my $got = shift;
-		my $result;
-		eval {$result = "$got" ne "$expected"};
-		return exception($@) if $@;
-		return $result ? 1 : fail("\"$got\" eq \"$expected\"");
-	};
-}
-sub _is_also
-{
-	my ($expected) = @_;
-	return sub{
-		my $got = shift;
-		my $result;
-		eval {$result = $expected->validate($got)};
-		return exception($@) if $@;
-		return $result;
-	};
-}
-
-sub validate
-{
-	my ($self, $got) = @_;
-	foreach (@{$self->{'tests'}})
-	{
-		my $result = $_->run($got);
-		return $result unless $result;
-	}
-	return 1;
-}
-sub is_also
-{
-	my ($self, $expected, $why) = @_;
-	$self->add_test(_is_also($self->upgrade($expected)), $why);
-}
-
-sub is_a
-{
-	my ($self, $expected, $why) = @_;
-	$self->add_test(_is_a($expected), $why);
-}
-sub is_defined
-{
-	my ($self, $why) = @_;
-	$self->add_test(_is_defined(), $why);
-}
-sub ok
-{
-	my($self, $got, $why) = @_;
-	my $tb = $CLASS->builder;
-	my $result = $self->validate($got);
-	# output failure:
-	$tb->diag($result) unless $result;
-	return $tb->ok($result, $why);
-}
-sub eq
-{
-	my ($self, $cmp, $expected, $why) = @_;
-	$self->add_test(_cmp($cmp, 'eq', $expected), $why);
-}
-sub ne
-{
-	my ($self, $cmp, $expected, $why) = @_;
-	$self->add_test(_cmp($cmp, 'ne', $expected), $why);
-}
-sub gt
-{
-	my ($self, $cmp, $expected, $why) = @_;
-	$self->add_test(_cmp($cmp, 'gt', $expected), $why);
-}
-sub ge
-{
-	my ($self, $cmp, $expected, $why) = @_;
-	$self->add_test(_cmp($cmp, 'ge', $expected), $why);
-}
-sub lt
-{
-	my ($self, $cmp, $expected, $why) = @_;
-	$self->add_test(_cmp($cmp, 'lt', $expected), $why);
-}
-sub le
-{
-	my ($self, $cmp, $expected, $why) = @_;
-	$self->add_test(_cmp($cmp, 'le', $expected), $why);
-}
-
-sub is_eq
-{
-	my ($self, $expected, $why) = @_;
-	$self->add_test(_is_eq($expected), $why);
-}
-sub is_ne
-{
-	my ($self, $expected, $why) = @_;
-	$self->add_test(_is_ne($expected), $why);
-}
-sub is_deeply
-{
-	my ($self, $expected, $why) = @_;
-	$self->add_test(_is_deeply($expected), $why);
-}
-sub is_like
-{
-	my ($self, $expected, $why) = @_;
-	$self->add_test(_is_like($expected), $why);
-}
-sub is_unlike
-{
-	my ($self, $expected, $why) = @_;
-	$self->add_test(_is_unlike($expected), $why);
-}
-sub _is_eq
-{
-	my ($expected) = @_;
-	return sub{
-		my $got = shift;
-		my $result;
-		eval {$result = "$got" eq "$expected"};
-		return exception($@) if $@;
-		return $result ? 1 : fail("\"$got\" ne \"$expected\"");
-	};
-}
-sub _cmp
-{
-	my ($cmp, $type, $expected) = @_;
-	return sub{
-		my $got = shift;
-		my $result;
-		my $success=0;
-		eval {$result = &{$cmp}($got,$expected)};
-		return exception($@) if $@;
-		if ($result > 0 and $type =~ /ge|gt|ne/)
-		{
-			$success = 1;
-		}
-		elsif ($result == 0 and $type =~ /ge|le|eq/)
-		{
-			$success = 1;
-		}
-		elsif ($result < 0 and $type =~ /lt|le|ne/)
-		{
-			$success = 1;
-		}
-		return $success ? 1 : fail("\"$got\" !$type \"$expected\"");
-	};
-}
-sub _is_deeply
-{
-	my ($expected) = @_;
-	return sub{
-		my $got = shift;
-		my $result;
-		eval {$result=eq_deeply ($got, $expected)}; # consider replacing this with something more 'native' later. 
-		return exception($@) if $@;
-		return $result ? 1 : fail(Dumper ($got). " !is_deeply ". Dumper($expected));
-	};
-}
-sub _is_like
-{
-	my ($expected) = @_;
-	return sub{
-		my $got = shift;
-		my $result;
-		eval {$result = "$got" =~ m/$expected/};
-		return exception($@) if $@;
-		return $result ? 1 : fail("\"$got\" !~ /$expected/");
-	};
-}
-sub _is_unlike
-{
-	my ($expected) = @_;
-	return sub{
-		my $got = shift;
-		my $result;
-		eval {$result = "$got" !~ m/$expected/};
-		return exception($@) if $@;
-		return $result ? 1 : fail("\"$got\" =~ /$expected/");
-	};
-}
-
-sub try
-{
-	my ($self, $code, $why) = @_;
-	$self->add_test(_try($code), $why);
-}
-sub _try
-{
-	my ($code) = @_;
-	return sub{
-		my $got = shift;
-		my $result;
-		eval {$result = &{$code}($got)};
-		return exception($@) if $@;
-		return $result ? 1 : fail("try returned ".$result);
-	};
-}
-sub upgrade
-{
-	my ($self, $expected, $why) = @_;
-	if (&{_is_a('SCALAR')}($expected))
-	{
-		return Test::Proto::Base->new($why)->is_eq($expected);
-	}
-	# returns => implicit elses
-	if (&{_is_a('Test::Proto::Base')}($expected) or &{_is_a('Test::Proto::Series')}($expected))
-	{
-		return $expected;
-	}
-	if (&{_is_a('Regexp')}($expected))
-	{
-		return Test::Proto::Base->new($why)->is_like($expected);
-	}
-	if (&{_is_a('ARRAY')}($expected))
-	{
-		return Test::Proto::ArrayRef->new($why)->is_deeply($expected); # iterate?
-	}
-	if (&{_is_a('HASH')}($expected))
-	{
-		return Test::Proto::HashRef->new($why)->is_deeply($expected);
-	}
-	if (&{_is_a('CODE')}($expected))
-	{
-		return Test::Proto::Base->new($why)->add_test($expected);
-	}
-	if (ref $expected)
-	{
-		return Test::Proto::Object->new($why)->is_a(ref $expected);
-	}
-	return $expected; # exception?
-}
-
-sub fail
-{
-	# should there be a metasugar module for things like this?
-	# More detailed interface to T::P::Fail? (More detailed T::P::F first!)
-	my ($why) = @_;
-	# warn $why; # results in false positives
-	return Test::Proto::Fail->new($why);
-}
-
-sub exception
-{
-	my ($why) = @_;
-	return Test::Proto::Exception->new($why);
-}
-
-
-#sub fail
-#{
-#	my ($self, $name, $why) = @_;
-#	return Test::Proto::Fail->new();
-#}
-
-return 1; # module loaded ok
-
-=pod
-
-=head1 NAME
-
-Test::Proto::Base - Base Class for Test Prototypes 
-
-=head1 SYNOPSIS
-
-	my $p = Test::Proto::Base->new->is_eq(-5);
-	$p->ok ($temperature) # will fail unless $temperature is -5
-	$p->ok ($score) # you can use the same test multple times
-	ok($p->validate($score)) # If you like your "ok"s first
-
-This is a test prototype which requires that the value it is given is defined and is a hashref. It provides methods for interacting with hashrefs. (To test hashes, make them hashrefs and test them with this module)
-
-=head1 METHODS
-
-=head3 new
-
-	my $test = Test::Proto::Base->new();
-
-Creates a new Test::Proto::Base object. 
-
-=head3 initialise
-
-When C<new> is called, C<initialise> is called on the object just before it is returned. This mostly exists so that subclasses wishing to add initial tests do not have to overload C<new>.
-
-=head3 validate
-
-	my $result = $p->validate($input);
-	warn $result unless $result;
-
-Runs through the tests in the prototype and checks that they all pass. If they do, returns true. If not, returns the appropriate fail or exception object. 
-
-=head3 ok
-
-	my $result = $p->ok($input, '$input must be valid');
-
-Like validate but attached to L<Test::Builder>, like L<Test::More>'s C<ok>.
-
 =head3 add_test
 
-	my $result = $p->add_test(sub{return $_[0] ne '';})->ok($input, '$input must be nonempty');
+This method adds a test to the current object, specifically to the C<user_script>, and returns the prototype object.
 
-Adds a test to the end of the list of tests to be performed when C<validate> or C<ok> is called. It is normally better to use C<try>, as that wraps your code in an C<eval> block.
+This is documented for information purposes only and is not intended to be used except in the maintainance of C<Test::Proto> itself.
 
-=head3 upgrade
+=cut
 
-	my $pInt = $p->upgrade(qr/^[a-z]+$/);
-	my $pAnswer = $p->upgrade(42);
+sub add_test{
+	my ($self, $name, $data, $reason)  = @_;
+	my $package = ref $self; 
+  
+	my $testMethodName = $package.'::TEST_'.$name;
+	my $code = sub {
+		my $runner = shift;
+		my $subject = $runner->subject;
+		{
+			no strict 'refs';
+			eval { &{$testMethodName} ($runner, $data, $reason); };
+			$runner->parent->exception($@) if $@;
+		}
+	};
+	push @{ $self->user_script }, Test::Proto::TestCase->new(
+		name=>$name,
+		code=>$code,
+		data=>$data,
+		reason=>$reason,
+	);
+	return $self;
+}
 
-Upgrading is an internal funciton but is documented here as it as an important concept. Basically, it is a Do What I Mean function for parameters to many arguments, e.g. if you require an array value to be C<qr/^[a-z]+$/>, then rather than expecting an identical regex object, the regex is 'upgraded' to a Test::Proto::Base object with a single test: C<is_like(qr/^[a-z]+$/)>. This works for strings, arrayrefs and hashrefs too.
+=head3 run_test
 
-=head3 is_a
+	$self->run_test($test, $subject, $context);
 
-	p->is_a('SCALAR')->ok('String');
-	p->is_a('HASH')->ok({a=>1});
-	p->is_a('XML::LibXML::Node')->ok(XML::LibXML::Element->new());
-	p->is_a('XML::LibXML::Element')->ok(XML::LibXML::Element->new());
+This method runs a particular test in the object's script, and returns the prototype object. It is called by the C<< ->run_tests >> method.
 
-Like Perl's C<ref> and C<isa> rolled into one.
+This is documented for information purposes only and is not intended to be used except in the maintainance of C<Test::Proto> itself.
 
-=head3 is_also
+=cut
 
-	my $nonempty = p->is_like(qr/\w+/);
-	my $lowercase = p->is_unlike(qr/[A-Z]/)->is_also($nonempty);
+sub run_test{
+	my ($self, $test, $context) = @_;
+	my $runner =  $context->subtest(test_case=>$test, subject=>$context->subject);
+	$test->code->($runner);
+	$runner->exception("Test execution did not return a result") unless $runner->is_complete;
+	return $self;
+}
 
-Allows you to effectively import all the tests of another prototype. 
 
-This is not to be confused with C<is_a>!
+=head3 run_tests
 
-=head3 is_defined
+	$self->run_tests($subject, $context);
 
-	p->is_defined->ok($input);
+This method runs all the tests in the prototype object's script (simply calling the C<< ->run_test >> method on each), and returns the prototype object. 
 
-Succeeds unless the value is C<undef>. 
+This is documented for information purposes only and is not intended to be used except in the maintainance of C<Test::Proto> itself.
 
-=head3 is_eq
+=cut
 
-	p->is_eq('ONION')->ok($input);
+sub run_tests{
+	my ($self, $context) = @_;
+	my $runner = $context->subtest(test_case=>$self);
+	foreach my $test (@{ $self->script }){
+		$self->run_test($test, $runner);
+	}
+	$runner->done;
+	return $self;
+}
 
-Tests for string equality.
+=head3 define_test
 
-=head3 is_ne
+	define_test 'is_uppercase', sub { $_[1] =~ !/[a-z]/ }
 
-	p->is_ne('GARLIC')->ok($input);
+This method runs all the tests in the prototype object's script (simply calling the C<< ->run_tests >> method on each), and returns the prototype object. 
 
-Tests for string inequality.
+This is documented for information purposes only and is not intended to be used except in the maintainance of C<Test::Proto> itself.
 
-=head3 is_deeply
+=cut
 
-	p->is_deeply({ingredient=>'ONION', qty=>3})->ok($input);
 
-Recursively test using C<Test::More::is_deeply>
+sub define_test{
+	my ($testName, $testSub) = @_;
+	my ($package, $filename, $line) = caller;
+	#defined_tests->{$testName} = $testSub;
+	{
+		no strict 'refs';
+		my $fullName = $package.'::TEST_'.$testName;
+		*$fullName = subname ('TEST_'.$testName , $testSub); # Consider Sub::Install here, per Khisanth on irc.freenode.net#perl
+	}
+	# return value of this not specified 
+}
 
-=head3 is_like
+=head3 is
 
-	p->is_like(qr/^[a-z]+$/)->ok($input);
+	p->is('This exact value');
 
-Tests if the value matches a regex.
+This test method adds a test which checks that the test subject is identical to the expected value. It uses the C<eq> comparison operator.
 
-=head3 is_unlike
+=cut
 
-	p->is_unlike(qr/^[a-z]+$/)->ok($input);
+sub is {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('is', { expected => $expected }, $reason);
+};
 
-Tests if the value fails to match a regex.
+define_test is => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	if($self->subject eq $data->{expected}) {
+		return $self->pass; 
+	}
+	else {
+		return $self->fail;
+	}
+}; 
 
-=head3 clone
-
-	my $keyword = p->is_unlike(qr/^[a-z]+$/);
-	$keyword->clone->is_ne('undef')->ok($perlword);
-	$keyword->clone->is_ne('null')->ok($jsonword);
-
-Creates a clone of the current C<Test::Proto::Base> object. Child tests are not recursively cloned, they remain references, but the list of tests can be added to independently. 
-
-=head3 as_string
-
-	p->as_string(p->is_like(qr/<html>/))->ok($input);
-	p->as_string(qr/<html>/)->ok($input);
-
-Coerces the value to a string, then tests the result against the prototpye which is the first argument.
-
-=head3 as_number
-
-	p->as_number(p->eq(cNum,42))->ok($input);
-	p->as_number(42)->ok($input);
-
-Coerces the value to a number, then tests the result against the prototpye which is the first argument.
-
-=head3 as_bool
-
-	p->as_bool(1)->ok($input);
-
-Coerces the value to a boolean, then tests the result against the prototpye which is the first argument. 
-
-=head3 eq, ne, gt, lt, ge, lt, le
+=head3 eq, ne, gt, lt, ge, le
 
 	p->ge(c, 'a')->ok('b');
 	p->ge(cNum, 2)->ok(10);
 
 Tests sort order against a comparator. The first argument is a comparison function, see C<Test::Proto::Compare>. The second argument is the comparator.
 
-=head3 try
+=cut
+sub eq {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('eq', { expected => $expected }, $reason);
+}
+sub ne {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('ne', { expected => $expected }, $reason);
+}
+sub gt {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('gt', { expected => $expected }, $reason);
+}
+sub lt {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('lt', { expected => $expected }, $reason);
+}
+sub ge {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('ge', { expected => $expected }, $reason);
+}
+sub le {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('le', { expected => $expected }, $reason);
+}
 
-	$p->try(sub{return $_[0] ne '';})->ok($input, '$input must be nonempty');
+=head3 ref
 
-Execute arbitrary code.
+	p->ref(undef)->ok('b');
+	p->ref('less')->ok(less);
+	p->ref(qr/[a-z]+/)->ok(less);
 
-=head3 fail
+Tests the result of the 'ref'. Any prototype will do here.
 
-This is a subroutine which is an alias for C<< Test::Proto::Fail->new() >>.
+=cut
 
-=head3 exception
+sub ref {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('ref', { expected => $expected }, $reason);
+}
 
-This is a subroutine which is an alias for C<< Test::Proto::Exception->new() >>.
+define_test ref => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	if(CORE::ref($self->subject) eq $data->{expected}) {
+		return $self->pass; 
+	}
+	else {
+		return $self->fail;
+	}
+}; 
+
+=head3 is_a
+
+	p->is_a('')->ok('b');
+	p->is_a('less')->ok(less);
+
+Tests the result of the 'is_a'. Must be a string.
+
+=cut
+
+sub is_a {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('is_a', { expected => $expected }, $reason);
+}
+
+define_test is_a => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	if((CORE::ref $self->subject) =~ /^(ARRAY|HASH|SCALAR)$/) {
+		if($1 eq $data->{expected}) {
+			return $self->pass;
+		}
+	}
+	elsif(CORE::ref $self->subject) {
+		if($self->subject->isa($data->{expected})) {
+			return $self->pass; 
+		}
+	}
+	elsif((!defined $data->{expected}) or $data->{expected} eq '') {
+		return $self->pass;
+	}
+	return $self->fail;
+};
+
+foreach my $dir (qw(eq ne gt lt ge le)){
+	define_test $dir => sub {
+		my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+		my $result;
+		eval "\$result = \$self->subject $dir \$data->{expected}";
+		if($result) {
+			return $self->pass;
+		}
+		else {
+			return $self->fail;
+		}
+	}; 
+}
+
+#todo
+
+=head3 validate
+
+	my $result = $p->validate($subject);
+	warn $result unless $result;
+
+Runs through the tests in the prototype and checks that they all pass. It returns a TestRunner which evaluates true or false accordingly. 
+
+If you have an existing TestRunner, you can pass it that as well;
+
+	my $result = $p->validate($subject, $context);
+
+=cut
+
+sub validate {
+	my ($self, $subject, $context) = @_;
+	if (!defined $context or !CORE::ref($context)){ # if context is not a TestRunner
+		$context = Test::Proto::TestRunner->new(subject=>$subject);
+	}else{
+		$context->subject($subject);
+	}
+	$self->run_tests($context);
+	$context->done;
+	return $context;
+}
 
 =head1 OTHER INFORMATION
 
 For author, version, bug reports, support, etc, please see L<Test::Proto>. 
 
 =cut
-
+1;
