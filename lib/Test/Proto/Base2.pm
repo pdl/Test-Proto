@@ -263,7 +263,17 @@ sub ref {
 	$self->add_test('ref', { expected => $expected }, $reason);
 }
 
-=head3 ref
+define_test ref => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	if(CORE::ref($self->subject) eq $data->{expected}) {
+		return $self->pass; 
+	}
+	else {
+		return $self->fail;
+	}
+}; 
+
+=head3 is_a
 
 	p->is_a('')->ok('b');
 	p->is_a('less')->ok(less);
@@ -276,6 +286,24 @@ sub is_a {
 	my ($self, $expected, $reason) = @_;
 	$self->add_test('is_a', { expected => $expected }, $reason);
 }
+
+define_test is_a => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	if((CORE::ref $self->subject) =~ /^(ARRAY|HASH|SCALAR)$/) {
+		if($1 eq $data->{expected}) {
+			return $self->pass;
+		}
+	}
+	elsif(CORE::ref $self->subject) {
+		if($self->subject->isa($data->{expected})) {
+			return $self->pass; 
+		}
+	}
+	elsif((!defined $data->{expected}) or $data->{expected} eq '') {
+		return $self->pass;
+	}
+	return $self->fail;
+};
 
 foreach my $dir (qw(eq ne gt lt ge le)){
 	define_test $dir => sub {

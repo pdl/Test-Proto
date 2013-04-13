@@ -17,16 +17,23 @@ sub is_a_good_fail {
 	ok(!$_[0]->is_exception, '... and not be an exception');
 }
 
+sub is_a_good_exception {
+	# Todo: test this more
+	ok($_[0]?0:1, $_[1]);
+	ok($_[0]->is_exception, '... and be an exception');
+}
+
+
 sub p { Test::Proto::Base2->new(); }
 
 is_a_good_pass(p->is('a')->validate('a'), "'a' is 'a' should pass");
-is_a_good_fail(p->is('a')->validate('b'), "'a' is 'b' should fail");
+is_a_good_fail(p->is('a')->validate('b'), "'b' is 'a' should fail");
 
 is_a_good_pass(p->eq('a')->validate('a'), "'a' eq 'a' should pass");
-is_a_good_fail(p->eq('a')->validate('b'), "'a' eq 'b' should fail");
+is_a_good_fail(p->eq('a')->validate('b'), "'b' eq 'a' should fail");
 
 is_a_good_fail(p->ne('a')->validate('a'), "'a' ne 'a' should fail");
-is_a_good_pass(p->ne('a')->validate('b'), "'a' ne 'b' should pass");
+is_a_good_pass(p->ne('a')->validate('b'), "'b' ne 'a' should pass");
 
 is_a_good_pass(p->lt('b')->validate('a'), "'a' lt 'b' should pass");
 is_a_good_fail(p->lt('a')->validate('a'), "'a' lt 'a' should fail");
@@ -44,8 +51,16 @@ is_a_good_fail(p->ge('b')->validate('a'), "'a' ge 'b' should fail");
 is_a_good_pass(p->ge('a')->validate('a'), "'a' ge 'a' should pass");
 is_a_good_pass(p->ge('a')->validate('b'), "'b' ge 'a' should pass");
 
+is_a_good_pass(p->is_a('ARRAY')->validate([]), "[] is_a ARRAY should pass");
+is_a_good_fail(p->is_a('ARRAY')->validate({}), "{} is_a ARRAY should fail");
+
+is_a_good_pass(p->ref('ARRAY')->validate([]), "[] ref ARRAY should pass");
+is_a_good_fail(p->ref('ARRAY')->validate({}), "{} ref ARRAY should fail");
+
+# is_a_good_exception(p->eq('a')->validate(undef), "undef eq 'a' should fail"); # Doesn't die, though, so maybe this is fine as a fail.
+
 # use Data::Dumper;
-# diag (Dumper p->le('b')->validate('a'));
+# diag (Dumper p->eq('a')->validate(undef));
 
 done_testing;
 
