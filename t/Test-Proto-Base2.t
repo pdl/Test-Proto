@@ -14,6 +14,7 @@ sub is_a_good_pass {
 sub is_a_good_fail {
 	# Todo: test this more
 	ok($_[0]?0:1, $_[1]);
+	ok(!$_[0]->is_exception, '... and not be an exception');
 }
 
 sub p { Test::Proto::Base2->new(); }

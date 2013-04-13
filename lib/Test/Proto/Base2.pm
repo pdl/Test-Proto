@@ -141,10 +141,10 @@ This is documented for information purposes only and is not intended to be used 
 =cut
 
 sub run_test{
-	my ($self, $test, $subject, $context) = @_;
-	my $runner =  $context->subtest(test_case=>$test, subject=>$subject);
+	my ($self, $test, $context) = @_;
+	my $runner =  $context->subtest(test_case=>$test, subject=>$context->subject);
 	$test->code->($runner);
-	$runner->done;
+	$runner->exception("Test execution did not return a result") unless $runner->is_complete;
 	return $self;
 }
 
@@ -160,10 +160,10 @@ This is documented for information purposes only and is not intended to be used 
 =cut
 
 sub run_tests{
-	my ($self, $subject, $context) = @_;
+	my ($self, $context) = @_;
 	my $runner = $context->subtest(test_case=>$self);
 	foreach my $test (@{ $self->script }){
-		run_test($self, $test, $subject, $runner);
+		$self->run_test($test, $runner);
 	}
 	$runner->done;
 	return $self;
@@ -248,6 +248,35 @@ sub le {
 	$self->add_test('le', { expected => $expected }, $reason);
 }
 
+=head3 ref
+
+	p->ref(undef)->ok('b');
+	p->ref('less')->ok(less);
+	p->ref(qr/[a-z]+/)->ok(less);
+
+Tests the result of the 'ref'. Any prototype will do here.
+
+=cut
+
+sub ref {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('ref', { expected => $expected }, $reason);
+}
+
+=head3 ref
+
+	p->is_a('')->ok('b');
+	p->is_a('less')->ok(less);
+
+Tests the result of the 'is_a'. Must be a string.
+
+=cut
+
+sub is_a {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('is_a', { expected => $expected }, $reason);
+}
+
 foreach my $dir (qw(eq ne gt lt ge le)){
 	define_test $dir => sub {
 		my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
@@ -279,10 +308,12 @@ If you have an existing TestRunner, you can pass it that as well;
 
 sub validate {
 	my ($self, $subject, $context) = @_;
-	if (!defined $context or !ref $context){ # if context is not a TestRunner
+	if (!defined $context or !CORE::ref($context)){ # if context is not a TestRunner
 		$context = Test::Proto::TestRunner2->new(subject=>$subject);
+	}else{
+		$context->subject($subject);
 	}
-	run_tests($self, $subject, $context);
+	$self->run_tests($context);
 	$context->done;
 	return $context;
 }
