@@ -15,6 +15,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Test::More' => 0,
 		'Data::Dumper' => 0,
+		'Moo' => 0,
 		'Test::Deep::NoTest' => 0
     },
 	META_MERGE => {
