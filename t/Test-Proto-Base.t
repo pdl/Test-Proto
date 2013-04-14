@@ -60,7 +60,7 @@ is_a_good_fail(p->ref('ARRAY')->validate({}), "{} ref ARRAY should fail");
 # is_a_good_exception(p->eq('a')->validate(undef), "undef eq 'a' should fail"); # Doesn't die, though, so maybe this is fine as a fail.
 
 # use Data::Dumper;
-# diag (Dumper p->eq('a')->validate(undef));
+# diag (Dumper p->eq('a')->validate('b'));
 
 done_testing;
 

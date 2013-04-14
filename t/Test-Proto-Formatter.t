@@ -9,5 +9,6 @@ ok defined new_formatter, 'Formatter->new is defined';
 ok ref new_formatter, 'Formatter->new is an object';
 isa_ok new_formatter, 'Test::Proto::Formatter', 'Formatter->new is a Test::Proto::Formatter';
 
+
 done_testing;
 

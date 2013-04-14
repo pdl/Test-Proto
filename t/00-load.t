@@ -7,6 +7,8 @@ BEGIN {
 		Test::Proto
 		Test::Proto::Base
 		Test::Proto::TestCase
+		Test::Proto::HashRef
+		Test::Proto::Role::HashRef
 		Test::Proto::TestRunner
 	))
 	{

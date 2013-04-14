@@ -2,6 +2,8 @@ Changes
 lib/Test/Proto.pm
 lib/Test/Proto/Base.pm
 lib/Test/Proto/Formatter.pm
+lib/Test/Proto/HashRef.pm
+lib/Test/Proto/Role/HashRef.pm
 lib/Test/Proto/TestCase.pm
 lib/Test/Proto/TestRunner.pm
 Makefile.PL

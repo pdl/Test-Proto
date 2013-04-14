@@ -9,7 +9,7 @@ sub zero { sub { 0;} };
 
 =head1 NAME
 
-Test::Proto::BaseTestRunner - Embodies a run through a test
+Test::Proto::TestRunner - Embodies a run through a test
 
 =head1 SYNOPSIS
 
@@ -210,6 +210,7 @@ Declares that the test run is complete, and determines if the result is a pass o
  
 sub done {
 	my ($self, $message) = @_;
+	return $self->exception if scalar grep { $_->is_exception } @{ $self->children() };
 	$self->complete($self->_count_fails?0:1);
 	return $self;
 }
@@ -294,11 +295,17 @@ sub exception{
 }
 
 sub inform_formatter{
-	my $self = shift;
+	my ($self) = @_;
 	my $formatter = $self->formatter;
 	if (defined $formatter){ 
 		$formatter->event(@_);
 	}
+}
+
+sub upgrade {
+	my ($self, $expected) = @_;
+	use Test::Proto::Base;
+	Test::Proto::Base->new()->eq($expected);
 }
 
 1;

@@ -7,177 +7,7 @@ use Test::Proto::TestCase;
 use Moo;
 use Sub::Name;
 
-=pod
-
-=head1 NAME
-
-Test::Proto::Base - Base Class for Test Prototypes
-
-=head1 SYNOPSIS
-
-	my $p = Test::Proto::Base2->new->is_eq(-5);
-	$p->ok ($temperature) # will fail unless $temperature is -5
-	$p->ok ($score) # you can use the same test multple times
-	ok($p->validate($score)) # If you like your "ok"s first
-
-This is a base class for test prototypes. 
-
-Note that it is a Moo class.
-
-=cut
-
-sub initialise
-{
-	return $_[0];
-}
-
-=head3 natural_type
-
-This roughly corresponds to C<ref>. Useful for indicating what sort of element you're expecting.
-
-This is documented for information purposes only and is not intended to be used except in the maintainance of C<Test::Proto> itself.
-
-=cut
-
-has natural_type => (
-	is=>'rw',
-	default=>sub{''},,
-); # roughly corresponds to ref.
-
-=head3 natural_script
-
-These are tests common to the whole prototype which need not be repeated if two similar scripts are joined together. Normally, this should only be modified by the prototype class.
-
-This is documented for information purposes only and is not intended to be used except in the maintainance of C<Test::Proto> itself.
-
-=cut
-
-has natural_script => (
-	is=>'rw',
-	default=>sub{[]},
-); 
-=head3 user_script
-
-These are the tests which the user (specifically, the test script author) has added by a method call. Normally, these should empty in a class but may be present in an instance of an object.
-
-This is documented for information purposes only and is not intended to be used except in the maintainance of C<Test::Proto> itself.
-
-=cut
-
-
-has user_script => (
-	is=>'rw',
-	default=>sub{[]},
-);
-
-=head3 script
-
-This method returns an arrayref containing the contents of the C<natural_script> and the C<user_script>, i.e. all the tests in the object that are due to be run when C<< ->ok() >> is called.
-
-=cut
-
-sub script {
-	my $self = shift;
-	return [
-		@{ $self->natural_script },
-		@{ $self->user_script },
-	];
-}
-
-=head3 script
-
-This method returns a copy of the current object. The new object can have tests added without affecting the existing test.
-
-=cut
-
-sub clone
-{
-	my $self = shift;
-	my $new = bless {
-		script=>$self->{'script'}, # that won't work!
-	}, ref $self;
-	return $new;
-}
-
-=head3 add_test
-
-This method adds a test to the current object, specifically to the C<user_script>, and returns the prototype object.
-
-This is documented for information purposes only and is not intended to be used except in the maintainance of C<Test::Proto> itself.
-
-=cut
-
-sub add_test{
-	my ($self, $name, $data, $reason)  = @_;
-	my $package = ref $self; 
-  
-	my $testMethodName = $package.'::TEST_'.$name;
-	my $code = sub {
-		my $runner = shift;
-		my $subject = $runner->subject;
-		{
-			no strict 'refs';
-			eval { &{$testMethodName} ($runner, $data, $reason); };
-			$runner->parent->exception($@) if $@;
-		}
-	};
-	push @{ $self->user_script }, Test::Proto::TestCase->new(
-		name=>$name,
-		code=>$code,
-		data=>$data,
-		reason=>$reason,
-	);
-	return $self;
-}
-
-=head3 run_test
-
-	$self->run_test($test, $subject, $context);
-
-This method runs a particular test in the object's script, and returns the prototype object. It is called by the C<< ->run_tests >> method.
-
-This is documented for information purposes only and is not intended to be used except in the maintainance of C<Test::Proto> itself.
-
-=cut
-
-sub run_test{
-	my ($self, $test, $context) = @_;
-	my $runner =  $context->subtest(test_case=>$test, subject=>$context->subject);
-	$test->code->($runner);
-	$runner->exception("Test execution did not return a result") unless $runner->is_complete;
-	return $self;
-}
-
-
-=head3 run_tests
-
-	$self->run_tests($subject, $context);
-
-This method runs all the tests in the prototype object's script (simply calling the C<< ->run_test >> method on each), and returns the prototype object. 
-
-This is documented for information purposes only and is not intended to be used except in the maintainance of C<Test::Proto> itself.
-
-=cut
-
-sub run_tests{
-	my ($self, $context) = @_;
-	my $runner = $context->subtest(test_case=>$self);
-	foreach my $test (@{ $self->script }){
-		$self->run_test($test, $runner);
-	}
-	$runner->done;
-	return $self;
-}
-
-=head3 define_test
-
-	define_test 'is_uppercase', sub { $_[1] =~ !/[a-z]/ }
-
-This method runs all the tests in the prototype object's script (simply calling the C<< ->run_tests >> method on each), and returns the prototype object. 
-
-This is documented for information purposes only and is not intended to be used except in the maintainance of C<Test::Proto> itself.
-
-=cut
+our $VERSION = '0.011';
 
 
 sub define_test{
@@ -191,6 +21,34 @@ sub define_test{
 	}
 	# return value of this not specified 
 }
+
+
+=pod
+
+=head1 NAME
+
+Test::Proto::Base - Base Class for Test Prototypes
+
+=head1 SYNOPSIS
+
+	my $p = Test::Proto::Base->new->is_eq(-5);
+	$p->ok ($temperature) # will fail unless $temperature is -5
+	$p->ok ($score) # you can use the same test multple times
+	ok($p->validate($score)) # If you like your "ok"s first
+
+This is a base class for test prototypes. 
+
+Note that it is a Moo class.
+
+=cut
+
+=head1 METHODS
+
+=head2 PUBLIC METHODS
+
+These are the methods intended for use when writing tests.
+
+=cut
 
 =head3 is
 
@@ -223,6 +81,7 @@ define_test is => sub {
 Tests sort order against a comparator. The first argument is a comparison function, see C<Test::Proto::Compare>. The second argument is the comparator.
 
 =cut
+
 sub eq {
 	my ($self, $expected, $reason) = @_;
 	$self->add_test('eq', { expected => $expected }, $reason);
@@ -263,7 +122,7 @@ sub ref {
 	$self->add_test('ref', { expected => $expected }, $reason);
 }
 
-define_test ref => sub {
+define_test 'ref' => sub {
 	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
 	if(CORE::ref($self->subject) eq $data->{expected}) {
 		return $self->pass; 
@@ -289,7 +148,7 @@ sub is_a {
 
 define_test is_a => sub {
 	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
-	if((CORE::ref $self->subject) =~ /^(ARRAY|HASH|SCALAR)$/) {
+	if((CORE::ref $self->subject) =~ /^(SCALAR|ARRAY|HASH|CODE|REF|GLOB|LVALUE|FORMAT|IO|VSTRING|Regexp)$/) {
 		if($1 eq $data->{expected}) {
 			return $self->pass;
 		}
@@ -345,6 +204,171 @@ sub validate {
 	$context->done;
 	return $context;
 }
+
+=head3 clone
+
+This method returns a copy of the current object. The new object can have tests added without affecting the existing test.
+
+=cut
+
+sub clone
+{
+	my $self = shift;
+	my $new = bless {
+		script=>$self->{'script'}, # that won't work!
+	}, CORE::ref $self;
+	return $new;
+}
+
+
+
+=head2 PROTOTYPER METHODS
+
+These are for documentation purposes only.
+
+=cut
+
+sub initialise
+{
+	return $_[0];
+}
+
+=head3 natural_type
+
+This roughly corresponds to C<ref>. Useful for indicating what sort of element you're expecting.
+
+This is documented for information purposes only and is not intended to be used except in the maintainance of C<Test::Proto> itself.
+
+=cut
+
+has natural_type => (
+	is=>'rw',
+	default=>sub{''},,
+); # roughly corresponds to ref.
+
+=head3 natural_script
+
+These are tests common to the whole prototype which need not be repeated if two similar scripts are joined together. Normally, this should only be modified by the prototype class.
+
+This is documented for information purposes only and is not intended to be used except in the maintainance of C<Test::Proto> itself.
+
+=cut
+
+has natural_script => (
+	is=>'rw',
+	default=>sub{[]},
+); 
+
+=head3 user_script
+
+These are the tests which the user (specifically, the test script author) has added by a method call. Normally, these should empty in a class but may be present in an instance of an object.
+
+This is documented for information purposes only and is not intended to be used except in the maintainance of C<Test::Proto> itself.
+
+=cut
+
+
+has user_script => (
+	is=>'rw',
+	default=>sub{[]},
+);
+
+=head3 script
+
+This method returns an arrayref containing the contents of the C<natural_script> and the C<user_script>, i.e. all the tests in the object that are due to be run when C<< ->ok() >> is called.
+
+=cut
+
+sub script {
+	my $self = shift;
+	return [
+		@{ $self->natural_script },
+		@{ $self->user_script },
+	];
+}
+
+=head3 add_test
+
+This method adds a test to the current object, specifically to the C<user_script>, and returns the prototype object.
+
+This is documented for information purposes only and is not intended to be used except in the maintainance of C<Test::Proto> itself.
+
+=cut
+
+sub add_test{
+	my ($self, $name, $data, $reason)  = @_;
+	my $package = CORE::ref ($self); 
+  
+	my $testMethodName = $package.'::TEST_'.$name;
+	my $code = sub {
+		my $runner = shift;
+		my $subject = $runner->subject;
+		{
+			no strict 'refs';
+			eval { &{$testMethodName} ($runner, $data, $reason); };
+			$runner->parent->exception($@) if $@;
+		}
+	};
+	push @{ $self->user_script }, Test::Proto::TestCase->new(
+		name=>$name,
+		code=>$code,
+		data=>$data,
+		reason=>$reason,
+	);
+	return $self;
+}
+
+=head3 run_test
+
+	$self->run_test($test, $subject, $context);
+
+This method runs a particular test in the object's script, and returns the prototype object. It is called by the C<< ->run_tests >> method.
+
+This is documented for information purposes only and is not intended to be used except in the maintainance of C<Test::Proto> itself.
+
+=cut
+use Data::Dumper;
+sub run_test{
+	my ($self, $test, $context) = @_;
+	my $runner =  $context->subtest(test_case=>$test, subject=>$context->subject);
+	my $result = $test->code->($runner);
+	$runner->exception("Test execution did not return a result. Return value was ". Dumper (\$result)) unless $runner->is_complete;
+	return $self;
+}
+
+
+=head3 run_tests
+
+	$self->run_tests($subject, $context);
+
+This method runs all the tests in the prototype object's script (simply calling the C<< ->run_test >> method on each), and returns the prototype object. 
+
+This is documented for information purposes only and is not intended to be used except in the maintainance of C<Test::Proto> itself.
+
+=cut
+
+sub run_tests{
+	my ($self, $context) = @_;
+	my $runner = $context->subtest(test_case=>$self);
+	foreach my $test (@{ $self->script }){
+		$self->run_test($test, $runner);
+	}
+	$runner->done;
+	return $self;
+}
+
+=head3 define_test
+
+	define_test 'is_uppercase', sub { $_[1] =~ !/[a-z]/ }
+
+This method runs all the tests in the prototype object's script (simply calling the C<< ->run_tests >> method on each), and returns the prototype object. 
+
+This is documented for information purposes only and is not intended to be used except in the maintainance of C<Test::Proto> itself.
+
+=cut
+
+
+# define_test defined above
 
 =head1 OTHER INFORMATION
 

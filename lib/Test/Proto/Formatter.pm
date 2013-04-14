@@ -2,37 +2,9 @@ package Test::Proto::Formatter;
 use 5.006;
 use strict;
 use warnings;
-
-sub new
-{
-	my ($class, $args) = @_;
-	$args = {} unless (defined $args) and ((ref $args) eq ref {});
-	bless $args, $class;
-}
-
-sub begin
-{
-	my $self = shift;
-	my $target = shift;	
-	return $self;
-}
-
-sub end
-{
-	my $self = shift;
-	my $target = shift;
-	return $self;
-}
-
-sub format
-{
-	my $self = shift;
-	my $target = shift;
-	return $self;
-}
-
-
-1;
+use Moo;
+use base 'Test::Builder::Module';
+my $CLASS= __PACKAGE__;
 
 =pod
 
@@ -52,6 +24,30 @@ The formatter is only used by the L<Test::Proto::TestRunner> class. There is no 
 This minimal formatter does precisely nothing.
 
 =head1 METHODS
+
+=cut
+
+sub event {
+	my $self = shift;
+	my $target = shift;
+	my $eventType = shift;
+	if ('new' eq $eventType) {
+		# ...
+	}
+	elsif ('done' eq $eventType) {
+		# ...
+	}
+	return $self;
+}
+
+sub format {
+	my $self = shift;
+	my $target = shift;
+	return $self;
+}
+
+
+1;
 
 
 =head1 OTHER INFORMATION
