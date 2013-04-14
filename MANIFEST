@@ -8,13 +8,10 @@ lib/Test/Proto/TestCase.pm
 lib/Test/Proto/TestRunner.pm
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 README
 t/00-load.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
 t/Test-Proto-Base.t
-t/Test-Proto-Formatter.t
-t/Test-Proto-TestCase.t
-t/Test-Proto-TestRunner.t
-
