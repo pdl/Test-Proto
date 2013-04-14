@@ -107,6 +107,43 @@ sub le {
 	$self->add_test('le', { expected => $expected }, $reason);
 }
 
+=head3 true, false
+
+Tests if the subject returns true or false in boolean context.
+
+=cut
+
+sub true {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('true', { expected => 'true' }, $reason);
+}
+
+define_test 'true' => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	if($self->subject) {
+		return $self->pass; 
+	}
+	else {
+		return $self->fail;
+	}
+};
+
+sub false {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('false', { expected => 'false' }, $reason);
+}
+
+define_test 'false' => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	if($self->subject) {
+		return $self->fail;
+	}
+	else {
+		return $self->pass; 
+	}
+}; 
+
+
 =head3 ref
 
 	p->ref(undef)->ok('b');

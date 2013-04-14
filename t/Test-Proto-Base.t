@@ -26,6 +26,12 @@ sub is_a_good_exception {
 
 sub p { Test::Proto::Base->new(); }
 
+is_a_good_pass(p->true->validate('a'), "'a' is true should pass");
+is_a_good_fail(p->true->validate(0), "0 is true should fail");
+
+is_a_good_pass(p->false->validate(0), "0 is false should pass");
+is_a_good_fail(p->false->validate('a'), "'a' is false should fail");
+
 is_a_good_pass(p->is('a')->validate('a'), "'a' is 'a' should pass");
 is_a_good_fail(p->is('a')->validate('b'), "'b' is 'a' should fail");
 
