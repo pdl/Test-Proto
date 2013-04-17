@@ -9,7 +9,6 @@ use Sub::Name;
 
 our $VERSION = '0.011';
 
-
 sub define_test{
 	my ($testName, $testSub) = @_;
 	my ($package, $filename, $line) = caller;
@@ -75,10 +74,6 @@ define_test is => sub {
 
 =head3 eq, ne, gt, lt, ge, le
 
-	p->ge(c, 'a')->ok('b');
-	p->ge(cNum, 2)->ok(10);
-
-Tests sort order against a comparator. The first argument is a comparison function, see C<Test::Proto::Compare>. The second argument is the comparator.
 
 =cut
 
@@ -106,6 +101,37 @@ sub le {
 	my ($self, $expected, $reason) = @_;
 	$self->add_test('le', { expected => $expected }, $reason);
 }
+
+=head3 num_eq, num_ne, num_gt, num_lt, num_ge, num_le
+
+
+=cut
+
+sub num_eq {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('num_eq', { expected => $expected }, $reason);
+}
+sub num_ne {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('num_ne', { expected => $expected }, $reason);
+}
+sub num_gt {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('num_gt', { expected => $expected }, $reason);
+}
+sub num_lt {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('num_lt', { expected => $expected }, $reason);
+}
+sub num_ge {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('num_ge', { expected => $expected }, $reason);
+}
+sub num_le {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('num_le', { expected => $expected }, $reason);
+}
+
 
 =head3 true, false
 
@@ -200,19 +226,36 @@ define_test is_a => sub {
 	}
 	return $self->fail;
 };
+{
+	my %num_eqv = qw(eq == ne != gt > lt < ge >= le <=);
+	foreach my $dir (keys %num_eqv){
+	
+		define_test $dir => sub {
+			my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+			my $result;
+			eval "\$result = \$self->subject $dir \$data->{expected}";
+			if($result) {
+				return $self->pass;
+			}
+			else {
+				return $self->fail;
+			}
+		};
 
-foreach my $dir (qw(eq ne gt lt ge le)){
-	define_test $dir => sub {
-		my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
-		my $result;
-		eval "\$result = \$self->subject $dir \$data->{expected}";
-		if($result) {
-			return $self->pass;
-		}
-		else {
-			return $self->fail;
-		}
-	}; 
+		my $num_dir = $num_eqv{$dir};
+
+		define_test "num_$dir" => sub {
+			my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+			my $result;
+			eval "\$result = \$self->subject $num_dir \$data->{expected}";
+			if($result) {
+				return $self->pass;
+			}
+			else {
+				return $self->fail;
+			}
+		};
+	}
 }
 
 #todo
@@ -396,16 +439,25 @@ sub run_tests{
 
 =head3 define_test
 
-	define_test 'is_uppercase', sub { $_[1] =~ !/[a-z]/ }
-
-This method runs all the tests in the prototype object's script (simply calling the C<< ->run_tests >> method on each), and returns the prototype object. 
-
-This is documented for information purposes only and is not intended to be used except in the maintainance of C<Test::Proto> itself.
+	define_test 'is_uppercase', sub {
+		my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+		if ($self->subject =~ !/[a-z]/){ 
+			return $self->pass;
+		}
+		return $self->fail;
+	}
 
 =cut
 
 
 # define_test defined above
+
+=head3 add_test_method
+
+	add_test_method 'is_uppercase', sub { $_[1]->subject =~ !/[a-z]/ }
+
+
+=cut
 
 =head1 OTHER INFORMATION
 
