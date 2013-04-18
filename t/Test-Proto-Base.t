@@ -34,6 +34,12 @@ is_a_good_fail(p->true->validate(0), "0 is true should fail");
 is_a_good_pass(p->false->validate(0), "0 is false should pass");
 is_a_good_fail(p->false->validate('a'), "'a' is false should fail");
 
+is_a_good_pass(p->defined->validate(0), "0 is defined should pass");
+is_a_good_fail(p->defined->validate(undef), "undef is defined should fail");
+
+is_a_good_pass(p->undefined->validate(undef), "undef is undefined should pass");
+is_a_good_fail(p->undefined->validate(0), "0 is undefined should fail");
+
 is_a_good_pass(p->is('a')->validate('a'), "'a' is 'a' should pass");
 is_a_good_fail(p->is('a')->validate('b'), "'b' is 'a' should fail");
 

@@ -169,6 +169,42 @@ define_test 'false' => sub {
 	}
 }; 
 
+=head3 defined, undefined
+
+Tests if the subject is defined/undefined.
+
+=cut
+
+sub defined {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('defined', { expected => 'defined' }, $reason);
+}
+
+define_test 'defined' => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	if(defined $self->subject) {
+		return $self->pass;
+	}
+	else {
+		return $self->fail; 
+	}
+}; 
+
+sub undefined {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('undefined', { expected => 'undefined' }, $reason);
+}
+
+define_test 'undefined' => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	if(defined $self->subject) {
+		return $self->fail;
+	}
+	else {
+		return $self->pass; 
+	}
+}; 
+
 
 =head3 ref
 
