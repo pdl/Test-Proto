@@ -91,6 +91,10 @@ is_a_good_fail(p->ref('ARRAY')->validate({}), "{} ref ARRAY should fail");
 
 # use Data::Dumper;
 # diag (Dumper p->eq('a')->validate('b'));
+{
+	$_ = 3;
+	is_a_good_pass(p->num_eq(3)->validate(), "validate implicitly takes $_");
+}
 
 done_testing;
 

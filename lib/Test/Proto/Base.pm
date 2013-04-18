@@ -275,6 +275,7 @@ If you have an existing TestRunner, you can pass it that as well;
 
 sub validate {
 	my ($self, $subject, $context) = @_;
+	$subject = $_ unless exists $_[1];
 	if (!defined $context or !CORE::ref($context)){ # if context is not a TestRunner
 		$context = Test::Proto::TestRunner->new(subject=>$subject);
 	}else{
