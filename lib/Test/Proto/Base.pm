@@ -190,6 +190,7 @@ define_test 'defined' => sub {
 	}
 }; 
 
+
 sub undefined {
 	my ($self, $expected, $reason) = @_;
 	$self->add_test('undefined', { expected => 'undefined' }, $reason);
@@ -202,6 +203,45 @@ define_test 'undefined' => sub {
 	}
 	else {
 		return $self->pass; 
+	}
+}; 
+
+=head3 like, unlike
+
+	p->like(qr/^a$/)->ok('a');
+	p->unlike(qr/^a$/)->ok('b');
+
+=cut
+
+sub like {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('like', { expected => $expected }, $reason);
+}
+
+define_test 'like' => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	my $re = $data->{expected};
+	if($self->subject =~ m/$re/) {
+		return $self->pass;
+	}
+	else {
+		return $self->fail; 
+	}
+}; 
+
+sub unlike {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('unlike', { expected => $expected }, $reason);
+}
+
+define_test 'unlike' => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	my $re = $data->{expected};
+	if($self->subject !~ m/$re/) {
+		return $self->pass;
+	}
+	else {
+		return $self->fail;
 	}
 }; 
 

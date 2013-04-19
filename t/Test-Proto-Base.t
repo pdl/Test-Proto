@@ -4,23 +4,28 @@ use warnings;
 
 use Test::More;
 use Test::Proto::Base;
+use Data::Dumper;
+my $undef = undef;
 ok (1, 'ok is ok');
 
 sub is_a_good_pass {
 	# Todo: test this more
-	ok($_[0]?1:0, , $_[1]);
+	ok($_[0]?1:0, , $_[1])
+	or diag Dumper $_[0];
 }
 
 sub is_a_good_fail {
 	# Todo: test this more
-	ok($_[0]?0:1, $_[1]);
-	ok(!$_[0]->is_exception, '... and not be an exception');
+	(	ok($_[0]?0:1, $_[1]) 
+	and	ok(!$_[0]->is_exception, '... and not be an exception')
+	) or	diag Dumper $_[0];
 }
 
 sub is_a_good_exception {
 	# Todo: test this more
-	ok($_[0]?0:1, $_[1]);
-	ok($_[0]->is_exception, '... and be an exception');
+	(	ok($_[0]?0:1, $_[1])
+	and	ok($_[0]->is_exception, '... and be an exception')
+	) or 	diag Dumper $_[0];
 }
 
 
@@ -35,7 +40,7 @@ is_a_good_pass(p->false->validate(0), "0 is false should pass");
 is_a_good_fail(p->false->validate('a'), "'a' is false should fail");
 
 is_a_good_pass(p->defined->validate(0), "0 is defined should pass");
-is_a_good_fail(p->defined->validate(undef), "undef is defined should fail");
+is_a_good_fail(p->defined->validate($undef), "undef is defined should fail");
 
 is_a_good_pass(p->undefined->validate(undef), "undef is undefined should pass");
 is_a_good_fail(p->undefined->validate(0), "0 is undefined should fail");
@@ -93,14 +98,21 @@ is_a_good_fail(p->is_a('ARRAY')->validate({}), "{} is_a ARRAY should fail");
 is_a_good_pass(p->ref('ARRAY')->validate([]), "[] ref ARRAY should pass");
 is_a_good_fail(p->ref('ARRAY')->validate({}), "{} ref ARRAY should fail");
 
+is_a_good_pass(p->like(qr/^a$/)->validate('a'), "'a' =~ /^a$/ should pass");
+is_a_good_fail(p->like(qr/^a$/)->validate('b'), "'a' =~ /^a$/ should fail");
+
+is_a_good_pass(p->unlike(qr/^b$/)->validate('a'), "'a' !~ /^b$/ should pass");
+is_a_good_fail(p->unlike(qr/^b$/)->validate('b'), "'b' !~ /^b$/ should fail");
+
 # is_a_good_exception(p->eq('a')->validate(undef), "undef eq 'a' should fail"); # Doesn't die, though, so maybe this is fine as a fail.
 
-# use Data::Dumper;
-# diag (Dumper p->eq('a')->validate('b'));
 {
 	$_ = 3;
-	is_a_good_pass(p->num_eq(3)->validate(), "validate implicitly takes $_");
+	is_a_good_pass(p->num_eq(3)->validate(), "validate implicitly takes \$_");
+	is_a_good_pass(p->undefined->validate($undef), "validate undef is still undef even when \$_ is defined");
+	is_a_good_pass(p->undefined->validate(sub{undef}->()), "validate undef is still undef even when \$_ is defined, and undef is created by an anon sub");
 }
+
 
 done_testing;
 
