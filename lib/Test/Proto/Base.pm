@@ -8,6 +8,7 @@ use Moo;
 use Sub::Name;
 
 our $VERSION = '0.011';
+our $TEST_PREFIX = '_TEST_';
 
 sub define_test{
 	my ($testName, $testSub) = @_;
@@ -15,11 +16,12 @@ sub define_test{
 	#defined_tests->{$testName} = $testSub;
 	{
 		no strict 'refs';
-		my $fullName = $package.'::TEST_'.$testName;
-		*$fullName = subname ('TEST_'.$testName , $testSub); # Consider Sub::Install here, per Khisanth on irc.freenode.net#perl
+		my $fullName = $package.'::'.$TEST_PREFIX.$testName;
+		*$fullName = subname ($TEST_PREFIX.$testName , $testSub); # Consider Sub::Install here, per Khisanth on irc.freenode.net#perl
 	}
 	# return value of this not specified 
 }
+
 
 
 =pod
@@ -48,29 +50,6 @@ Note that it is a Moo class.
 These are the methods intended for use when writing tests.
 
 =cut
-
-=head3 is
-
-	p->is('This exact value');
-
-This test method adds a test which checks that the test subject is identical to the expected value. It uses the C<eq> comparison operator.
-
-=cut
-
-sub is {
-	my ($self, $expected, $reason) = @_;
-	$self->add_test('is', { expected => $expected }, $reason);
-};
-
-define_test is => sub {
-	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
-	if($self->subject eq $data->{expected}) {
-		return $self->pass; 
-	}
-	else {
-		return $self->fail;
-	}
-}; 
 
 =head3 eq, ne, gt, lt, ge, le
 
@@ -238,6 +217,30 @@ define_test 'unlike' => sub {
 	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
 	my $re = $data->{expected};
 	if($self->subject !~ m/$re/) {
+		return $self->pass;
+	}
+	else {
+		return $self->fail;
+	}
+}; 
+
+=head3 try
+
+	p->like(qr/^a$/)->ok('a');
+	p->unlike(qr/^a$/)->ok('b');
+
+Execute arbitrary code.
+
+=cut
+
+sub try {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('try', { expected => $expected }, $reason);
+}
+
+define_test 'try' => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	if($data->{expected}->($self->subject)) {
 		return $self->pass;
 	}
 	else {
@@ -456,7 +459,7 @@ sub add_test{
 	my ($self, $name, $data, $reason)  = @_;
 	my $package = CORE::ref ($self); 
   
-	my $testMethodName = $package.'::TEST_'.$name;
+	my $testMethodName = $package.'::'.$TEST_PREFIX.$name;
 	my $code = sub {
 		my $runner = shift;
 		my $subject = $runner->subject;

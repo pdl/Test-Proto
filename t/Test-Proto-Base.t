@@ -45,9 +45,6 @@ is_a_good_fail(p->defined->validate($undef), "undef is defined should fail");
 is_a_good_pass(p->undefined->validate(undef), "undef is undefined should pass");
 is_a_good_fail(p->undefined->validate(0), "0 is undefined should fail");
 
-is_a_good_pass(p->is('a')->validate('a'), "'a' is 'a' should pass");
-is_a_good_fail(p->is('a')->validate('b'), "'b' is 'a' should fail");
-
 is_a_good_pass(p->eq('a')->validate('a'), "'a' eq 'a' should pass");
 is_a_good_fail(p->eq('a')->validate('b'), "'b' eq 'a' should fail");
 
@@ -103,6 +100,9 @@ is_a_good_fail(p->like(qr/^a$/)->validate('b'), "'a' =~ /^a$/ should fail");
 
 is_a_good_pass(p->unlike(qr/^b$/)->validate('a'), "'a' !~ /^b$/ should pass");
 is_a_good_fail(p->unlike(qr/^b$/)->validate('b'), "'b' !~ /^b$/ should fail");
+
+is_a_good_pass(p->try(sub{'a' eq shift})->validate('a'), "sub{'a' eq shift}->('b') should pass");
+is_a_good_fail(p->try(sub{'a' eq shift})->validate('b'), "'sub{'a' eq shift}->('b') should fail");
 
 # is_a_good_exception(p->eq('a')->validate(undef), "undef eq 'a' should fail"); # Doesn't die, though, so maybe this is fine as a fail.
 
