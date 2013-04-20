@@ -32,6 +32,7 @@ is_a_good_pass(pHr->key_has_value('a','b')->validate({'a'=>'b'}), "This should p
 is_a_good_fail(pHr->key_has_value('a','b')->validate({'a'=>'c'}), "This should fail");
 is_a_good_fail(pHr->key_has_value('a','b')->validate({}), "This should fail");
 
+is_a_good_pass(pHr->count_keys(1)->validate({'a'=>'b'}), "This should pass");
 
 
 done_testing;

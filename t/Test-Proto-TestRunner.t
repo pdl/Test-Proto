@@ -38,9 +38,5 @@ not_ok_or_dump (runner->add_event(runner->fail)->done, 'Complete runner with fai
 not_ok_or_dump (runner->add_event(runner->fail)->add_event(runner->pass)->done, 'Complete runner with pass and fail fails');
 
 
-isa_ok (runner->upgrade('a'), 'Test::Proto::Base', 'Runner can upgrade and produce a prorotype');
-isa_ok (runner->upgrade('a')->validate('a'), 'Test::Proto::TestRunner', 'Runner can upgrade and produce a prototype that validates to produce a TestRunner');
-ok_or_dump (runner->upgrade('a')->validate('a'), 'Test::Proto::TestRunner', 'Runner can upgrade and produce a prototype that validates \'a\' as \'a\'');
-
 done_testing;
 

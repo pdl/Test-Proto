@@ -302,13 +302,6 @@ sub inform_formatter{
 	}
 }
 
-sub upgrade {
-	my ($self, $expected) = @_;
-	use Test::Proto::Base;
-	use Scalar::Util 'looks_like_number';
-	Test::Proto::Base->new()->eq($expected);
-
-}
 
 1;
 

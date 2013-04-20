@@ -6,6 +6,7 @@ BEGIN {
 	foreach (qw(
 		Test::Proto
 		Test::Proto::Base
+		Test::Proto::Common
 		Test::Proto::TestCase
 		Test::Proto::HashRef
 		Test::Proto::Role::HashRef

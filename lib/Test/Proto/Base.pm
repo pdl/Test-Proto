@@ -2,27 +2,12 @@ package Test::Proto::Base;
 use 5.006;
 use strict;
 use warnings;
+use Test::Proto::Common;
 use Test::Proto::TestRunner;
 use Test::Proto::TestCase;
 use Moo;
-use Sub::Name;
 
 our $VERSION = '0.011';
-our $TEST_PREFIX = '_TEST_';
-
-sub define_test{
-	my ($testName, $testSub) = @_;
-	my ($package, $filename, $line) = caller;
-	#defined_tests->{$testName} = $testSub;
-	{
-		no strict 'refs';
-		my $fullName = $package.'::'.$TEST_PREFIX.$testName;
-		*$fullName = subname ($TEST_PREFIX.$testName , $testSub); # Consider Sub::Install here, per Khisanth on irc.freenode.net#perl
-	}
-	# return value of this not specified 
-}
-
-
 
 =pod
 
@@ -459,7 +444,7 @@ sub add_test{
 	my ($self, $name, $data, $reason)  = @_;
 	my $package = CORE::ref ($self); 
   
-	my $testMethodName = $package.'::'.$TEST_PREFIX.$name;
+	my $testMethodName = $package.'::'.${Test::Proto::Common::TEST_PREFIX}.$name;
 	my $code = sub {
 		my $runner = shift;
 		my $subject = $runner->subject;
