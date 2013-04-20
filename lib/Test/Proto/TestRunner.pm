@@ -294,6 +294,15 @@ sub exception{
 	return $self;
 }
 
+=head3 inform_formatter
+
+	$self->inform_formatter;
+
+Used internally to send events to the formatter. The two events currently permitted are 'new' and 'done'. 
+
+=cut
+
+
 sub inform_formatter{
 	my ($self) = @_;
 	my $formatter = $self->formatter;
@@ -302,6 +311,24 @@ sub inform_formatter{
 	}
 }
 
+=head3 status
+
+	$self->status;
+
+Useful to summarise the status of the TestRunner. Possible values are: FAIL, PASS, INFO, SKIPPED, EXCEPTION, INCOMPLETE. 
+
+=cut
+
+
+sub status {
+	my ($self) = @_;
+	return 'INCOMPLETE' unless $self->is_complete;
+	return 'EXCEPTION' if $self->is_exception;
+	return 'SKIPPED' if $self->is_skipped;
+	return 'INFO' if $self->is_info;
+	return 'PASS' if $self->value;
+	return 'FAIL';
+}
 
 1;
 

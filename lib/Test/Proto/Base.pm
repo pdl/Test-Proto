@@ -502,20 +502,7 @@ sub run_tests{
 	return $self;
 }
 
-=head3 define_test
 
-	define_test 'is_uppercase', sub {
-		my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
-		if ($self->subject =~ !/[a-z]/){ 
-			return $self->pass;
-		}
-		return $self->fail;
-	}
-
-=cut
-
-
-# define_test defined above
 
 =head3 add_test_method
 
