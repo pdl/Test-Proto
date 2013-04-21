@@ -31,6 +31,29 @@ has '_object_id_register',
 	is=> 'rw',
 	default => sub { {} };
 
+sub _explain_test_case {
+	my $self = shift;
+	my $test_case = shift;
+	if (ref $test_case){
+		if ($test_case->isa('Test::Proto::TestCase')){
+			my $report = $test_case->name."\nexpected: ".$test_case->data->{expected};
+			if (scalar keys %{$test_case->data}>1){	
+				$report.= "\nOther data:";
+				foreach my $key (grep {'expected' ne $_} keys %{$test_case->data}){
+					$report.="\n  $key: ". $test_case->data->{$key};
+				}
+			}
+			return $report;
+		}
+		elsif ($test_case->isa('Test::Proto::Base')){
+			return "A ". (ref $test_case)." must pass all its subtests."
+		}
+	}
+	else {
+		return '[not a TestCase]';
+	}
+}
+
 sub event {
 	my $self = shift;
 	my $runner = shift;
@@ -45,7 +68,7 @@ sub event {
 	}
 	elsif ('done' eq $eventType) {
 		if ( my $tb = $self->_object_id_register->{$runner->object_id} ){
-			$tb->ok($runner, $runner->status . (defined $runner->status_message ?  ': '. $runner->status_message : '') );
+			$tb->ok($runner, $runner->status ." - got: ". $runner->subject ."\n". $self->_explain_test_case($runner->test_case));
 			$tb->done_testing;
 			$tb->finalize;
 		}
