@@ -331,5 +331,11 @@ sub status {
 	return 'FAIL';
 }
 
+=head3 object_id, object_uuid
+
+Test::Proto::TestRunner implements L<Object::ID>. This is used by formatters.
+
+=cut
+
 1;
 
