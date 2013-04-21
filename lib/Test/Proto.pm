@@ -4,6 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::Proto::Base;
+use Test::Proto::Common;
 use base "Exporter";
 our @EXPORT_OK = qw(&p); # symbols to export on request
 
@@ -24,14 +25,14 @@ our $VERSION = ${Test::Proto::Base::VERSION};
 
 This module simplifies writing tests for deep structures and objects.
 
-	use Test::Proto qw(p);
+	use Test::Proto qw(p pAr pHr);
 	
 	pAr	->contains_only('', pHr, 
 			"ArrayRef must contain only an empty string followed by a hashref")
 		->ok(["", {a=>'b'}]);
 	
-	p	->is_like(qr/^\d+$/, 'looks like a positive integer')
-		->is_unlike(qr/^0\d+$/, 'no leading zeros')
+	p	->like(qr/^\d+$/, 'looks like a positive integer')
+		->unlike(qr/^0\d+$/, 'no leading zeros')
 		->ok('123');
 	
 	pOb	->is_a('XML::LibXML::Node', 'must inherit from XML::LibXML::Node')
@@ -55,7 +56,8 @@ Returns a basic prototype. See L<Test::Proto::Base>.
 =cut
 
 sub p {
-	return Test::Proto::Base->new();
+	return Test::Proto::Common::upgrade ($_[0]) if 1 == scalar @_;
+	return Test::Proto::Base->new(@_);
 }
 
 
@@ -78,8 +80,7 @@ automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Test::Proto
-
+	perldoc Test::Proto
 
 You can also look for information at:
 
