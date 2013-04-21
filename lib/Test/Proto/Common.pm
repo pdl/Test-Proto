@@ -120,9 +120,9 @@ sub upgrade {
 		use Scalar::Util qw(blessed looks_like_number);
 		if (defined ref $expected) {
 			if (blessed $expected){
-				return $expected if ref $expected->isa('Test::Proto::Base');
+				return $expected if $expected->isa('Test::Proto::Base');
 			}
-			return Test::Proto::Base->new()->like($expected) if ref $expected eq 'Regex';
+			return Test::Proto::Base->new()->like($expected) if ref $expected eq 'Regexp';
 			return Test::Proto::Base->new()->try($expected) if ref $expected eq 'CODE';
 		}
 		return Test::Proto::Base->new()->num_eq($expected) if looks_like_number ($expected);

@@ -344,7 +344,26 @@ define_test is_a => sub {
 	}
 }
 
-#todo
+=head3 also
+
+	$positive = p->num_gt(0);
+	$integer->also($positive);
+	$integer->also(qr/[02468]$/);
+	$integer->ok(42); # passes
+
+Tests that the subject also matches the protoype given. If the argument given is not a prototype, the argument is upgraded to become one.
+
+=cut
+
+sub also {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('also', { expected => $expected }, $reason);
+}
+
+define_test also => sub{
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	return upgrade($data->{expected})->validate($self->subject, $self); 
+};
 
 =head3 validate
 

@@ -104,6 +104,11 @@ is_a_good_fail(p->unlike(qr/^b$/)->validate('b'), "'b' !~ /^b$/ should fail");
 is_a_good_pass(p->try(sub{'a' eq shift})->validate('a'), "sub{'a' eq shift}->('b') should pass");
 is_a_good_fail(p->try(sub{'a' eq shift})->validate('b'), "'sub{'a' eq shift}->('b') should fail");
 
+is_a_good_pass(p->also(p->eq('a'))->validate('a'), "also will correctly pass");
+is_a_good_fail(p->also(p->eq('a'))->validate('b'), "also will correctly fail");
+is_a_good_pass(p->also('a')->validate('a'), "also will correctly fail (upgrading)");
+is_a_good_fail(p->also('a')->validate('b'), "also will correctly fail (upgrading)");
+
 # is_a_good_exception(p->eq('a')->validate(undef), "undef eq 'a' should fail"); # Doesn't die, though, so maybe this is fine as a fail.
 
 {
