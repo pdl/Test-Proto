@@ -38,6 +38,10 @@ These are the methods intended for use when writing tests.
 
 =head3 eq, ne, gt, lt, ge, le
 
+	p->eq('green')->ok('green'); # passes
+	p->lt('green')->ok('grape'); # passes
+
+Performs the relevant string comparison on the subject, comparing against the text supplied. 
 
 =cut
 
@@ -68,6 +72,10 @@ sub le {
 
 =head3 num_eq, num_ne, num_gt, num_lt, num_ge, num_le
 
+	p->num_eq(0)->ok(0); # passes
+	p->num_lt(256)->ok(255); # passes
+
+Performs the relevant string comparison on the subject, comparing against the number supplied. 
 
 =cut
 
@@ -98,6 +106,9 @@ sub num_le {
 
 
 =head3 true, false
+
+	p->true->ok("Strings are true"); # passes
+	p->false->ok($undefined); # fails
 
 Tests if the subject returns true or false in boolean context.
 
@@ -135,7 +146,16 @@ define_test 'false' => sub {
 
 =head3 defined, undefined
 
-Tests if the subject is defined/undefined.
+Tests if the subject is defined/undefined. 
+
+	p->defined("Pretty much anything"); # passes
+
+Note that directly supplying undef into the protoype (as opposed to a variable containing undef, a function which returns undef, etc.) will exhibit different behaviour: it will attempt to use C<$_> instead.
+
+	$_ = 3;
+	$undef = undef;
+	p->undefined(undef); # fails
+	p->undefined($undef); # passes
 
 =cut
 
@@ -175,6 +195,8 @@ define_test 'undefined' => sub {
 	p->like(qr/^a$/)->ok('a');
 	p->unlike(qr/^a$/)->ok('b');
 
+The test subject is validated against the regular expression. Like tests for a match; unlike tests for nonmatching.
+
 =cut
 
 sub like {
@@ -211,10 +233,9 @@ define_test 'unlike' => sub {
 
 =head3 try
 
-	p->like(qr/^a$/)->ok('a');
-	p->unlike(qr/^a$/)->ok('b');
+	p->try( sub { 'a' eq lc shift; } )->ok('A');
 
-Execute arbitrary code.
+Used to execute arbitrary code. Passes if the return value is true.
 
 =cut
 
