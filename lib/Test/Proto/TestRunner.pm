@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use overload 'bool'=> sub{$_[0]->value};
 use Moo;
+use Object::ID;
 
 sub zero { sub { 0;} };
 

@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Test::Proto::Common;
 use Test::Proto::TestRunner;
+use Test::Proto::Formatter::TestBuilder;
 use Test::Proto::TestCase;
 use Moo;
 
@@ -363,13 +364,25 @@ sub validate {
 	$subject = $_ unless exists $_[1];
 	if (!defined $context or !CORE::ref($context)){ # if context is not a TestRunner
 		$context = Test::Proto::TestRunner->new(subject=>$subject);
-	}else{
+	}
+	else{
 		$context->subject($subject);
 	}
 	$self->run_tests($context);
 	$context->done;
 	return $context;
 }
+
+=head3 ok
+
+=cut
+
+sub ok {
+	my ($self, $subject, $context) = @_;
+	$context = $context = Test::Proto::TestRunner->new(formatter=>Test::Proto::Formatter::TestBuilder->new()) unless defined $context;
+	$self->validate($subject, $context);
+}
+
 
 =head3 clone
 
@@ -537,4 +550,5 @@ sub run_tests{
 For author, version, bug reports, support, etc, please see L<Test::Proto>. 
 
 =cut
+
 1;
