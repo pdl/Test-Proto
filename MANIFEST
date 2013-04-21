@@ -3,6 +3,7 @@ lib/Test/Proto.pm
 lib/Test/Proto/Base.pm
 lib/Test/Proto/Common.pm
 lib/Test/Proto/Formatter.pm
+lib/Test/Proto/Formatter/TestBuilder.pm
 lib/Test/Proto/HashRef.pm
 lib/Test/Proto/Role/HashRef.pm
 lib/Test/Proto/TestCase.pm
@@ -17,5 +18,7 @@ t/pod-coverage.t
 t/pod.t
 t/Test-Proto-Base.t
 t/Test-Proto-HashRef.t
+t/Test-Proto-Formatter.t
+t/Test-Proto-Formatter-TestBuilder.t
 t/Test-Proto-TestRunner.t
 t/Test-Proto-TestCase.t
