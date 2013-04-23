@@ -117,11 +117,14 @@ sub upgrade {
 	my ($expected) = @_;
 	{
 		require Test::Proto::Base;
+		require Test::Proto::HashRef;
+		require Test::Proto::ArrayRef;
 		use Scalar::Util qw(blessed looks_like_number);
 		if (defined ref $expected) {
 			if (blessed $expected){
 				return $expected if $expected->isa('Test::Proto::Base');
 			}
+			return Test::Proto::ArrayRef->new()->array_eq($expected) if ref $expected eq 'ARRAY';
 			return Test::Proto::Base->new()->like($expected) if ref $expected eq 'Regexp';
 			return Test::Proto::Base->new()->try($expected) if ref $expected eq 'CODE';
 		}

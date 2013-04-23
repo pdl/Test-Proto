@@ -19,5 +19,7 @@ foreach my $upg (
 	ok ($upg_result->validate('a'), $upg_text.' produces a prototype that validates \'a\' as \'a\'');
 	ok (!$upg_result->validate('b'), $upg_text.' produces a prototype that validates \'b\' as \'a\' and gives a negative result');
 }
+isa_ok(upgrade(['a']), 'Test::Proto::ArrayRef');
+ok(upgrade(['a'])->validate(['a']));
 
 done_testing();
