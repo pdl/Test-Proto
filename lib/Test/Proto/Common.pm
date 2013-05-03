@@ -51,6 +51,12 @@ sub define_test{
 	# return value of this not specified 
 }
 
+=head3 define_simple_test
+
+Adds a test definition to the class. In this case, the subroutine passed evaluates the subject against the expected data.
+
+=cut
+
 sub define_simple_test{
 	my ($testName, $testSub, $customPackage) = @_;
 	my ($package, $filename, $line) = caller;

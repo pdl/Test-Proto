@@ -6,7 +6,7 @@ use overload 'bool'=> sub{$_[0]->value};
 use Moo;
 use Object::ID;
 
-sub zero { sub { 0;} };
+sub _zero { sub { 0;} };
 
 =head1 NAME
 
@@ -24,7 +24,6 @@ Note that it is a Moo class.
 Unless otherwise specified, the return value is itself.
 
 =cut
-
 
 sub BUILD {
 	my $self = shift;
@@ -70,7 +69,7 @@ Returns C<1> if the test run has finished, C<0> otherwise.
 
 has 'is_complete' =>
 	is => 'rwp',
-	default => zero;
+	default => _zero;
 
 =head3 value
 
@@ -80,7 +79,7 @@ Returns C<0> if the test run has failed or exception, C<1> otherwise.
 
 has 'value' =>
 	is => 'rw',
-	default => zero;
+	default => _zero;
 
 =head3 is_exception
 
@@ -90,7 +89,7 @@ Returns C<1> if the test run has run into an exception, C<0> otherwise.
 
 has 'is_exception'  =>
 	is => 'rwp',
-	default => zero;
+	default => _zero;
 
 =head3 is_info
 
@@ -100,7 +99,7 @@ Returns C<1> if the result is for information purposes, C<0> otherwise.
 
 has 'is_info'  =>
 	is => 'rwp',
-	default => zero; 
+	default => _zero; 
 
 =head3 is_skipped
 
@@ -110,7 +109,7 @@ Returns C<1> if the test case was skipped, C<0> otherwise.
 
 has 'is_skipped'  =>
 	is => 'rwp',
-	default => zero;
+	default => _zero;
 
 =head3 children
 

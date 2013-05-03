@@ -10,20 +10,27 @@ my $CLASS= __PACKAGE__;
 
 =head1 NAME
 
-Test::Proto::Formatter - handles output, formatting of RunnerEvents.
+Test::Proto::Formatter::TestBuilder - formats RunnerEvents as TestBuilder events.
 
 =head1 SYNOPSIS
 
 	my $formatter = Test::Proto::Formatter->new();
-	$formatter->begin($testRunner); #? -> current_state?
-	$formatter->format($_) foreach @runnerEvents; # no, this doesn't look right
-	$formatter->end($testRunner);
+	$formatter->event($testRunner, 'new');
+	$formatter->event($testRunner, 'done');
 
-The formatter is only used by the L<Test::Proto::TestRunner> class. There is no reason to call it anywhere else. However, if you are writing a test script you might want to write your own formatter to give it to the TestRunner. 
+This formatter is only used by the L<Test::Proto::TestRunner> class, and will be created when you use a prototype's C<ok>.
 
-This minimal formatter does precisely nothing.
 
 =head1 METHODS
+
+=cut
+
+=head3 event
+
+	$formatter->event($testRunner, 'new');
+	$formatter->event($testRunner, 'done');
+
+Used in Test::Proto::TestRunner to inform the formatter of progress. Event types 'new' and 'done' are supported.
 
 =cut
 
@@ -78,6 +85,15 @@ sub event {
 	}
 	return $self;
 }
+
+=head3 format
+
+	$formatter->format($runner);
+
+NOT YET IMPLEMENTED. Will probably be used to output information from a test runner that is already complete but did not expect to be outputting to Test::Builder.
+
+=cut
+
 
 sub format {
 	my $self = shift;

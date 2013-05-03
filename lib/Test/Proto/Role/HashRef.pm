@@ -44,13 +44,13 @@ define_test count_keys => sub {
 	return upgrade($data->{expected})->validate($subject, $self);
 };
 
-=head3 values
+=head3 keys
 
-	p->values($tests_keys)->ok({a=>1, b=>2});
+	p->keys($tests_keys)->ok({a=>1, b=>2});
 
 Returns the hash keys of the subject as an array reference (in an undetermined order), and tests them against the prototype provided in the argument.
 
-In the above example, the prototype C<$tests_keys> should return a pass for C<['a','b']> or C<['b','a']>.
+In the above example, the C<ok> passes if the prototype C<$tests_keys> returns a pass for C<['a','b']> or C<['b','a']>.
 
 =cut
 
@@ -72,7 +72,7 @@ define_test 'keys' => sub {
 
 Produces the hash values of the subject as an array reference (in an undetermined order), and tests them against the prototype provided in the argument.
 
-In the above example, the prototype C<$tests_values> should return a pass for C<[1,2]> or C<[2,1]>.
+In the above example, the C<ok> passes if the prototype C<$tests_values> returns a pass for C<[1,2]> or C<[2,1]>.
 
 =cut
 

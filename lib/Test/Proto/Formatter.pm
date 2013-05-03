@@ -27,6 +27,14 @@ This minimal formatter does precisely nothing.
 
 =cut
 
+=head3 event
+
+	$formatter->event($runner, 'new');
+
+There are two supported events, 'new' and 'done'. The formatter reads the test runner to find out more.
+
+=cut
+
 sub event {
 	my $self = shift;
 	my $target = shift;
@@ -39,6 +47,15 @@ sub event {
 	}
 	return $self;
 }
+
+=head3 format
+
+	$formatter->format($runner);
+
+NOT YET IMPLEMENTED. 
+
+=cut
+
 
 sub format {
 	my $self = shift;

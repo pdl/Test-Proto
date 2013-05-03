@@ -426,10 +426,10 @@ These are for documentation purposes only.
 
 =cut
 
-sub initialise
-{
-	return $_[0];
-}
+#sub initialise
+#{
+#	return $_[0];
+#}
 
 =head3 natural_type
 
