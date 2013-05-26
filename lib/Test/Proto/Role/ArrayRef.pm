@@ -95,7 +95,7 @@ define_test 'enumerated' => sub {
 
 	p->in_groups(2,[['a','b'],['c','d'],['e']])->ok(['a','b','c','d','e']);
 
-Finds the nth item (where n is the first argument) and compares the result to the prototype provided in the second argument.
+Bundles the contents in groups of n (where n is the first argument), puts each group in an arrayref, and compares the resulting arrayref to the prototype provided in the second argument.
 
 =cut
 
