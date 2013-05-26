@@ -121,6 +121,36 @@ define_test in_groups => sub {
 	return upgrade($data->{expected})->validate($newArray, $self);
 };
 
+=head3 group_when
+
+	p->group_when(sub {$_[eq uc $_[0]} ,[['A'],['B','c','d'],['E']])->ok(['A','B','c','d','E']);
+	p->group_when(sub {$_[0] eq $_[0]} ,[['a','b','c','d','e']])->ok(['a','b','c','d','e']);
+
+Bundles the contents of the test subject in groups; a new group is created when the member matches the first argument (a prototype). The resulting arrayref is compared to the second argument.
+
+=cut
+
+sub group_when {
+	my ($self, $condition, $expected, $reason) = @_;
+	$self->add_test('group_when', { 'condition' => $condition, expected => $expected }, $reason);
+}
+
+define_test group_when => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	my $newArray = [];
+	my $currentGroup = [];
+	my $condition = upgrade ($data->{condition});
+	foreach my $item (@{ $self->subject }) {
+		if ($condition->validate($item)){
+			push @$newArray, $currentGroup if defined $currentGroup and @$currentGroup;
+			$currentGroup = [];
+		}
+		push @$currentGroup, $item;
+	}
+	push @$newArray, $currentGroup if defined $currentGroup and @$currentGroup;
+	return upgrade($data->{expected})->validate($newArray, $self);
+};
+
 =head3 array_eq
 
 	p->array_eq(['a','b'])->ok(['a','b']);
