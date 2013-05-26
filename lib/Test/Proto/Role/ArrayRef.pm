@@ -54,7 +54,7 @@ define_test nth => sub {
 
 	p->count_items(2)->ok(['a','b']);
 
-Finds the length of the array (number of items) and compares the result to the prototype provided in the argument.
+Finds the length of the array (i.e. the number of items) and compares the result to the prototype provided in the argument.
 
 =cut
 

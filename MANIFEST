@@ -8,6 +8,7 @@ lib/Test/Proto/HashRef.pm
 lib/Test/Proto/Role/HashRef.pm
 lib/Test/Proto/ArrayRef.pm
 lib/Test/Proto/Role/ArrayRef.pm
+lib/Test/Proto/Object.pm
 lib/Test/Proto/TestCase.pm
 lib/Test/Proto/TestRunner.pm
 Makefile.PL
@@ -23,5 +24,7 @@ t/Test-Proto-Base.t
 t/Test-Proto-HashRef.t
 t/Test-Proto-Formatter.t
 t/Test-Proto-Formatter-TestBuilder.t
+t/Test-Proto-Object.t
 t/Test-Proto-TestRunner.t
 t/Test-Proto-TestCase.t
+
