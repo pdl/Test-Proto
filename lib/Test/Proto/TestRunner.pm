@@ -153,8 +153,7 @@ Declares the test run is complete. It is intended that this is only called by th
 sub complete {
 	my ($self, $value, $message) = @_;
 	if ($self->is_complete){
-		use Data::Dumper;
-		warn "Tried to complete something that was already complete. (Tried with value=> " . ($value // '[undefined]') . ", message=>". ($message // '[undefined]') .", self=> " .Dumper ($self);
+		warn "Tried to complete something that was already complete (a ".$self->status."). (Tried with value=> " . ($value // '[undefined]') . ", message=>". ($message // '[undefined]') .")";
 		return $self;
 	}
 	$self->value($value);

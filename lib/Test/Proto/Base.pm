@@ -525,12 +525,12 @@ This method runs a particular test in the object's script, and returns the proto
 This is documented for information purposes only and is not intended to be used except in the maintainance of C<Test::Proto> itself.
 
 =cut
-use Data::Dumper;
+
 sub run_test{
 	my ($self, $test, $context) = @_;
 	my $runner =  $context->subtest(test_case=>$test, subject=>$context->subject);
 	my $result = $test->code->($runner);
-	$runner->exception("Test execution did not return a result. Return value was ". Dumper (\$result)) unless $runner->is_complete;
+	$runner->exception("Test execution did not complete.") unless $runner->is_complete;
 	return $self;
 }
 
