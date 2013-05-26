@@ -36,6 +36,10 @@ is_a_good_pass(pAr->map(sub {uc shift;}, ['A','B'])->validate(['a','b']), "map p
 is_a_good_pass(pAr->map(sub {shift;}, ['a','b'])->validate(['a','b']), "map passes with no transform");
 is_a_good_fail(pAr->map(sub {uc shift;}, ['a','b'])->validate(['a','b']), "map fails when expected does not match");
 
+is_a_good_pass(pAr->grep(sub {$_[0] eq uc $_[0]}, ['A'])->validate(['A','b']), "grep passes");
+is_a_good_pass(pAr->grep(sub {$_[0] eq uc $_[0]}, [])->validate(['a','b']), "grep passes when nothing matches");
+is_a_good_fail(pAr->grep(sub {$_[0] eq uc $_[0]}, ['a','b'])->validate(['A','b']), "grep fails when expected does not match");
+
 is_a_good_pass(pAr->array_eq(['a','b'])->validate(['a','b']), "['a','b'] is ['a','b']");
 is_a_good_pass(pAr->array_eq(['a',['b']])->validate(['a',['b']]), "['a',['b']] is ['a',['b']]");
 is_a_good_pass(pAr->array_eq([])->validate([]), "[] is  []");

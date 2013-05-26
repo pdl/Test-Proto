@@ -8,7 +8,7 @@ use Moo::Role;
 
 =head3 map
 
-	p->map(sub { uc shift }, ['A','B'])->ok(['a','b']);
+	pAr->map(sub { uc shift }, ['A','B'])->ok(['a','b']);
 
 Applies the first argument (a coderef) onto each member of the array. The resulting array is compared to the second argument.
 
@@ -22,6 +22,25 @@ sub map {
 define_test 'map' => sub {
 	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
 	my $subject = [ map { $data->{code}->($_) } @{ $self->subject } ];
+	return upgrade($data->{expected})->validate($subject, $self);
+};
+
+=head3 grep
+
+	pAr->grep(sub { $_[0] eq uc $_[0] }, ['A'])->ok(['A','b']);
+
+Applies the first argument (a prototype) onto each member of the array; if it returns true, the member is added to the resulting array. The resulting array is compared to the second argument.
+
+=cut
+
+sub grep {
+	my ($self, $code, $expected, $reason) = @_;
+	$self->add_test('grep', { code=> $code, expected => $expected }, $reason);
+}
+
+define_test 'grep' => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	my $subject = [ grep { $data->{code}->($_) } @{ $self->subject } ];
 	return upgrade($data->{expected})->validate($subject, $self);
 };
 
