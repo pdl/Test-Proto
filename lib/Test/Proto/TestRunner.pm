@@ -153,7 +153,7 @@ Declares the test run is complete. It is intended that this is only called by th
 sub complete {
 	my ($self, $value, $message) = @_;
 	if ($self->is_complete){
-		warn "Tried to complete something that was already complete (a ".$self->status."). (Tried with value=> " . ($value // '[undefined]') . ", message=>". ($message // '[undefined]') .")";
+		warn "Tried to complete something that was already complete (a ".$self->status."). (Tried with value=> " . (defined $value ? $value : '[undefined]') . ", message=>". (defined $message ? $message : '[undefined]') .")";
 		return $self;
 	}
 	$self->value($value);
