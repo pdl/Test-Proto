@@ -5,6 +5,26 @@ use warnings;
 use Test::Proto::Common;
 use Moo::Role;
 
+
+=head3 map
+
+	p->map(sub { uc shift }, ['A','B'])->ok(['a','b']);
+
+Applies the first argument (a coderef) onto each member of the array. The resulting array is compared to the second argument.
+
+=cut
+
+sub map {
+	my ($self, $code, $expected, $reason) = @_;
+	$self->add_test('map', { code=> $code, expected => $expected }, $reason);
+}
+
+define_test 'map' => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	my $subject = [ map { $data->{code}->($_) } @{ $self->subject } ];
+	return upgrade($data->{expected})->validate($subject, $self);
+};
+
 =head3 nth
 
 	p->nth(1,'b')->ok(['a','b']);
@@ -117,11 +137,14 @@ sub array_eq {
 define_test array_eq => sub {
 	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
 	my $length = scalar @{ $data->{expected} };
-	my $length_result = Test::Proto::ArrayRef->new()->count_items($length)->validate($self->subject, $self);
-	foreach my $i (0..$length){
-		#upgrade($data->{expected}->[$i])->validate($self->subject->[$i], $self);
-		Test::Proto::ArrayRef->new()->nth($i, $data->{expected}->[$i])->validate($self->subject, $self);
+	my $length_result = Test::Proto::ArrayRef->new()->count_items($length)->validate($self->subject, $self->subtest);
+	if ($length_result) {
+		foreach my $i (0..($length-1)){
+			#upgrade($data->{expected}->[$i])->validate($self->subject->[$i], $self);
+			Test::Proto::ArrayRef->new()->nth($i, $data->{expected}->[$i])->validate($self->subject, $self->subtest);
+		}
 	}
+	$self->done;
 };
 
 

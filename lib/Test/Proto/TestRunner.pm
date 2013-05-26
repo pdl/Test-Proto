@@ -166,6 +166,7 @@ sub complete {
 =head3 subtest
 
 =cut
+
 sub subtest{
 	my $self = shift;
 	my $event = __PACKAGE__->new({

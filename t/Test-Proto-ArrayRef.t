@@ -32,11 +32,16 @@ sub pAr { Test::Proto::ArrayRef->new(); }
 is_a_good_pass(pAr->nth(1, 'b')->validate(['a','b']), "item 1 of ['a','b'] is 'b'");
 is_a_good_fail(pAr->nth(1, 'a')->validate(['a','b']), "item 1 of ['a','b'] is not 'a'");
 
+is_a_good_pass(pAr->map(sub {uc shift;}, ['A','B'])->validate(['a','b']), "map passes with a transform");
+is_a_good_pass(pAr->map(sub {shift;}, ['a','b'])->validate(['a','b']), "map passes with no transform");
+is_a_good_fail(pAr->map(sub {uc shift;}, ['a','b'])->validate(['a','b']), "map fails when expected does not match");
+
 is_a_good_pass(pAr->array_eq(['a','b'])->validate(['a','b']), "['a','b'] is ['a','b']");
 is_a_good_pass(pAr->array_eq(['a',['b']])->validate(['a',['b']]), "['a',['b']] is ['a',['b']]");
 is_a_good_pass(pAr->array_eq([])->validate([]), "[] is  []");
-is_a_good_fail(pAr->array_eq(['a','b'])->validate(['a']), "['a'] is not ['a', 'b']");
+is_a_good_fail(pAr->array_eq(['a','b'])->validate(['a']), "['a'] is not ['a','b']");
 is_a_good_fail(pAr->array_eq(['a'])->validate(['a', 'b']), "['a','b'] is not ['a']");
+is_a_good_fail(pAr->array_eq(['a','b'])->validate(['b','a']), "['b','a'] is not ['a','b']");
 
 is_a_good_pass(pAr->in_groups(2,[['a','b'],['c','d']])->validate(['a','b','c','d']), "in_groups works");
 is_a_good_pass(pAr->in_groups(2,[['a','b'],['c','d'],['e']])->validate(['a','b','c','d','e']), "in_groups works with remainders");
