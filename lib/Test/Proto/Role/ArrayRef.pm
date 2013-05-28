@@ -182,6 +182,7 @@ sub in_groups {
 
 define_test in_groups => sub {
 	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	return $self->exception('in_groups needs groups of 1 or more') if $data->{'groups'} < 1;
 	my $newArray = [];
 	my $i = 0;
 	my $currentGroup = [];

@@ -57,7 +57,11 @@ is_a_good_fail(pAr->array_eq(['a'])->validate(['a', 'b']), "['a','b'] is not ['a
 is_a_good_fail(pAr->array_eq(['a','b'])->validate(['b','a']), "['b','a'] is not ['a','b']");
 
 is_a_good_pass(pAr->in_groups(2,[['a','b'],['c','d']])->validate(['a','b','c','d']), "in_groups works");
+is_a_good_pass(pAr->in_groups(2,[])->validate([]), "in_groups works with empty list");
+is_a_good_pass(pAr->in_groups(1,[['a'],['b'],['c'],['d']])->validate(['a','b','c','d']), "in_groups works with n=1");
 is_a_good_pass(pAr->in_groups(2,[['a','b'],['c','d'],['e']])->validate(['a','b','c','d','e']), "in_groups works with remainders");
+is_a_good_fail(pAr->in_groups(2,[])->validate(['a','b','c','d']), "in_groups fails when no match");
+is_a_good_exception(pAr->in_groups(0,[['a'],['b'],['c'],['d']])->validate(['a','b','c','d']), "in_groups throws exceptions when n<1");
 
 is_a_good_pass(pAr->group_when(sub {$_[0] eq uc $_[0]} ,[['A'],['B','c','d'],['E']])->validate(['A','B','c','d','E']), "group_when works");
 is_a_good_pass(pAr->group_when(sub {$_[0] eq uc $_[0]} ,[['a','b','c','d','e']])->validate(['a','b','c','d','e']), "group_when works when it matches nothing");
