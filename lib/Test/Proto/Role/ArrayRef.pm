@@ -27,7 +27,9 @@ define_test 'map' => sub {
 
 =head3 grep
 
-	pAr->grep(sub { $_[0] eq uc $_[0] }, ['A'])->ok(['A','b']);
+	pAr->grep(sub { $_[0] eq uc $_[0] }, ['A'])->ok(['A','b']); # passes
+	pAr->grep(sub { $_[0] eq uc $_[0] }, [])->ok(['a','b']); # passes
+	pAr->grep(sub { $_[0] eq uc $_[0] })->ok(['a','b']); # fails - 'boolean' grep behaves like array_any
 
 Applies the first argument (a prototype) onto each member of the array; if it returns true, the member is added to the resulting array. The resulting array is compared to the second argument.
 
@@ -35,13 +37,68 @@ Applies the first argument (a prototype) onto each member of the array; if it re
 
 sub grep {
 	my ($self, $code, $expected, $reason) = @_;
-	$self->add_test('grep', { code=> $code, expected => $expected }, $reason);
+	if (defined $expected) {
+		$self->add_test('grep', { code => $code, expected => $expected }, $reason);
+	}
+	else {
+		$self->add_test('array_any', { code => $code }, $reason);
+	}
 }
 
 define_test 'grep' => sub {
 	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
-	my $subject = [ grep { $data->{code}->($_) } @{ $self->subject } ];
+	my $subject = [ grep { upgrade($data->{code})->validate($_) } @{ $self->subject } ];
 	return upgrade($data->{expected})->validate($subject, $self);
+};
+
+=head3 array_any
+
+	pAr->array_any(sub { $_[0] eq uc $_[0] })->ok(['A','b']); # passes
+	pAr->array_any(sub { $_[0] eq uc $_[0] })->ok(['a','b']); # fails
+
+Applies the first argument (a prototype) onto each member of the array; if any member returns true, the test case succeeds.
+
+=cut
+
+
+sub array_any {
+	my ($self, $code, $reason) = @_;
+	$self->add_test('array_any', { code => $code }, $reason);
+}
+
+define_test 'array_any' => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	my $i = 0;
+	foreach my $single_subject ( @{ $self->subject } ){
+		return $self->pass("Item $i matched") if upgrade($data->{code})->validate($single_subject);
+		$i++;
+	}
+	return $self->fail('None matched');
+};
+
+=head3 array_none
+
+	pAr->array_none(sub { $_[0] eq uc $_[0] })->ok(['a','b']); # passes
+	pAr->array_none(sub { $_[0] eq uc $_[0] })->ok(['A','b']); # fails
+
+Applies the first argument (a prototype) onto each member of the array; if any member returns true, the test case fails.
+
+=cut
+
+
+sub array_none {
+	my ($self, $code, $reason) = @_;
+	$self->add_test('array_none', { code => $code }, $reason);
+}
+
+define_test 'array_none' => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	my $i = 0;
+	foreach my $single_subject ( @{ $self->subject } ){
+		return $self->fail("Item $i matched") if upgrade($data->{code})->validate($single_subject);
+		$i++;
+	}
+	return $self->pass('None matched');
 };
 
 =head3 nth

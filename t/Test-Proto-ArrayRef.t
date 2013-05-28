@@ -40,6 +40,15 @@ is_a_good_pass(pAr->grep(sub {$_[0] eq uc $_[0]}, ['A'])->validate(['A','b']), "
 is_a_good_pass(pAr->grep(sub {$_[0] eq uc $_[0]}, [])->validate(['a','b']), "grep passes when nothing matches");
 is_a_good_fail(pAr->grep(sub {$_[0] eq uc $_[0]}, ['a','b'])->validate(['A','b']), "grep fails when expected does not match");
 
+is_a_good_pass(pAr->grep(sub {$_[0] eq uc $_[0]})->validate(['A','b']), "boolean grep passes when something matches");
+is_a_good_fail(pAr->grep(sub {$_[0] eq uc $_[0]})->validate(['a','b']), "boolean grep fails when nothing matches");
+
+is_a_good_pass(pAr->array_any(sub {$_[0] eq uc $_[0]})->validate(['A','b']), "array_any passes when something matches");
+is_a_good_fail(pAr->array_any(sub {$_[0] eq uc $_[0]})->validate(['a','b']), "array_any fails when nothing matches");
+
+is_a_good_pass(pAr->array_none(sub {$_[0] eq uc $_[0]})->validate(['a','b']), "array_none passes when nothing matches");
+is_a_good_fail(pAr->array_none(sub {$_[0] eq uc $_[0]})->validate(['A','b']), "array_none fails when something matches");
+
 is_a_good_pass(pAr->array_eq(['a','b'])->validate(['a','b']), "['a','b'] is ['a','b']");
 is_a_good_pass(pAr->array_eq(['a',['b']])->validate(['a',['b']]), "['a',['b']] is ['a',['b']]");
 is_a_good_pass(pAr->array_eq([])->validate([]), "[] is  []");
