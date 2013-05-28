@@ -23,29 +23,36 @@ our $VERSION = ${Test::Proto::Base::VERSION};
 
 =head1 SYNOPSIS
 
-This module simplifies writing tests for deep structures and objects.
+This module provides an expressive interface for validating deep structures and objects.
 
 	use Test::Proto qw(p pAr pHr);
 	
 	pAr	->contains_only('', pHr, 
 			"ArrayRef must contain only an empty string followed by a hashref")
 		->ok(["", {a=>'b'}]);
+		# provides diagnostics, including subtests as TAP, using Test::Builder
 	
 	p	->like(qr/^\d+$/, 'looks like a positive integer')
 		->unlike(qr/^0\d+$/, 'no leading zeros')
-		->ok('123');
+		->validate('123');
+		# returns an object with a true value
 	
 	pOb	->is_a('XML::LibXML::Node', 'must inherit from XML::LibXML::Node')
 		->is_a('XML::LibXML::Element', 'what it really is')
 		->can_do('findnodes', 'must have the findnodes method')
-		->try_can('localName', [], 'li')
+		->try_can('localName', [], 
+			p->like(qr/blockquote|li|p/, 'We can add normal text here')
+		)
 		->ok(XML::LibXML::Element->new('li'));
+		# have a look at the nested prototype in try_can
 
-The idea behind Test Proto is that test scripts for code written on modern, OO principles should themselves resemble the target code rather than sequential code. 
+The idea behind Test::Proto is that test scripts for code written on modern, OO principles should themselves resemble the target code rather than sequential code. 
 
-Tests for deep structures and objects tend should not be repetitive and should be flexible so that when you decide you need C<< $got->{'wurple'}{'diddle'}{'do'} >> to look like C<< $got->{'wurple'}->diddle->[$i]{'do'} >> you can make a much smaller change to your script. Test::Proto is a framework primarily for testing the same thing for multiple conditions, and testing the things it contains/produces in a similar manner. 
+Tests for deep structures and objects tend should not be repetitive and should be flexible. Test::Proto allows you to create objects "protoypes" intended to test structures which conform to a known type. 
 
-The way it works is that you create a "prototype" (using a subclass of L<Test::Proto::Base>), add tests to the prototype, and validate then your string/arryref/object/etc. against the prototype. 
+As in the example above, the way it works is: you create a prototype object, add test cases to the prototype using method calls, and then validate your string/arryref/object/etc. against the prototype using . 
+
+NB: The meaning of "prototype" used here is not related to subroutine prototypes (declaring the arguments expected by a given function or method). 
 
 =head1 FUNCTIONS
 
@@ -63,7 +70,7 @@ sub p {
 
 =head1 AUTHOR
 
-Begin by Daniel Perrett, C<< <perrettdl at googlemail.com> >>
+Begun by Daniel Perrett, C<< <perrettdl at googlemail.com> >>
 
 =head1 CONTRIBUTORS
 
@@ -108,7 +115,7 @@ L<http://search.cpan.org/dist/Test-Proto/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012 Daniel Perrett.
+Copyright 2012-2013 Daniel Perrett.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
