@@ -338,5 +338,25 @@ define_test range => sub {
 	return upgrade($data->{expected})->validate($result, $self);
 };
 
+=head3 reverse
+
+	p->reverse([10..1])->ok([1..10]);
+
+Reverses the order of elements and compares the result to the prototype given.
+
+=cut
+
+sub reverse {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('reverse', { expected => $expected }, $reason);
+}
+
+define_test reverse => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	my $reversed = [ CORE::reverse @{ $self->subject }];
+	return upgrade($data->{expected})->validate($reversed, $self);
+};
+
+
 1;
 
