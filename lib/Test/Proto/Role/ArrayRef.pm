@@ -101,6 +101,31 @@ define_test 'array_none' => sub {
 	return $self->pass('None matched');
 };
 
+=head3 array_all
+
+	pAr->array_all(sub { $_[0] eq uc $_[0] })->ok(['A','B']); # passes
+	pAr->array_all(sub { $_[0] eq uc $_[0] })->ok(['A','b']); # fails
+
+Applies the first argument (a prototype) onto each member of the array; if any member returns false, the test case fails.
+
+=cut
+
+
+sub array_all {
+	my ($self, $code, $reason) = @_;
+	$self->add_test('array_all', { code => $code }, $reason);
+}
+
+define_test 'array_all' => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	my $i = 0;
+	foreach my $single_subject ( @{ $self->subject } ){
+		return $self->fail("Item $i did not match") unless upgrade($data->{code})->validate($single_subject);
+		$i++;
+	}
+	return $self->pass('All matched');
+};
+
 
 =head3 reduce
 

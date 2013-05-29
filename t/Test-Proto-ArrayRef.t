@@ -49,6 +49,9 @@ is_a_good_fail(pAr->array_any(sub {$_[0] eq uc $_[0]})->validate(['a','b']), "ar
 is_a_good_pass(pAr->array_none(sub {$_[0] eq uc $_[0]})->validate(['a','b']), "array_none passes when nothing matches");
 is_a_good_fail(pAr->array_none(sub {$_[0] eq uc $_[0]})->validate(['A','b']), "array_none fails when something matches");
 
+is_a_good_pass(pAr->array_all(sub {$_[0] eq uc $_[0]})->validate(['A','B']), "array_all passes when everything matches");
+is_a_good_fail(pAr->array_all(sub {$_[0] eq uc $_[0]})->validate(['A','b']), "array_all fails when anything does not match");
+
 is_a_good_pass(pAr->reduce(sub { $_[0] + $_[1] }, 6 )->validate([1,2,3]), "reduce passes when result matches");
 is_a_good_fail(pAr->reduce(sub { $_[0] + $_[1] }, 7 )->validate([1,2,3]), "reduce fails when result does not match");
 is_a_good_exception(pAr->reduce(sub { $_[0] + $_[1] }, 7 )->validate([1]), "reduce is exception when subject has less than two members");
