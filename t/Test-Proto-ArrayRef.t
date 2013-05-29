@@ -107,6 +107,11 @@ is_a_good_pass(pAr->range('0..1,1..3', ['a','b','b','c','d'])->validate(['a','b'
 is_a_good_pass(pAr->reverse([qw (d c b a)])->validate(['a','b','c','d']), "reverse passes when expected matches");
 is_a_good_fail(pAr->reverse([qw (a b c d)])->validate(['a','b','c','d']), "reverse fails when expected does not match");
 
+# before
+is_a_good_pass(pAr->array_before('c', ['a','b'])->validate(['a','b','c','d']), "array_before passes when expected matches");
+is_a_good_pass(pAr->array_before('a',[])->validate(['a','b','c','d']), "array_before passes when expected matches and is empty");
+is_a_good_fail(pAr->array_before('c',[])->validate(['a','b','c','d']), "array_before fails when expected does not match");
+
 done_testing;
 
 

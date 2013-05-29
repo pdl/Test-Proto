@@ -38,16 +38,16 @@ Applies the first argument (a prototype) onto each member of the array; if it re
 sub grep {
 	my ($self, $code, $expected, $reason) = @_;
 	if (defined $expected) {
-		$self->add_test('grep', { code => $code, expected => $expected }, $reason);
+		$self->add_test('grep', { match => $code, expected => $expected }, $reason);
 	}
 	else {
-		$self->add_test('array_any', { code => $code }, $reason);
+		$self->add_test('array_any', { match => $code }, $reason);
 	}
 }
 
 define_test 'grep' => sub {
 	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
-	my $subject = [ grep { upgrade($data->{code})->validate($_) } @{ $self->subject } ];
+	my $subject = [ grep { upgrade($data->{match})->validate($_) } @{ $self->subject } ];
 	return upgrade($data->{expected})->validate($subject, $self);
 };
 
@@ -62,15 +62,15 @@ Applies the first argument (a prototype) onto each member of the array; if any m
 
 
 sub array_any {
-	my ($self, $code, $reason) = @_;
-	$self->add_test('array_any', { code => $code }, $reason);
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('array_any', { match => $expected }, $reason);
 }
 
 define_test 'array_any' => sub {
 	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
 	my $i = 0;
 	foreach my $single_subject ( @{ $self->subject } ){
-		return $self->pass("Item $i matched") if upgrade($data->{code})->validate($single_subject);
+		return $self->pass("Item $i matched") if upgrade($data->{match})->validate($single_subject);
 		$i++;
 	}
 	return $self->fail('None matched');
@@ -357,6 +357,65 @@ define_test reverse => sub {
 	return upgrade($data->{expected})->validate($reversed, $self);
 };
 
+
+=head3 array_before
+
+	pAr->array_before('b',['A'])->ok(['a','b']); # passes
+
+Applies the first argument (a prototype) onto each member of the array; if any member returns true, the second argument is validated against a new arrayref containing all the preceding members of the array.
+
+=cut
+
+
+sub array_before {
+	my ($self, $match, $expected, $reason) = @_;
+	$self->add_test('array_before', { match => $match, expected => $expected }, $reason);
+}
+
+define_test 'array_before' => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	my $i = 0;
+	foreach my $single_subject ( @{ $self->subject } ){
+		if (upgrade($data->{match})->validate($single_subject)) {
+			# $self->add_info("Item $i matched")
+			my $before = [ @{ $self->subject }[0..$i] ];
+			pop @$before unless $data->{include_self};
+			return upgrade($data->{expected})->validate($before, $self);
+		}
+		$i++;
+	}
+	return $self->fail('None matched');
+};
+
+=head3 array_after
+
+	pAr->after('b',['A'])->ok(['a','b']); # passes
+
+Applies the first argument (a prototype) onto each member of the array; if any member returns true, the second argument is validated against a new arrayref containing all the following members of the array.
+
+=cut
+
+
+sub array_after {
+	my ($self, $match, $expected, $reason) = @_;
+	$self->add_test('array_after', { match => $match, expected => $expected }, $reason);
+}
+
+define_test 'array_after' => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	my $i = 0;
+	foreach my $single_subject ( @{ $self->subject } ){
+		if (upgrade($data->{match})->validate($single_subject)) {
+			# $self->add_info("Item $i matched")
+			my $last_index = $#{$self->subject};
+			my $after = [ @{ $self->subject }[$i..$last_index] ];
+			pop @$after unless $data->{include_self};
+			return upgrade($data->{expected})->validate($after, $self);
+		}
+		$i++;
+	}
+	return $self->fail('None matched');
+};
 
 1;
 
