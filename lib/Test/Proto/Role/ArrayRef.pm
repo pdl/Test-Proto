@@ -308,7 +308,35 @@ define_test array_eq => sub {
 	$self->done;
 };
 
+=head3 range
 
+	p->range('1,3..4',[9,7,6,5])->ok([10..1]);
+
+Finds the range specified in the first element, and compares them to the second element.
+
+=cut
+
+sub range {
+	my ($self, $range, $expected, $reason) = @_;
+	$self->add_test('range', { range=>$range, expected => $expected }, $reason);
+}
+
+define_test range => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	my $range = $data->{range};
+	my $result = [];
+	my $length = scalar @{ $self->subject };
+	$range =~ s/-(\d+)/$length - $1/ge;
+	$range =~ s/\.\.$/'..' . ($length - 1)/e;
+	$range =~ s/^\.\./0../;
+	return $self->exception('Invalid range specified') unless $range =~ m/^(?:\d+|\d+..\d+)(?:,(\d+|\d+..\d+))*$/;
+	my @range = eval ("($range)"); # surely there is a better way?
+	foreach my $i (@range) {
+		return $self->fail("Element $i does not exist") unless exists $self->subject->[$i];
+		push (@$result, $self->subject->[$i]);
+	}
+	return upgrade($data->{expected})->validate($result, $self);
+};
 
 1;
 
