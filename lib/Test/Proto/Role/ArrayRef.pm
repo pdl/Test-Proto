@@ -101,6 +101,35 @@ define_test 'array_none' => sub {
 	return $self->pass('None matched');
 };
 
+
+=head3 reduce
+
+	pAr->reduce(sub { $_[0] + $_[1] }, 6 )->ok([1,2,3]);
+
+Applies the first argument (a coderef) onto the first two elements of the array, and thereafter the next element and the return value of the previous calculation. Similar to List::Util::reduce.
+
+=cut
+
+sub reduce {
+	my ($self, $code, $expected, $reason) = @_;
+	$self->add_test('reduce', { code=> $code, expected => $expected }, $reason);
+}
+
+define_test 'reduce' => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	my $length = $#{ $self->subject };
+	return $self->exception ('Cannot use reduce unless the subject has at least two elements; only '. ( $length + 1 ). ' found') unless $length; 
+	my $left = ${ $self->subject }[0];
+	my $right;
+	my $i = 1;
+	while ($i <= $length) {
+		$right = ${ $self->subject }[$i];
+		$left = $data->{code}->($left, $right);
+		$i++;
+	}
+	return upgrade($data->{expected})->validate($left, $self);
+};
+
 =head3 nth
 
 	p->nth(1,'b')->ok(['a','b']);
