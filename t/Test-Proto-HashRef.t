@@ -34,7 +34,8 @@ is_a_good_fail(pHr->key_has_value('a','b')->validate({'a'=>'c'}), "key_has_value
 is_a_good_fail(pHr->key_has_value('a','b')->validate({}), "key_has_value should fail when the key does not exist");
 
 # key_exists
-is_a_good_pass(pHr->key_exists('a')->validate({'a'=>'b'}), "key_exists should pass when the key does exists");
+is_a_good_pass(pHr->key_exists('a')->validate({'a'=>'b'}), "key_exists should pass when the key does exist");
+is_a_good_pass(pHr->key_exists('a')->validate({'a'=>undef}), "key_exists should pass when the key does exist, even if value is undef");
 is_a_good_fail(pHr->key_exists('a')->validate({}), "key_exists should fail when the key does not exist");
 
 # count_keys

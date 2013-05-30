@@ -7,9 +7,9 @@ use Moo::Role;
 
 =head3 key_exists
 
-	p->key_exiets('a')->ok({a=>1, b=>2});
+	p->key_exists('a')->ok({a=>1, b=>2});
 
-Returns true if the key exists, even if the value is undefined.
+Returns true if the key exists (even if the value is undefined).
 
 =cut
 
