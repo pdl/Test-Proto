@@ -21,6 +21,7 @@ t/pod-coverage.t
 t/pod.t
 t/Test-Proto-ArrayRef.t
 t/Test-Proto-Base.t
+t/Test-Proto-Common.t
 t/Test-Proto-HashRef.t
 t/Test-Proto-Formatter.t
 t/Test-Proto-Formatter-TestBuilder.t
