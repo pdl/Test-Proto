@@ -28,11 +28,19 @@ sub is_a_good_exception {
 
 sub pHr { Test::Proto::HashRef->new(); }
 
-is_a_good_pass(pHr->key_has_value('a','b')->validate({'a'=>'b'}), "This should pass");
-is_a_good_fail(pHr->key_has_value('a','b')->validate({'a'=>'c'}), "This should fail");
-is_a_good_fail(pHr->key_has_value('a','b')->validate({}), "This should fail");
+# key_has_value
+is_a_good_pass(pHr->key_has_value('a','b')->validate({'a'=>'b'}), "key_has_value should pass when expected matches");
+is_a_good_fail(pHr->key_has_value('a','b')->validate({'a'=>'c'}), "key_has_value should fail when expected does not match");
+is_a_good_fail(pHr->key_has_value('a','b')->validate({}), "key_has_value should fail when the key does not exist");
 
-is_a_good_pass(pHr->count_keys(1)->validate({'a'=>'b'}), "This should pass");
+# key_exists
+is_a_good_pass(pHr->key_exists('a')->validate({'a'=>'b'}), "key_exists should pass when the key does exists");
+is_a_good_fail(pHr->key_exists('a')->validate({}), "key_exists should fail when the key does not exist");
+
+# count_keys
+is_a_good_pass(pHr->count_keys(1)->validate({'a'=>'b'}), "count_keys should pass when the number matches");
+is_a_good_pass(pHr->count_keys(0)->validate({}), "count_keys should pass when the number is 0 and the hash is empty");
+is_a_good_fail(pHr->count_keys(5)->validate({'a'=>'b'}), "count_keys should fail when the number does not match");
 
 
 done_testing;

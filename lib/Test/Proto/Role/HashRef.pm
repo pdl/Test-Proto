@@ -5,6 +5,24 @@ use warnings;
 use Test::Proto::Common;
 use Moo::Role;
 
+=head3 key_exists
+
+	p->key_exiets('a')->ok({a=>1, b=>2});
+
+Returns true if the key exists, even if the value is undefined.
+
+=cut
+
+sub key_exists {
+	my ($self, $key, $reason) = @_;
+	$self->add_test('key_exists', { key => $key }, $reason);
+}
+define_test key_exists => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	return $self->pass if exists $self->subject->{$data->{key}}; 
+	return $self->fail; 
+};
+
 =head3 key_has_value
 
 	p->key_has_value('a',1)->ok({a=>1, b=>2});
