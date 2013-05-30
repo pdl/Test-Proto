@@ -1,7 +1,8 @@
 Revision history for Test-Proto
 
 Unreleased Changes	Undated
-		Rewritten the underlying logic of running the tests: this is now done by a TestRunner; refactored Pass/Fail objects as RunnerEvents; created a more robust DSL for defining prototype classes. 
+		Near total rewrite.
+		Rewritten the underlying logic of running the tests: this is now done by a TestRunner. Pass/Fail objects are now TestRunners. Created more of a DSL for defining prototype classes. All classes use Moo. ArrayRef and HashRef refactored out as roles. 
 
 0.011	2012-06-14
 		Fixed prerequisites.
