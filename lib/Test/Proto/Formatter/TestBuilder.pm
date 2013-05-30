@@ -66,11 +66,16 @@ sub event {
 	my $runner = shift;
 	my $eventType = shift;
 	if ('new' eq $eventType) {
-		if (defined $runner->parent){
-			$self->_object_id_register->{$runner->object_id} = $self->_object_id_register->{$runner->parent->object_id}->child;
+		my $name = defined($runner->test_case) ? 
+			$runner->test_case->can('name') ? 
+				$runner->test_case->name 
+			: ref $runner->test_case
+		: undef;
+		if (defined $runner->parent) {
+			$self->_object_id_register->{$runner->object_id} = $self->_object_id_register->{$runner->parent->object_id}->child($name);
 		}
 		else {
-			$self->_object_id_register->{$runner->object_id} = $CLASS->builder->child;
+			$self->_object_id_register->{$runner->object_id} = $CLASS->builder->child($name);
 		}
 	}
 	elsif ('done' eq $eventType) {
