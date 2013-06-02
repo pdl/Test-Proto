@@ -54,9 +54,13 @@ sub validate {
 	my ($self, $subject, $context) = @_;
 	$subject = $_ unless exists $_[1];
 	if (!defined $context or !CORE::ref($context)){ # if context is not a TestRunner
+		my $reason = $context;
 		$context = Test::Proto::TestRunner->new(subject=>$subject);
+		if (defined $reason) {
+			$context->subtest->diag($reason);
+		}
 	}
-	else{
+	else {
 		$context->subject($subject);
 	}
 	$self->run_tests($context);
@@ -70,7 +74,11 @@ sub validate {
 
 sub ok {
 	my ($self, $subject, $context) = @_;
-	$context = $context = Test::Proto::TestRunner->new(formatter=>Test::Proto::Formatter::TestBuilder->new()) unless defined $context;
+	my $reason = $context; 
+	$context = Test::Proto::TestRunner->new(formatter=>Test::Proto::Formatter::TestBuilder->new()) unless ((defined $context) and (CORE::ref $context));
+	if (defined $reason) {
+		$context->subtest->diag($reason);
+	}
 	$self->validate($subject, $context);
 }
 

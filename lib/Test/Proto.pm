@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::Proto::Base;
-use Test::Proto::Common;
+use Test::Proto::Common ();
 use base "Exporter";
 our @EXPORT_OK = qw(&p &pArray &pHash); # symbols to export on request
 

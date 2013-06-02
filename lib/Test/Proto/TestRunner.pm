@@ -158,7 +158,7 @@ sub complete {
 		return $self;
 	}
 	$self->value($value);
-	$self->status_message($message);
+	$self->status_message($message) if defined $message;
 	$self->_set_is_complete(1);
 	$self->inform_formatter('done');
 	return $self;

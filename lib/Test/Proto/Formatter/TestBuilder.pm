@@ -43,7 +43,9 @@ sub _explain_test_case {
 	my $test_case = shift;
 	if (ref $test_case){
 		if ($test_case->isa('Test::Proto::TestCase')){
-			my $report = $test_case->name."\nexpected: ".$test_case->data->{expected};
+			my $report = '';
+			$report .= $test_case->name;
+			$report .= "\nexpected: ".$test_case->data->{expected} if defined($test_case->data->{expected});
 			if (scalar keys %{$test_case->data}>1){	
 				$report.= "\nOther data:";
 				foreach my $key (grep {'expected' ne $_} keys %{$test_case->data}){
@@ -52,9 +54,10 @@ sub _explain_test_case {
 			}
 			return $report;
 		}
+		return '[not a TestCase]';
 	}
 	else {
-		return '[not a TestCase]';
+		return '[not a TestCase or any other object]';
 	}
 }
 
@@ -79,7 +82,7 @@ sub event {
 		if ( my $tb = $self->_object_id_register->{$runner->object_id} ){
 			$tb->ok($runner, 
 				$runner->status 
-			." - got: ". $runner->subject 
+			." - got: ". ( defined $runner->subject ? $runner->subject : '[undefined]' )
 			."\n". $self->_explain_test_case($runner->test_case)
 			. (defined $runner->status_message ? "\n". $runner->status_message : '')
 			);
@@ -105,6 +108,7 @@ NOT YET IMPLEMENTED. Will probably be used to output information from a test run
 sub format {
 	my $self = shift;
 	my $runner = shift;
+	$runner->inform_formatter($self, 'done');
 	return $self;
 }
 
