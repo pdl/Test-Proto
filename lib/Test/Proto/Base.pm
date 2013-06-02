@@ -223,7 +223,7 @@ sub run_tests{
 	foreach my $test (@{ $self->script }){
 		$self->run_test($test, $runner);
 	}
-	$runner->done;
+	$runner->done("A ". (ref $self). " must pass all its subtests.");
 	return $self;
 }
 

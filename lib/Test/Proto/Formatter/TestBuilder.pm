@@ -52,9 +52,6 @@ sub _explain_test_case {
 			}
 			return $report;
 		}
-		elsif ($test_case->isa('Test::Proto::Base')){
-			return "A ". (ref $test_case)." must pass all its subtests."
-		}
 	}
 	else {
 		return '[not a TestCase]';
@@ -80,7 +77,12 @@ sub event {
 	}
 	elsif ('done' eq $eventType) {
 		if ( my $tb = $self->_object_id_register->{$runner->object_id} ){
-			$tb->ok($runner, $runner->status ." - got: ". $runner->subject ."\n". $self->_explain_test_case($runner->test_case));
+			$tb->ok($runner, 
+				$runner->status 
+			." - got: ". $runner->subject 
+			."\n". $self->_explain_test_case($runner->test_case)
+			. (defined $runner->status_message ? "\n". $runner->status_message : '')
+			);
 			$tb->done_testing;
 			$tb->finalize;
 		}

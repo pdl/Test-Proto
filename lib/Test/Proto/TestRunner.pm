@@ -145,6 +145,7 @@ has 'formatter' =>
 =head3 complete
 
 	$self->complete(0);
+	$self->complete(0, 'Something went wrong');
 
 Declares the test run is complete. It is intended that this is only called by the other methods C<done>, C<pass>, C<fail>, C<exception>, C<diag>, C<skip>.
 
@@ -164,6 +165,8 @@ sub complete {
 }
 
 =head3 subtest
+
+Creates and returns a child, which is another TestRunner. The child keeps the same formatter, subject, and test_case as the parent. The child is added to the parent's list of events. 
 
 =cut
 
@@ -203,6 +206,7 @@ sub add_event {
 =head3 done
 
 	$self->done;
+	$self->done ('Completed check of widgets');
 
 Declares that the test run is complete, and determines if the result is a pass or a fail - if there are any failures, then the result is deemed to be a failure. 
 
@@ -211,7 +215,7 @@ Declares that the test run is complete, and determines if the result is a pass o
 sub done {
 	my ($self, $message) = @_;
 	return $self->exception if scalar grep { $_->is_exception } @{ $self->children() };
-	$self->complete($self->_count_fails?0:1);
+	$self->complete($self->_count_fails?0:1, $message);
 	return $self;
 }
 
@@ -260,7 +264,7 @@ Declares that the test run is complete, and declares that it is not a result but
 sub diag{
 	my ($self, $message) = @_;
 	$self->_set_is_info(1);
-	$self->complete(1);
+	$self->complete(1, $message);
 	return $self;
 }
 
