@@ -5,6 +5,19 @@ use warnings;
 use Test::Proto::Common;
 use Moo::Role;
 
+=head1 NAME
+
+Test::Proto::Role::Value - Role containing test case methods for any perl value
+
+=head1 SYNOPSIS
+
+	package MyProtoClass;
+	use Moo;
+	with 'Test::Proto::Role::Value';
+
+This Moo Role provides methods to L<Test::Proto::Base> for common test case methods like C<eq>, C<defined>, etc. which can potentially be used on any perl value/object.
+
+=head1 METHODS
 
 =head3 eq, ne, gt, lt, ge, le
 
@@ -335,3 +348,10 @@ define_test also => sub{
 	return upgrade($data->{expected})->validate($self->subject, $self); 
 };
 
+=head1 OTHER INFORMATION
+
+For author, version, bug reports, support, etc, please see L<Test::Proto>. 
+
+=cut
+
+1;

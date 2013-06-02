@@ -6,7 +6,7 @@ use warnings;
 use Test::Proto::Base;
 use Test::Proto::Common;
 use base "Exporter";
-our @EXPORT_OK = qw(&p); # symbols to export on request
+our @EXPORT_OK = qw(&p &pArray &pHash); # symbols to export on request
 
 =head1 NAME
 
@@ -65,6 +65,28 @@ Returns a basic prototype. See L<Test::Proto::Base>.
 sub p {
 	return Test::Proto::Common::upgrade ($_[0]) if 1 == scalar @_;
 	return Test::Proto::Base->new(@_);
+}
+
+=head2 pArray
+
+Returns a prototype for an array/ArrayRef. See L<Test::Proto::ArrayRef>.
+
+=cut
+
+sub pArray {
+	return Test::Proto::Common::upgrade ($_[0]) if 1 == scalar @_;
+	return Test::Proto::ArrayRef->new(@_);
+}
+
+=head2 pHash
+
+Returns a prototype for a hash/HashRef. See L<Test::Proto::HashRef>.
+
+=cut
+
+sub pHash {
+	return Test::Proto::Common::upgrade ($_[0]) if 1 == scalar @_;
+	return Test::Proto::HashRef->new(@_);
 }
 
 

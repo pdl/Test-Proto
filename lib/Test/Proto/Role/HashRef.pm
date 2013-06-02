@@ -5,9 +5,24 @@ use warnings;
 use Test::Proto::Common;
 use Moo::Role;
 
+=head1 NAME
+
+Test::Proto::Role::HashRef - Role containing test case methods for hash refs.
+
+=head1 SYNOPSIS
+
+	package MyProtoClass;
+	use Moo;
+	with 'Test::Proto::Role::HashRef';
+
+This Moo Role provides methods to Test::Proto::HashRef for test case methods that apply to hashrefs such as C<key_exists>. It can also be used for objects which use overload or otherwise respond to hashref syntax.
+
+=head1 METHODS
+
+
 =head3 key_exists
 
-	p->key_exists('a')->ok({a=>1, b=>2});
+	pHash->key_exists('a')->ok({a=>1, b=>2});
 
 Returns true if the key exists (even if the value is undefined).
 
@@ -25,8 +40,8 @@ define_test key_exists => sub {
 
 =head3 key_has_value
 
-	p->key_has_value('a',1)->ok({a=>1, b=>2});
-	p->key_has_value('b',p->num_gt(0))->ok({a=>1, b=>2});
+	pHash->key_has_value('a',1)->ok({a=>1, b=>2});
+	pHash->key_has_value('b',p->num_gt(0))->ok({a=>1, b=>2});
 
 Returns the value of corresponding to the key provided within the subject, and tests it against the prototype provided in the argument.
 
@@ -44,8 +59,8 @@ define_test key_has_value => sub {
 
 =head3 count_keys
 
-	p->count_keys(2)->ok({a=>1, b=>2});
-	p->count_keys(p->num_gt(0))->ok({a=>1, b=>2});
+	pHash->count_keys(2)->ok({a=>1, b=>2});
+	pHash->count_keys(p->num_gt(0))->ok({a=>1, b=>2});
 
 Counts the keys of the hashref and compares them to the prototype provided. There is no equivalent count_values - the number should be identical!
 
@@ -64,7 +79,7 @@ define_test count_keys => sub {
 
 =head3 keys
 
-	p->keys($tests_keys)->ok({a=>1, b=>2});
+	pHash->keys($tests_keys)->ok({a=>1, b=>2});
 
 Returns the hash keys of the subject as an array reference (in an undetermined order), and tests them against the prototype provided in the argument.
 
@@ -86,7 +101,7 @@ define_test 'keys' => sub {
 
 =head3 values
 
-	p->values($tests_values)->ok({a=>1, b=>2});
+	pHash->values($tests_values)->ok({a=>1, b=>2});
 
 Produces the hash values of the subject as an array reference (in an undetermined order), and tests them against the prototype provided in the argument.
 
@@ -107,7 +122,7 @@ define_test 'values' => sub {
 
 =head3 enumerated
 
-	p->enumerated($tests_key_value_pairs)->ok({a=>1, b=>2});
+	pHash->enumerated($tests_key_value_pairs)->ok({a=>1, b=>2});
 
 Produces the hash keys and values of the subject as an array reference (in an undetermined order), and tests them against the prototype provided in the argument.
 
@@ -132,5 +147,12 @@ define_test 'enumerated' => sub {
 # 	my ($subject, $expected) = @_; # self is the runner, NOT the prototype
 # 	return $expected == scalar keys %$subject;
 # };
+
+=head1 OTHER INFORMATION
+
+For author, version, bug reports, support, etc, please see L<Test::Proto>. 
+
+=cut
+
 
 1;

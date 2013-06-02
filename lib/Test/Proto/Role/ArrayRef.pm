@@ -5,10 +5,23 @@ use warnings;
 use Test::Proto::Common;
 use Moo::Role;
 
+=head1 NAME
+
+Test::Proto::Role::ArrayRef - Role containing test case methods for array refs.
+
+=head1 SYNOPSIS
+
+	package MyProtoClass;
+	use Moo;
+	with 'Test::Proto::Role::ArrayRef';
+
+This Moo Role provides methods to Test::Proto::ArrayRef for test case methods that apply to arrayrefs such as C<map>. It can also be used for objects which use overload or otherwise respond to arrayref syntax.
+
+=head1 METHODS
 
 =head3 map
 
-	pAr->map(sub { uc shift }, ['A','B'])->ok(['a','b']);
+	pArray->map(sub { uc shift }, ['A','B'])->ok(['a','b']);
 
 Applies the first argument (a coderef) onto each member of the array. The resulting array is compared to the second argument.
 
@@ -27,9 +40,9 @@ define_test 'map' => sub {
 
 =head3 grep
 
-	pAr->grep(sub { $_[0] eq uc $_[0] }, ['A'])->ok(['A','b']); # passes
-	pAr->grep(sub { $_[0] eq uc $_[0] }, [])->ok(['a','b']); # passes
-	pAr->grep(sub { $_[0] eq uc $_[0] })->ok(['a','b']); # fails - 'boolean' grep behaves like array_any
+	pArray->grep(sub { $_[0] eq uc $_[0] }, ['A'])->ok(['A','b']); # passes
+	pArray->grep(sub { $_[0] eq uc $_[0] }, [])->ok(['a','b']); # passes
+	pArray->grep(sub { $_[0] eq uc $_[0] })->ok(['a','b']); # fails - 'boolean' grep behaves like array_any
 
 Applies the first argument (a prototype) onto each member of the array; if it returns true, the member is added to the resulting array. The resulting array is compared to the second argument.
 
@@ -53,8 +66,8 @@ define_test 'grep' => sub {
 
 =head3 array_any
 
-	pAr->array_any(sub { $_[0] eq uc $_[0] })->ok(['A','b']); # passes
-	pAr->array_any(sub { $_[0] eq uc $_[0] })->ok(['a','b']); # fails
+	pArray->array_any(sub { $_[0] eq uc $_[0] })->ok(['A','b']); # passes
+	pArray->array_any(sub { $_[0] eq uc $_[0] })->ok(['a','b']); # fails
 
 Applies the first argument (a prototype) onto each member of the array; if any member returns true, the test case succeeds.
 
@@ -78,8 +91,8 @@ define_test 'array_any' => sub {
 
 =head3 array_none
 
-	pAr->array_none(sub { $_[0] eq uc $_[0] })->ok(['a','b']); # passes
-	pAr->array_none(sub { $_[0] eq uc $_[0] })->ok(['A','b']); # fails
+	pArray->array_none(sub { $_[0] eq uc $_[0] })->ok(['a','b']); # passes
+	pArray->array_none(sub { $_[0] eq uc $_[0] })->ok(['A','b']); # fails
 
 Applies the first argument (a prototype) onto each member of the array; if any member returns true, the test case fails.
 
@@ -103,8 +116,8 @@ define_test 'array_none' => sub {
 
 =head3 array_all
 
-	pAr->array_all(sub { $_[0] eq uc $_[0] })->ok(['A','B']); # passes
-	pAr->array_all(sub { $_[0] eq uc $_[0] })->ok(['A','b']); # fails
+	pArray->array_all(sub { $_[0] eq uc $_[0] })->ok(['A','B']); # passes
+	pArray->array_all(sub { $_[0] eq uc $_[0] })->ok(['A','b']); # fails
 
 Applies the first argument (a prototype) onto each member of the array; if any member returns false, the test case fails.
 
@@ -129,7 +142,7 @@ define_test 'array_all' => sub {
 
 =head3 reduce
 
-	pAr->reduce(sub { $_[0] + $_[1] }, 6 )->ok([1,2,3]);
+	pArray->reduce(sub { $_[0] + $_[1] }, 6 )->ok([1,2,3]);
 
 Applies the first argument (a coderef) onto the first two elements of the array, and thereafter the next element and the return value of the previous calculation. Similar to List::Util::reduce.
 
@@ -157,7 +170,7 @@ define_test 'reduce' => sub {
 
 =head3 nth
 
-	p->nth(1,'b')->ok(['a','b']);
+	pArray->nth(1,'b')->ok(['a','b']);
 
 Finds the nth item (where n is the first argument) and compares the result to the prototype provided in the second argument.
 
@@ -182,7 +195,7 @@ define_test nth => sub {
 
 =head3 count_items
 
-	p->count_items(2)->ok(['a','b']);
+	pArray->count_items(2)->ok(['a','b']);
 
 Finds the length of the array (i.e. the number of items) and compares the result to the prototype provided in the argument.
 
@@ -201,7 +214,7 @@ define_test count_items => sub {
 
 =head3 enumerated
 
-	p->enumerated($tests_enumerated)->ok(['a','b']);
+	pArray->enumerated($tests_enumerated)->ok(['a','b']);
 
 Produces the indices and values of the subject as an array reference, and tests them against the prototype provided in the argument.
 
@@ -223,7 +236,7 @@ define_test 'enumerated' => sub {
 
 =head3 in_groups
 
-	p->in_groups(2,[['a','b'],['c','d'],['e']])->ok(['a','b','c','d','e']);
+	pArray->in_groups(2,[['a','b'],['c','d'],['e']])->ok(['a','b','c','d','e']);
 
 Bundles the contents in groups of n (where n is the first argument), puts each group in an arrayref, and compares the resulting arrayref to the prototype provided in the second argument.
 
@@ -254,8 +267,8 @@ define_test in_groups => sub {
 
 =head3 group_when
 
-	p->group_when(sub {$_[eq uc $_[0]} ,[['A'],['B','c','d'],['E']])->ok(['A','B','c','d','E']);
-	p->group_when(sub {$_[0] eq $_[0]} ,[['a','b','c','d','e']])->ok(['a','b','c','d','e']);
+	pArray->group_when(sub {$_[eq uc $_[0]} ,[['A'],['B','c','d'],['E']])->ok(['A','B','c','d','E']);
+	pArray->group_when(sub {$_[0] eq $_[0]} ,[['a','b','c','d','e']])->ok(['a','b','c','d','e']);
 
 Bundles the contents of the test subject in groups; a new group is created when the member matches the first argument (a prototype). The resulting arrayref is compared to the second argument.
 
@@ -284,7 +297,7 @@ define_test group_when => sub {
 
 =head3 array_eq
 
-	p->array_eq(['a','b'])->ok(['a','b']);
+	pArray->array_eq(['a','b'])->ok(['a','b']);
 
 Compares the elements of the test subject with the elements of the first argument, using the C<upgrade> feature.
 
@@ -310,7 +323,7 @@ define_test array_eq => sub {
 
 =head3 range
 
-	p->range('1,3..4',[9,7,6,5])->ok([10..1]);
+	pArray->range('1,3..4',[9,7,6,5])->ok([10..1]);
 
 Finds the range specified in the first element, and compares them to the second element.
 
@@ -340,7 +353,7 @@ define_test range => sub {
 
 =head3 reverse
 
-	p->reverse([10..1])->ok([1..10]);
+	pArray->reverse([10..1])->ok([1..10]);
 
 Reverses the order of elements and compares the result to the prototype given.
 
@@ -360,7 +373,7 @@ define_test reverse => sub {
 
 =head3 array_before
 
-	pAr->array_before('b',['A'])->ok(['a','b']); # passes
+	pArray->array_before('b',['A'])->ok(['a','b']); # passes
 
 Applies the first argument (a prototype) onto each member of the array; if any member returns true, the second argument is validated against a new arrayref containing all the preceding members of the array.
 
@@ -389,7 +402,7 @@ define_test 'array_before' => sub {
 
 =head3 array_after
 
-	pAr->after('b',['A'])->ok(['a','b']); # passes
+	pArray->after('b',['A'])->ok(['a','b']); # passes
 
 Applies the first argument (a prototype) onto each member of the array; if any member returns true, the second argument is validated against a new arrayref containing all the following members of the array.
 
