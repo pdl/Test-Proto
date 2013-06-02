@@ -1,6 +1,7 @@
 Changes
 lib/Test/Proto.pm
 lib/Test/Proto/Base.pm
+lib/Test/Proto/Role/Value.pm
 lib/Test/Proto/Common.pm
 lib/Test/Proto/Formatter.pm
 lib/Test/Proto/Formatter/TestBuilder.pm
