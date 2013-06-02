@@ -14,8 +14,9 @@ Test::Proto::Common - Provides common functions for Test::Proto development
 
 =head1 SYNOPSIS
 
-	use Test::Proto::Common;
-	define 
+	use Test::Proto::Common; # exports all functions automatically
+
+Provides functions used to build a Prototype class.
 
 =cut
 
