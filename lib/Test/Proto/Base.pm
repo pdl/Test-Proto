@@ -8,6 +8,7 @@ use Test::Proto::Formatter::TestBuilder;
 use Test::Proto::TestCase;
 use Moo;
 with('Test::Proto::Role::Value');
+with('Test::Proto::Role::Tagged');
 our $VERSION = '0.011';
 
 =pod
