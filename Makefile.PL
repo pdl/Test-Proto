@@ -16,8 +16,8 @@ WriteMakefile(
 		'Test::More' => 0,
 		'Data::Dumper' => 0,
 		'Moo' => 0,
-		'Object::ID' => 0,
-		'Scalar::Util' => 0,
+		'Object::ID' => '0.0.5',
+		'Scalar::Util' => '1.14',
 		'Test::Deep::NoTest' => 0
 	},
 	META_MERGE    => {
