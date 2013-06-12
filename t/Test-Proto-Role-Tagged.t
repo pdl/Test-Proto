@@ -3,8 +3,6 @@ use Test::More;
 use Test::Proto::Base;
 use Test::Proto::TestCase;
 
-sub tc {Test::Proto::TestCase->new(@_)}
-
 foreach my $obj (Test::Proto::TestCase->new, Test::Proto::Base->new) {
 	subtest ( (ref $obj) => sub{
 		# tags attribute
@@ -31,8 +29,10 @@ use Test::Proto::TestRunner;
 
 my $runner = Test::Proto::TestRunner->new;
 
+$runner->skip_tag('skip_me');
 
+my $result = Test::Proto::Base->new->eq('b')->tag('skip_me')->validate('a', $runner);
 
-
+ok($result, 'Skips failing test ok');
 
 done_testing();
