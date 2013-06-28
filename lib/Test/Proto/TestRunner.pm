@@ -81,6 +81,27 @@ has 'value' =>
 	is => 'rw',
 	default => _zero;
 
+=head3 skipped_tags
+
+If any test case or prototype has one of the tags in this list, the runner will skip it.
+
+=cut
+
+has 'skipped_tags'  =>
+	is => 'rw',
+	default => sub{[]};
+
+=head3 required_tags
+
+If this list is not empty, then unless a test case or prototype has a tag in this list, the runner will skip it. 
+
+=cut
+
+has 'required_tags'  =>
+	is => 'rw',
+	default => sub{[]};
+
+
 =head3 is_exception
 
 Returns C<1> if the test run has run into an exception, C<0> otherwise.
@@ -176,6 +197,8 @@ sub subtest{
 		formatter=> $self->formatter,
 		subject=> $self->subject,
 		test_case=> $self->test_case,
+		skipped_tags=> $self->skipped_tags,
+		required_tags=> $self->required_tags,
 		parent=>$self,
 		@_
 	});
@@ -334,11 +357,42 @@ sub status {
 	return 'FAIL';
 }
 
+=head3 run_test
+
+	$self->run_test($test, $proto);
+
+This method runs a particular test in the object's script, and returns the subtest. It is called by the C<< Test::Proto::Base::run_tests >> and should only be called by subclasses of L<Test::Proto::Base> which override that method.
+
+This is documented for information purposes only and is not intended to be used except in the maintainance of C<Test::Proto> itself.
+
+=cut
+
+sub run_test{
+	my ($self, $test, $proto) = @_;
+	my $runner = $self->subtest(test_case=>$test, subject=>$self->subject);
+	foreach my $tag (@{ $self->skipped_tags }) {
+		if ($test->has_tag($tag) or $proto->has_tag($tag)) {
+			return $runner->skip('Skipping tag '.$tag);
+		}
+	}
+	foreach my $tag (@{ $self->required_tags }) {
+		if ($test->has_tag($tag) or $proto->has_tag($tag)) {
+			$runner->required_tags([]);
+			last;
+		}
+	}
+	return $runner->skip ('None of the required tags ('.join ('',@{ $self->required_tags() }).')found') if @{ $self->required_tags() } and @{ $runner->required_tags() };
+	my $result = $test->code->($runner);
+	$runner->exception("Test execution did not complete.") unless $runner->is_complete;
+	return $runner;
+}
+
 =head3 object_id, object_uuid
 
 Test::Proto::TestRunner implements L<Object::ID>. This is used by formatters.
 
 =cut
+
 
 1;
 

@@ -8,6 +8,7 @@ use Test::Proto::Formatter::TestBuilder;
 use Test::Proto::TestCase;
 use Moo;
 with('Test::Proto::Role::Value');
+with('Test::Proto::Role::Tagged');
 our $VERSION = '0.011';
 
 =pod
@@ -196,24 +197,6 @@ sub add_test{
 	return $self;
 }
 
-=head3 run_test
-
-	$self->run_test($test, $subject, $context);
-
-This method runs a particular test in the object's script, and returns the prototype object. It is called by the C<< ->run_tests >> method.
-
-This is documented for information purposes only and is not intended to be used except in the maintainance of C<Test::Proto> itself.
-
-=cut
-
-sub run_test{
-	my ($self, $test, $context) = @_;
-	my $runner =  $context->subtest(test_case=>$test, subject=>$context->subject);
-	my $result = $test->code->($runner);
-	$runner->exception("Test execution did not complete.") unless $runner->is_complete;
-	return $self;
-}
-
 
 =head3 run_tests
 
@@ -229,7 +212,9 @@ sub run_tests{
 	my ($self, $context) = @_;
 	my $runner = $context->subtest(test_case=>$self);
 	foreach my $test (@{ $self->script }){
-		$self->run_test($test, $runner);
+		# $self->run_test($test, $runner);
+		$runner->run_test($test, $self);
+
 	}
 	$runner->done("A ". (ref $self). " must pass all its subtests.");
 	return $self;

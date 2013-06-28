@@ -3,7 +3,7 @@ use 5.006;
 use strict;
 use warnings;
 use Moo;
-
+with('Test::Proto::Role::Tagged');
 
 =head1 NAME
 
