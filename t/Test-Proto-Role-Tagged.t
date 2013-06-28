@@ -29,9 +29,9 @@ use Test::Proto::TestRunner;
 
 my $runner = Test::Proto::TestRunner->new;
 
-$runner->skip_tag('skip_me');
+$runner->skipped_tags(['skip_me']);
 
-my $result = Test::Proto::Base->new->eq('b')->tag('skip_me')->validate('a', $runner);
+my $result = Test::Proto::Base->new->eq('b')->add_tag('skip_me')->validate('a', $runner);
 
 ok($result, 'Skips failing test ok');
 
