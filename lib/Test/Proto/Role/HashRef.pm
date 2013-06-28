@@ -57,6 +57,30 @@ define_test key_has_value => sub {
 	return upgrade($data->{expected})->validate($subject, $self);
 };
 
+
+=head3 superhash_of
+
+	pHash->superhash_of({'a'=>1})->ok({a=>1, b=>2});
+	pHash->superhash_of({'b'=>p->num_gt(0)})->ok({a=>1, b=>2});
+
+Tests whether each of the key-value pairs in the second argument are present and validate the test subject's equivalent pair.
+
+=cut
+
+sub superhash_of {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('superhash_of', { expected => $expected }, $reason);
+}
+define_test superhash_of => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	my $subproto = Test::Proto::HashRef->new();
+	foreach my $key (keys %{ $data->{expected} }){
+		my $expected = $data->{expected}->{$key};
+		$subproto->key_has_value($key, $expected);
+	}
+	return $subproto->validate($self->subject, $self);
+};
+
 =head3 count_keys
 
 	pHash->count_keys(2)->ok({a=>1, b=>2});

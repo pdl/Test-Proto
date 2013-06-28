@@ -43,6 +43,13 @@ is_a_good_pass(pHr->count_keys(1)->validate({'a'=>'b'}), "count_keys should pass
 is_a_good_pass(pHr->count_keys(0)->validate({}), "count_keys should pass when the number is 0 and the hash is empty");
 is_a_good_fail(pHr->count_keys(5)->validate({'a'=>'b'}), "count_keys should fail when the number does not match");
 
+# superhash_of
+is_a_good_pass(pHr->superhash_of({'a'=>'b'})->validate({'a'=>'b'}), "superhash_of should pass when expected matches");
+is_a_good_pass(pHr->superhash_of({})->validate({'a'=>'b'}), "superhash_of should pass when expected is empty");
+is_a_good_pass(pHr->superhash_of({'a'=>qr/a|b/})->validate({'a'=>'b'}), "superhash_of should pass when expected matches but needs upgrading");
+is_a_good_fail(pHr->superhash_of({'a'=>'b'})->validate({'a'=>'c'}), "superhash_of should fail when expected does not match");
+is_a_good_fail(pHr->superhash_of({'a'=>'b'})->validate({}), "superhash_of should fail when the key does not exist");
+
 
 done_testing;
 

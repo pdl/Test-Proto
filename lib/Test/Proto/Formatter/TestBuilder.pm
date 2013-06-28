@@ -100,7 +100,7 @@ sub event {
 
 	$formatter->format($runner);
 
-NOT YET IMPLEMENTED. Will probably be used to output information from a test runner that is already complete but did not expect to be outputting to Test::Builder.
+Outputs information from a test runner that is already complete but did not expect to be outputting to Test::Builder.
 
 =cut
 
@@ -108,7 +108,7 @@ NOT YET IMPLEMENTED. Will probably be used to output information from a test run
 sub format {
 	my $self = shift;
 	my $runner = shift;
-	$runner->inform_formatter($self, 'done');
+	$self->event($runner, 'done');
 	return $self;
 }
 
