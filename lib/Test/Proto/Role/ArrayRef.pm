@@ -373,7 +373,7 @@ define_test reverse => sub {
 
 =head3 array_before
 
-	pArray->array_before('b',['A'])->ok(['a','b']); # passes
+	pArray->array_before('b',['a'])->ok(['a','b']); # passes
 
 Applies the first argument (a prototype) onto each member of the array; if any member returns true, the second argument is validated against a new arrayref containing all the preceding members of the array.
 
@@ -402,7 +402,7 @@ define_test 'array_before' => sub {
 
 =head3 array_after
 
-	pArray->after('b',['A'])->ok(['a','b']); # passes
+	pArray->after('a',['b'])->ok(['a','b']); # passes
 
 Applies the first argument (a prototype) onto each member of the array; if any member returns true, the second argument is validated against a new arrayref containing all the following members of the array.
 
