@@ -112,6 +112,75 @@ is_a_good_pass(pAr->array_before('c', ['a','b'])->validate(['a','b','c','d']), "
 is_a_good_pass(pAr->array_before('a',[])->validate(['a','b','c','d']), "array_before passes when expected matches and is empty");
 is_a_good_fail(pAr->array_before('c',[])->validate(['a','b','c','d']), "array_before fails when expected does not match");
 
+# subset_of, superset_of, subbag_of, superbag_of
+my $testCases = [
+	{
+		type=>'subset,subbag,superset,superbag',
+		comment => 'Equal',
+		left => [1,2,3],
+		right => [1,2,3],
+	},
+	{
+		type  =>'superset,superbag',
+		comment => 'Left > Right',
+		left  => [1,2,3],
+		right => [1,2],
+	},
+	{
+		type=>'subset,subbag',
+		comment => 'Right > Left',
+		left => [1,2],
+		right => [1,2,3],
+	},
+	{
+		type  =>'subset,superset,superbag',
+		comment => 'Left > Right (but setwise equal)',
+		left  => [1,1,2],
+		right => [1,2],
+	},
+	{
+		type  =>'subset,superset,subbag',
+		comment => 'Right > Left (but setwise equal)',
+		left  => [1,2],
+		right => [1,1,2],
+	},
+	{
+		type  =>'superset,subset,superbag',
+		comment => '[1,2] vs [p]',
+		left  => [1,2],
+		right => [p],
+	},
+	{
+		type  =>'superset,subset,superbag,subbag',
+		comment => '[1,2] vs [2,p]',
+		left  => [1,2],
+		right => [2,p],
+	},
+	{
+		type  =>'superset,subset,superbag,subbag',
+		comment => '[1,2,3] vs [p,p,1]',
+		left  => [1,2,3],
+		right => [p,p,1],
+	},
+];
+my $machine = sub {
+	my ($method, $left, $right) = @_;
+	my $fullMethod = $method.'_of';
+	pAr->$fullMethod($right)->validate($left);
+};
+foreach my $testCase (@$testCases) {
+	foreach my $method (qw(superset subset superbag subbag)) {
+		if ($testCase->{type} =~ $method) {
+			ok ($machine->($method,$testCase->{left}, $testCase->{right}), "$method should pass with these arguments - ".$testCase->{comment});
+		}
+		else {
+			ok (!$machine->($method,$testCase->{left}, $testCase->{right}), "$method should fail with these arguments - ".$testCase->{comment});
+		}
+	}
+}
+
+
+
 done_testing;
 
 

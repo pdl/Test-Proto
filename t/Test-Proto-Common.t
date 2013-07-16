@@ -21,5 +21,6 @@ foreach my $upg (
 }
 isa_ok(upgrade(['a']), 'Test::Proto::ArrayRef');
 ok(upgrade(['a'])->validate(['a']));
+ok(!upgrade(2)->validate(1));
 
 done_testing();

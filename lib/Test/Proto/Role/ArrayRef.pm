@@ -430,5 +430,143 @@ define_test 'array_after' => sub {
 	return $self->fail('None matched');
 };
 
+# Unordered comparisons
+
+my $machine;
+
+=head3 subset_of
+
+	pArray->subset_of(['a','b','c'])->ok(['a','a','b']); # passes
+
+Checks that all of the elements in the test subject match at least one element in the first argument. Members of the test subject may be 'reused'.
+
+=cut
+
+
+sub subset_of {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('unordered_comparison', { expected => $expected, method=>'subset' }, $reason);
+}
+
+=head3 superset_of
+
+	pArray->superset_of(['a','b','a'])->ok(['a','b','c']); # passes
+
+Checks that all of the elements in the first argument can validate at least one element in the test subject. Members of the test subject may be 'reused'.
+
+=cut
+
+
+sub superset_of {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('unordered_comparison', { expected => $expected, method=>'superset' }, $reason);
+}
+
+=head3 subbag_of
+
+	pArray->subbag_of(['a','b','c'])->ok(['a','b']); # passes
+
+Checks that all of the elements in the test subject match at least one element in the first argument. Members of the test subject may B<not> be 'reused'.
+
+=cut
+
+
+sub subbag_of {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('unordered_comparison', { expected => $expected, method=>'subbag' }, $reason);
+}
+
+=head3 superbag_of
+
+	pArray->superbag_of(['a','b'])->ok(['a','b','c']); # passes
+
+Checks that all of the elements in the first argument can validate at least one element in the test subject. Members of the test subject may B<not> be 'reused'.
+
+=cut
+
+sub superbag_of {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('unordered_comparison', { expected => $expected, method=>'superbag' }, $reason);
+}
+
+define_test 'unordered_comparison' => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	return $machine->($self, $data->{method}, $self->subject, $data->{expected});
+};
+
+my ($allocate_l, $allocate_r);
+$allocate_l = sub{
+	my ($matrix, $pairs, $bag) = @_;
+	my $best = $pairs;
+	LEFT: foreach my $l (0..$#{$matrix}) {
+		next LEFT if grep { $_->[0] == $l } @$pairs; # skip if already allocated
+		RIGHT: foreach my $r (0..$#{$matrix->[$l]}) {
+			next RIGHT if $bag and grep { $_->[1] == $r } @$pairs; # skip if already allocated and bag logic
+			if ($matrix->[$l]->[$r]){
+				my $result = $allocate_l->($matrix, [@$pairs, [$l, $r]], $bag);
+				$best = $result if ( @$result > @$best);
+				# short circuit if length of Best == length of matrix ?
+			}
+		}
+	}
+	return $best;
+};
+$allocate_r = sub{
+	my ($matrix, $pairs, $bag) = @_;
+	my $best = $pairs;
+	RIGHT: foreach my $r (0..$#{$matrix->[0]}) {
+		next RIGHT if grep { $_->[1] == $r } @$pairs; # skip if already allocated
+		LEFT: foreach my $l (0..$#{$matrix}) {
+			next LEFT if $bag and grep { $_->[0] == $l } @$pairs; # skip if already allocated and bag logic
+			if ($matrix->[$l]->[$r]){
+				my $result = $allocate_r->($matrix, [@$pairs, [$l, $r]], $bag);
+				$best = $result if (@$result > @$best);
+			}
+		}
+	}
+	return $best;
+};
+$machine = sub {
+	my ($runner, $method, $left, $right) = @_;
+	my $bag = ( $method =~ /bag$/ );
+	my $matrix = [];
+	my $super = ($method =~ m/^super/);
+	# prepare the results matrix
+	LEFT: foreach my $l (0..$#{$left}) {
+		RIGHT: foreach my $r (0..$#{$right}) {
+			my $result = upgrade($right->[$r])->validate($left->[$l], ); #$runner->subtest("Comparing subject->[$l] and expected->[$r]"));
+			$matrix->[$l]->[$r] = $result;
+		}
+	}
+	my $pairs = [];
+
+	my $allocation_l = $allocate_l->($matrix, $pairs, $bag);
+	my $allocation_r = $allocate_r->($matrix, $pairs, $bag);
+
+	if ($method =~ m/^(sub|)(bag|set)$/){
+		foreach my $l (0..$#{$left}){
+			unless (grep { $_->[0] == $l } @$allocation_l) {
+				return $runner->fail('Not a superbag') if $bag;
+				return $runner->fail('Not a superset');
+			}
+
+		}
+	}
+	if ($method =~ m/^(super|)(bag|set)$/){
+		foreach my $r (0..$#{$right}){
+			unless (grep { $_->[1] == $r } @$allocation_r) {
+				return $runner->fail('Not a superbag') if $bag;
+				return $runner->fail('Not a superset');
+			}
+		}
+	}
+	return $runner->pass("Successful");
+};
+
+
+
+
+
+
 1;
 
