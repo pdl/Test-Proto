@@ -116,7 +116,7 @@ is_a_good_fail(pAr->array_before('c',[])->validate(['a','b','c','d']), "array_be
 
 my $testCases = [
 	{
-		type=>'subset,subbag,superset,superbag',
+		type=>'bag,set,subset,subbag,superset,superbag',
 		comment => 'Equal',
 		left => [1,2,3],
 		right => [1,2,3],
@@ -134,31 +134,31 @@ my $testCases = [
 		right => [1,2,3],
 	},
 	{
-		type  =>'subset,superset,superbag',
+		type  =>'set,subset,superset,superbag',
 		comment => 'Left > Right (but setwise equal)',
 		left  => [1,1,2],
 		right => [1,2],
 	},
 	{
-		type  =>'subset,superset,subbag',
+		type  =>'set,subset,superset,subbag',
 		comment => 'Right > Left (but setwise equal)',
 		left  => [1,2],
 		right => [1,1,2],
 	},
 	{
-		type  =>'superset,subset,superbag',
+		type  =>'set,superset,subset,superbag',
 		comment => '[1,2] vs [p]',
 		left  => [1,2],
 		right => [p],
 	},
 	{
-		type  =>'superset,subset,superbag,subbag',
+		type  =>'bag,set,superset,subset,superbag,subbag',
 		comment => '[1,2] vs [2,p]',
 		left  => [1,2],
 		right => [2,p],
 	},
 	{
-		type  =>'superset,subset,superbag,subbag',
+		type  =>'bag,set,superset,subset,superbag,subbag',
 		comment => '[1,2,3] vs [p,p,1]',
 		left  => [1,2,3],
 		right => [p,p,1],
@@ -170,8 +170,8 @@ my $machine = sub {
 	pAr->$fullMethod($right)->validate($left);
 };
 foreach my $testCase (@$testCases) {
-	foreach my $method (qw(superset subset superbag subbag)) {
-		if ($testCase->{type} =~ $method) {
+	foreach my $method (qw(bag set superset subset superbag subbag)) {
+		if ($testCase->{type} =~ /\b$method\b/) {
 			ok ($machine->($method,$testCase->{left}, $testCase->{right}), "$method should pass with these arguments - ".$testCase->{comment});
 		}
 		else {

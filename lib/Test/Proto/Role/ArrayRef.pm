@@ -432,7 +432,33 @@ define_test 'array_after' => sub {
 
 # Unordered comparisons
 
-my $machine;
+=head3 set_of
+
+	pArray->set_of(['a','b','c'])->ok(['a','c','a','b']); # passes
+
+Checks that all of the elements in the test subject match at least one element in the first argument, and vice versa. Members of the test subject may be 'reused'.
+
+=cut
+
+
+sub set_of {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('unordered_comparison', { expected => $expected, method=>'set' }, $reason);
+}
+
+=head3 bag_of
+
+	pArray->bag_of(['a','b','c'])->ok(['c','a','b']); # passes
+
+Checks that all of the elements in the test subject match at least one element in the first argument, and vice versa. Members may B<not> be 'reused'.
+
+=cut
+
+
+sub bag_of {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('unordered_comparison', { expected => $expected, method=>'bag' }, $reason);
+}
 
 =head3 subset_of
 
@@ -489,6 +515,7 @@ sub superbag_of {
 	$self->add_test('unordered_comparison', { expected => $expected, method=>'superbag' }, $reason);
 }
 
+my $machine;
 define_test 'unordered_comparison' => sub {
 	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
 	return $machine->($self, $data->{method}, $self->subject, $data->{expected});
