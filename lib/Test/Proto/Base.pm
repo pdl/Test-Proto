@@ -185,7 +185,7 @@ sub add_test{
 		{
 			no strict 'refs';
 			eval { &{$testMethodName} ($runner, $data, $reason); };
-			$runner->parent->exception($@) if $@;
+			$runner->exception("Failed during $name\n".$@) if $@;
 		}
 	};
 	push @{ $self->user_script }, Test::Proto::TestCase->new(
@@ -214,7 +214,7 @@ sub run_tests{
 	foreach my $test (@{ $self->script }){
 		# $self->run_test($test, $runner);
 		$runner->run_test($test, $self);
-
+		return $self if $runner->is_exception;
 	}
 	$runner->done("A ". (ref $self). " must pass all its subtests.");
 	return $self;
