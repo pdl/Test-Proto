@@ -618,7 +618,7 @@ $seriesMachine = sub {
 		my $working_copy = [@$subject];
 		my $i = 0;
 		foreach my $item (@{ $expected->contents }) {
-			return $runner->fail('No more items left in the test subject') unless exists $working_copy->[0];
+			return { runner => $runner->fail('No more items left in the test subject') , remainder => $working_copy } unless exists $working_copy->[0];
 			my $result = $seriesMachine->($runner->subtest(), $working_copy, $item);
 			if ($result->{runner}){
 				$working_copy = $result->{remainder};
