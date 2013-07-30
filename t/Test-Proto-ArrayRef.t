@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use Data::Dumper;
-
+$Data::Dumper::Indent = 1; # prevent them getting out of hand.
 use Test::More;
 use Test::Proto::ArrayRef;
 
@@ -179,6 +179,60 @@ foreach my $testCase (@$testCases) {
 		}
 	}
 }
+
+use Test::Proto::Series;
+use Test::Proto::Repeatable;
+
+sub pSeries { Test::Proto::Series->new(@_); }
+sub pRepeatable { Test::Proto::Repeatable->new(@_); }
+my $seriesTests = [
+
+{
+	prototype  => pSeries('a'),
+	subject    => ['a'],
+	value      => 1,
+},
+{
+	prototype  => pSeries('b'),
+	subject    => ['a'],
+	value      => 0,
+},
+{
+	prototype  => pSeries('a','b'),
+	subject    => ['a','b'],
+	value      => 1,
+},
+{
+	prototype  => pSeries('a','b','c'),
+	subject    => ['a','b'],
+	value      => 0,
+},
+{
+	prototype  => pSeries('a','b'),
+	subject    => ['a','b','c'],
+	value      => 0,
+},
+{
+	prototype  => pRepeatable(p)->max(2),
+	subject    => ['a','b'],
+	value      => 0,
+},
+
+
+];
+
+my $i = 0;
+foreach my $t (@$seriesTests){
+	$i++;
+	if ( $t->{value} ) {
+		is_a_good_pass( pAr->begins_with($t->{prototype})->validate($t->{subject}), "Series Test $i must pass");
+	}
+	else {
+		is_a_good_fail( pAr->begins_with($t->{prototype})->validate($t->{subject}), "Series Test $i must fail" );
+	}
+}
+
+
 
 
 

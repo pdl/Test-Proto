@@ -3,6 +3,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::Proto::Common;
+use Scalar::Util 'blessed';
 use Moo::Role;
 
 =head1 NAME
@@ -590,10 +591,78 @@ $machine = sub {
 	return $runner->pass("Successful");
 };
 
+#~ Series handling
 
 
+=head3 begins_with
+
+	pArray->begins_with(pSeries(pRepeat('a')->max(5)))->ok(['a','a','a']); # passes
+
+=cut
+
+sub begins_with {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('begins_with', { expected => $expected, method=>'superbag' }, $reason);
+}
+
+my $seriesMachine;
+define_test 'begins_with' => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	return $seriesMachine->($self, $self->subject, $data->{expected})->{runner};
+};
 
 
+$seriesMachine = sub {
+	my ($runner, $subject, $expected, ) = @_;
+	if ( blessed $expected and $expected->isa('Test::Proto::Series') ) {
+		my $working_copy = [@$subject];
+		my $i = 0;
+		foreach my $item (@{ $expected->contents }) {
+			return $runner->fail('No more items left in the test subject') unless exists $working_copy->[0];
+			my $result = $seriesMachine->($runner->subtest(), $working_copy, $item);
+			if ($result->{runner}){
+				$working_copy = $result->{remainder};
+			}
+			else {
+				return { runner => $runner->fail('Series failed on item '.$i), remainder => $working_copy};
+			}
+			$i++;
+		}
+		return { runner => $runner->pass('Series Matched'), remainder => $working_copy};
+	}
+	elsif ( blessed $expected and $expected->isa('Test::Proto::Repeatable') ) {
+		my $working_copy = [@$subject];
+		my $count = 0;
+		while ( (!defined $subject->max) or ($count < $subject->max) ){
+			my $result = $seriesMachine->($runner->subtest('Repeatable instance '.$count), $working_copy, $expected->contents, );
+			if ($result->{runner}){
+				$working_copy = $runner->{remainder};
+			}
+			else {
+				last;
+			}
+		}
+		return { runner => $runner->pass('Repeatable met criteria (matched '.$count.' time(s))'), remainder => $working_copy } unless $count < $subject->min;
+		return { runner => $runner->fail('Repeatable failed to match enouch times (got '.$count.', needed'.$subject->min().')'), remainder => $working_copy };
+		
+	}
+	elsif ( blessed $expected and $expected->isa('Test::Proto::Alternation') ) {
+		my $i = 0;
+		foreach my $alt (@{ $expected->alternatives }) {
+			my $result = $seriesMachine->($runner->subtest('Branching on Alternation '.$i), $subject, $alt );
+			if ($result->{runner}) {
+				return {runner=> $runner->pass('Alternation '.$i. ' was successful'), $result->{remainder} };
+			}
+			$i++
+		}
+		return { runner => $runner->fail('None of the alternations succeeded'), remainder => $subject};
+	}
+	else {
+		my $working_copy = [@$subject];
+		my $first_item = shift @$working_copy;
+		return { runner => upgrade($expected)->validate($first_item, $runner), remainder => $working_copy }; 
+	}
+};
 
 1;
 
