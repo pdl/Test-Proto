@@ -185,7 +185,8 @@ use Test::Proto::Repeatable;
 
 sub pSeries { Test::Proto::Series->new(@_); }
 sub pRepeatable { Test::Proto::Repeatable->new(@_); }
-my $rpt = pRepeatable(p)->max(2);
+my $rpt = pRepeatable(p);
+$rpt->max(2);
 my $seriesTests = [
 
 {
@@ -204,6 +205,11 @@ my $seriesTests = [
 	value      => 1,
 },
 {
+	prototype  => pSeries('a','b'),
+	subject    => ['a','c'],
+	value      => 0,
+},
+{
 	prototype  => pSeries('a','b','c'),
 	subject    => ['a','b'],
 	value      => 0,
@@ -216,9 +222,18 @@ my $seriesTests = [
 {
 	prototype  => $rpt,
 	subject    => ['a','b'],
+	value      => 1,
+},
+{
+	prototype  => $rpt,
+	subject    => ['a','b','c'],
 	value      => 0,
 },
-
+{
+	prototype  => $rpt,
+	subject    => [0],
+	value      => 0,
+},
 
 ];
 
