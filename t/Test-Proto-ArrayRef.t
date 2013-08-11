@@ -189,47 +189,47 @@ my $rpt = pRepeatable(p);
 $rpt->max(2);
 my $seriesTests = [
 
-{
+{ # 1
 	prototype  => pSeries('a'),
 	subject    => ['a'],
 	value      => 1,
 },
-{
+{ # 2
 	prototype  => pSeries('b'),
 	subject    => ['a'],
 	value      => 0,
 },
-{
+{ # 3
 	prototype  => pSeries('a','b'),
 	subject    => ['a','b'],
 	value      => 1,
 },
-{
+{ # 4
 	prototype  => pSeries('a','b'),
 	subject    => ['a','c'],
 	value      => 0,
 },
-{
+{ # 5
 	prototype  => pSeries('a','b','c'),
 	subject    => ['a','b'],
 	value      => 0,
 },
-{
+{ # 6
 	prototype  => pSeries('a','b'),
 	subject    => ['a','b','c'],
 	value      => 0,
 },
-{
+{ # 7
 	prototype  => $rpt,
 	subject    => ['a','b'],
 	value      => 1,
 },
-{
+{ # 8
 	prototype  => $rpt,
 	subject    => ['a','b','c'],
 	value      => 0,
 },
-{
+{ # 9
 	prototype  => $rpt,
 	subject    => [0],
 	value      => 0,
