@@ -715,7 +715,7 @@ So the backtracker should do the following:
 $bt_core = sub {
 	my ($runner, $subject, $expected, $history) = @_;
 	$history = [] unless defined $history;
-	while (1) { #~ yeah, scary, I know
+	while (1) { #~ yeah, scary, I know, but better than diving headlong into recursion
 
 		#~ Advance
 		my $next_step = $bt_advance->($runner, $subject, $expected, $history);
