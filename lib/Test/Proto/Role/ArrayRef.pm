@@ -606,9 +606,11 @@ sub begins_with {
 }
 
 my $seriesMachine;
+my ($bt_core, $bt_advance, $bt_eval_step, $bt_backtrack);
 define_test 'begins_with' => sub {
 	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
-	return $seriesMachine->($self, $self->subject, $data->{expected})->{runner};
+	#return $seriesMachine->($self, $self->subject, $data->{expected})->{runner};
+	return $bt_core->($self, $self->subject, $data->{expected})->{runner};
 };
 
 # todo: implement branching
@@ -666,6 +668,245 @@ $seriesMachine = sub {
 		my $first_item = shift @$working_copy;
 		return { runner => upgrade($expected)->validate($first_item, $runner), remainder => $working_copy }; 
 	}
+};
+
+=pod
+
+1. To advance a step
+
+Find the most recent incomplete SERIES
+
+Get its next element.
+
+2. To get the next alternative (backreack)
+
+Find the most recent VARIABLE_UNIT
+
+If a repeatable, decrease it (they begin greedy)
+
+If an alternation, try the next alternative,
+
+If either of those cannot legally be done, it's no longer a variable unit so keep looking
+
+When you run out of history, fail
+
+
+So the backtracker should do the following:
+
+
+	backtracker (runner r, subject s, expected e, history h)
+		loop
+			next_step = advance (r, s, e, h)
+			if no next_step
+				return r->pass if index of last h is length of s
+			push next step onto history
+			result = evaluate
+			if result is not ok
+				next_solution = backtrack (r, s, e, h) # modifies h
+				if no next_solution
+					return r->fail
+				# implicit else continue and redo the loop
+		
+
+=cut
+
+
+
+$bt_core = sub {
+	my ($runner, $subject, $expected, $history) = @_;
+	$history = [] unless defined $history;
+	while (1) { #~ yeah, scary, I know
+
+		#~ Advance
+		my $next_step = $bt_advance->($runner, $subject, $expected, $history);
+
+		#~ If we cannot advance, then pass if what we've matched so far meets the criteria
+		unless (defined $next_step) {
+			return $runner->pass if (
+				(!@{$history} and !$subject)
+				or
+				($history->[-1]->{index} == $#$subject)
+			);
+			return $runner->fail;
+		}
+
+		#~ Add the next step to the history
+		unshift @$history, $next_step;
+		
+		#~ Determine if the next step can be executed
+		my $evaluation_result = $bt_eval_step->($runner, $subject, $expected, $history);
+		unless ($evaluation_result) {
+			my $next_solution = $bt_backtrack->($runner, $subject, $expected, $history);
+			unless (defined $next_solution) {
+				return $runner->fail('no more alternatve solutions');
+			}
+		}
+	}
+};
+
+
+$bt_advance = sub {
+
+	#~ the purpose of this to find the latest series or repeatble which has not been exhausted. 
+	#~ This method adds items to the end of the history stack, and never removes them.
+	my ($runner, $subject, $expected, $history) = @_;
+	my $l = $#$history;
+	my $next_step; 
+	my $parent;
+	#~ todo: check if l == -1
+	if ($l == -1) {
+		return {
+			self=>$expected,
+			parent=>undef,
+			index=>0,
+		};
+	}
+	for my $i ($l..0) {
+		my $step = $history->[$i];
+		#~ todo: check if parent is defined. if not, use $history->[0]->self
+		#~ what if history [0] self is exhausted?
+		if ($#$history == 0 or $step == $parent) {
+			my $children;
+			if ((blessed $step->{self}) and $step->{self}->isa('Test::Proto::Series')) {
+				$children = $step->{children};
+				$children = [] unless defined $children; #:5.8
+				my $contents = $step->{self}->contents;
+				unless ($#$children == $#$contents) {
+					#~ we conclude the step is not complete. Add a new step.
+					$next_step = {
+						self=>$contents->[$#$children+1],
+						parent=>$step,
+						element=>$#$children+1
+					};
+					push @{$step->{children}}, ($l+1);
+				}
+				else {
+					$parent = $step->{parent};
+					return undef if !defined $parent; #~ Cause a termination
+				}
+			}
+			elsif ((blessed $step->{self}) and $step->{self}->isa('Test::Proto::Repeatable')) {
+				$children = $step->{children};
+				$children = [] unless defined $children; #:5.8
+				my $max = $step->{max}; #~ the maximum set by a backtrack action
+				$max = $step->{self}->max unless defined $max; # the maximum allowed by the repeatable
+				#~ NB: Repeatables are greedy, so go as far as they can unless a backtrack has caused them to try being less greedy.
+				unless ( ( defined $step->{self}->max ) and ( $#$children + 1 == $step->{self}->max ) ) {
+					#~ we conclude the step is not complete. Add a new step.
+					$next_step = {
+						self=>$step->{self}->contents,
+						parent=>$step, #~ todo: weaken this? Or weaken the children? Need to prevent circular refs causing memory leakage.
+						element=>$#$children+1
+					};
+					push @{$step->{children}}, $l+1;
+				}
+				else {
+					$parent = $step->{parent};
+					return undef if !defined $parent; #~ Cause a termination
+				}
+			}
+			elsif (blessed $step->{self} and $step->isa('Test::Proto::Alternation')) {
+				$parent = $step->{parent};
+				return undef if !defined $parent; #~ Cause a termination
+			}
+		}
+		return $next_step if defined $next_step;
+	}
+};
+
+$bt_eval_step = sub {
+	#~ The purpose of this function is to determine if the current solution can continue at this point.
+	#~ Specifically, if the current step (i.e. the last in the history) validates against the next item in the subject.
+	#~ However, if the current step is a series/repeatable/altenration, then this is not an issue. 
+	my ($runner, $subject, $expected, $history) = @_;
+	my $current_step = $history->[-1];
+	my $current_index = ((exists $history->[-2] ) ? defined $history->[-2]->{index}? $history->[-2]->{index}:-1 : -1); # current_index is what has been completed
+	if (exists $subject->[$current_index+1]) {
+		#~ if a series, repeatable, or alternation, we're always ok, we just need to update the index
+		#~ if a prototype, evaluate it.
+		if (ref ($current_step->{self}) =~ /^Test::Proto::(?:Series|Repeatable|Alternation)$/) {
+			$current_step->{index} = $current_index;
+			return 1; #~ always ok
+		}
+		else {
+			my $p = upgrade($current_step->{self});
+			return $p->validate($subject->[$current_index+1], $runner->subtest());
+		}
+	}
+	else {
+		#~...
+		#~ We are allowed only:
+		#~ - repeatables with zero minimum
+		#~ - alternations
+		#~ i.e. no prototypes or series
+		if (ref ($current_step->{self}) eq 'Test::Proto::Alternation') {
+			$current_step->{index} = $current_index;
+		}
+		elsif (ref ($current_step->{self}) eq 'Test::Proto::Alternation' and $current_step->{self}->min ==0) {
+			$current_step->{index} = $current_index;
+		}
+		else {
+			return 0; #~ cause a backtrack
+		}
+
+	}
+};
+
+$bt_backtrack = sub{
+	my ($runner, $subject, $expected, $history) = @_;
+	return undef;
+	#~ The purpose of this to find the latest repeatable and alternation which has not had all its options exhausted. 
+	#~ This method then removes all items from the history stack after that point and increments a counter on that history item.
+	#~ No extra steps are added.
+	#~ Consider taking the removed slice and keeping it in a 'failed branches' slot of the repeatable/alternation.
+	my $l = $#$history;
+	my $parent;
+	#~ todo: check if l == -1
+	for my $i ($l..0) {
+		my $step = $history->[$i];
+		#~ todo: check if parent is defined. if not, use $history->[0]->self
+		if ($step == $parent) {
+			if (blessed $step->{self} and $step->isa('Test::Proto::Series')) {
+				my $children = $step->{children};
+				$children = [] unless defined $children; #:5.8
+				my $contents = $step->{self}->contents;
+				unless ($#$children == $#$contents) {
+					#~ we conclude the step is not complete. Add a new step.
+					my $next_step = {
+						self=>$contents->[$#$children+1],
+						parent=>$parent,
+						element=>$#$children+1
+					};
+					push @{$step->{children}}, $l+1;
+				}
+				else {
+					$parent = $step->$parent;
+					return undef if !defined $parent; #~ Cause a termination
+				}
+			}
+			if (blessed $step->{self} and $step->isa('Test::Proto::Repeatable')) {
+				my $children = $step->{children};
+				$children = [] unless defined $children; #:5.8
+				my $max = $step->{max}; #~ the maximum set by a backtrack action
+				$max = $step->{self}->max unless defined $max; # the maximum allowed by the repeatable
+				unless ( ( defined $step->{self}->max ) and ( $#$children + 1 == $step->{self}->max ) ) {
+					#~ we conclude the step is not complete. Add a new step.
+					my $next_step = {
+						self=>$step->{self}->contents,
+						parent=>$parent, #~ todo: weaken this? Or weaken the children? Need to prevent circular refs causing memory leakage.
+						element=>$#$children+1
+					};
+					push @{$step->{children}}, $l+1;
+				}
+				else {
+					$parent = $step->{parent};
+					return undef if !defined $parent; #~ Cause a termination
+				}
+			}
+		}
+		#return $next_step if defined $next_step;
+	}	
+
 };
 
 1;
