@@ -610,7 +610,7 @@ my ($bt_core, $bt_advance, $bt_eval_step, $bt_backtrack);
 define_test 'begins_with' => sub {
 	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
 	#return $seriesMachine->($self, $self->subject, $data->{expected})->{runner};
-	return $bt_core->($self, $self->subject, $data->{expected})->{runner};
+	return $bt_core->($self, $self->subject, $data->{expected});
 };
 
 # todo: implement branching
@@ -716,22 +716,22 @@ $bt_core = sub {
 	my ($runner, $subject, $expected, $history) = @_;
 	$history = [] unless defined $history;
 	while (1) { #~ yeah, scary, I know, but better than diving headlong into recursion
-
+		
 		#~ Advance
 		my $next_step = $bt_advance->($runner, $subject, $expected, $history);
-
+		
 		#~ If we cannot advance, then pass if what we've matched so far meets the criteria
 		unless (defined $next_step) {
 			return $runner->pass if (
-				(!@{$history} and !$subject)
+				(!@{$history} and !@{$subject}) # this oughtn't to happen
 				or
 				($history->[-1]->{index} == $#$subject)
 			);
-			return $runner->fail;
+			return $runner->fail('No next step; index reached: '.$history->[-1]->{index});
 		}
-
+		
 		#~ Add the next step to the history
-		unshift @$history, $next_step;
+		push @$history, $next_step; # is this working?
 		
 		#~ Determine if the next step can be executed
 		my $evaluation_result = $bt_eval_step->($runner, $subject, $expected, $history);
@@ -751,14 +751,16 @@ $bt_advance = sub {
 	#~ This method adds items to the end of the history stack, and never removes them.
 	my ($runner, $subject, $expected, $history) = @_;
 	my $l = $#$history;
+	$runner->subtest->diag('Advance '.$l.'!');
 	my $next_step; 
 	my $parent;
 	#~ todo: check if l == -1
 	if ($l == -1) {
+		$runner->subtest->diag('First advance!');
 		return {
 			self=>$expected,
 			parent=>undef,
-			index=>0,
+			index=>-1,
 		};
 	}
 	for my $i ($l..0) {
@@ -778,7 +780,7 @@ $bt_advance = sub {
 						parent=>$step,
 						element=>$#$children+1
 					};
-					push @{$step->{children}}, ($l+1);
+					push @{$step->{children}}, ($next_step);
 				}
 				else {
 					$parent = $step->{parent};
@@ -798,7 +800,7 @@ $bt_advance = sub {
 						parent=>$step, #~ todo: weaken this? Or weaken the children? Need to prevent circular refs causing memory leakage.
 						element=>$#$children+1
 					};
-					push @{$step->{children}}, $l+1;
+					push @{$step->{children}}, $next_step;
 				}
 				else {
 					$parent = $step->{parent};
@@ -806,12 +808,23 @@ $bt_advance = sub {
 				}
 			}
 			elsif (blessed $step->{self} and $step->isa('Test::Proto::Alternation')) {
-				$parent = $step->{parent};
-				return undef if !defined $parent; #~ Cause a termination
+				#~ Pick first alternative
+				unless ( (defined $step->{children}) and @{$step->{children}}) {
+					$next_step = {
+						self=>$step->{self}->alternatives->[0],
+						parent=>$step, #~ todo: weaken this? Or weaken the children? Need to prevent circular refs causing memory leakage.
+						element=>0
+					};
+				}
+				else{
+					$parent = $step->{parent};
+					return undef if !defined $parent; #~ Cause a termination
+				}
 			}
 		}
 		return $next_step if defined $next_step;
 	}
+	return undef;
 };
 
 $bt_eval_step = sub {
@@ -825,12 +838,15 @@ $bt_eval_step = sub {
 		#~ if a series, repeatable, or alternation, we're always ok, we just need to update the index
 		#~ if a prototype, evaluate it.
 		if (ref ($current_step->{self}) =~ /^Test::Proto::(?:Series|Repeatable|Alternation)$/) {
+			$runner->subtest->diag('Starting a '.(ref $current_step->{self}));
 			$current_step->{index} = $current_index;
 			return 1; #~ always ok
 		}
 		else {
 			my $p = upgrade($current_step->{self});
-			return $p->validate($subject->[$current_index+1], $runner->subtest());
+			my $result = $p->validate($subject->[$current_index+1], $runner->subtest());
+			$current_step->{index} = $current_index + 1 if $result;
+			return $result;
 		}
 	}
 	else {
@@ -839,6 +855,8 @@ $bt_eval_step = sub {
 		#~ - repeatables with zero minimum
 		#~ - alternations
 		#~ i.e. no prototypes or series
+		#~ Todo: check if we're repeating interminably by seeing if any object is its own ancestor
+		$runner->subtest()->diag('Reached end of subject, allowing only potentially empty patterns');
 		if (ref ($current_step->{self}) eq 'Test::Proto::Alternation') {
 			$current_step->{index} = $current_index;
 		}
@@ -861,6 +879,7 @@ $bt_backtrack = sub{
 	#~ Consider taking the removed slice and keeping it in a 'failed branches' slot of the repeatable/alternation.
 	my $l = $#$history;
 	my $parent;
+	$runner->subtest()->diag('Backtracking... (last history item: '.$l.')');
 	#~ todo: check if l == -1
 	for my $i ($l..0) {
 		my $step = $history->[$i];
