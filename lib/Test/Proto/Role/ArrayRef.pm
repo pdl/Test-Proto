@@ -763,18 +763,20 @@ $bt_advance = sub {
 			index=>-1,
 		};
 	}
-	for my $i ($l..0) {
+	else {
+		$parent = $history->[-1]->{parent};
+	}
+	for my $i (CORE::reverse (0..$l)) {
 		my $step = $history->[$i];
-		#~ todo: check if parent is defined. if not, use $history->[0]->self
-		#~ what if history [0] self is exhausted?
-		if ($#$history == 0 or $step == $parent) {
+		if ($i==0 or ((!defined $parent) and $i == 0) or ((defined $parent) and ($step == $parent))) {
 			my $children;
 			if ((blessed $step->{self}) and $step->{self}->isa('Test::Proto::Series')) {
 				$children = $step->{children};
 				$children = [] unless defined $children; #:5.8
 				my $contents = $step->{self}->contents;
-				unless ($#$children == $#$contents) {
-					#~ we conclude the step is not complete. Add a new step.
+				$runner->subtest->diag("CHILDREN: $#$children ; CONTENTS: $#$contents");
+				if ($#$children < $#$contents) {
+					#~ we conclude the series is not complete. Add a new step.
 					$next_step = {
 						self=>$contents->[$#$children+1],
 						parent=>$step,
@@ -794,7 +796,7 @@ $bt_advance = sub {
 				$max = $step->{self}->max unless defined $max; # the maximum allowed by the repeatable
 				#~ NB: Repeatables are greedy, so go as far as they can unless a backtrack has caused them to try being less greedy.
 				unless ( ( defined $step->{self}->max ) and ( $#$children + 1 == $step->{self}->max ) ) {
-					#~ we conclude the step is not complete. Add a new step.
+					#~ we conclude the repeatable is not complete. Add a new step.
 					$next_step = {
 						self=>$step->{self}->contents,
 						parent=>$step, #~ todo: weaken this? Or weaken the children? Need to prevent circular refs causing memory leakage.
@@ -821,8 +823,16 @@ $bt_advance = sub {
 					return undef if !defined $parent; #~ Cause a termination
 				}
 			}
+			else { #~ shouldn't be required:
+				$parent = $step->{parent};
+				return undef if !defined $parent; #~ Cause a termination
+			}
 		}
-		return $next_step if defined $next_step;
+		if (defined $next_step) {
+			$runner->subtest->diag('Advanced ok');
+			return $next_step;
+		}
+		#~ Othewise next $i
 	}
 	return undef;
 };
