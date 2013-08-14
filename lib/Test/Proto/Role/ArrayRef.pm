@@ -810,11 +810,15 @@ $bt_advance = sub {
 			elsif ((blessed $step->{self}) and $step->{self}->isa('Test::Proto::Alternation')) {
 				#~ Pick first alternative
 				unless ( (defined $step->{children}) and @{$step->{children}}) {
+					my $alt = 0;
+					$alt = $step->{alt} if defined $step->{alt};
 					$next_step = {
-						self=>$step->{self}->alternatives->[0],
+						self=>$step->{self}->alternatives->[$alt],
 						parent=>$step, #~ todo: weaken this? Or weaken the children? Need to prevent circular refs causing memory leakage.
 						element=>0
 					};
+					$step->{alt} = $alt;
+					push @{$step->{children}}, $next_step;
 				}
 				else{
 					$parent = $step->{parent};
@@ -914,12 +918,18 @@ $bt_backtrack = sub{
 				unless ( $new_max < $step->{self}->min ) {
 					$step->{max} = $new_max;
 					$#{$step->{children}} = $new_max-1;
-					#if ($new_max == 0){
-					#	$bt_backtrack_to->($history, $step);
-					#}
-					#else {
-						$bt_backtrack_to->($runner, $history, $step->{children}->[$new_max]);
-					#}
+					$bt_backtrack_to->($runner, $history, $step->{children}->[$new_max]);
+					return 1;
+				}
+				else {
+					$parent = $step->{parent};
+					return undef if !defined $parent; #~ Cause a termination
+				}
+			}
+			elsif ((blessed $step->{self}) and $step->{self}->isa('Test::Proto::Alternation')) {
+				if ( $step->{alt}+1 <= $#{ $step->{self}->{alternatives}} ) {
+					$step->{alt}++;
+					$bt_backtrack_to->($runner, $history, $step->{children}->[0]);
 					return 1;
 				}
 				else {

@@ -182,8 +182,10 @@ foreach my $testCase (@$testCases) {
 
 use Test::Proto::Series;
 use Test::Proto::Repeatable;
+use Test::Proto::Alternation;
 
 sub pSeries { Test::Proto::Series->new(@_); }
+sub pAlternation { Test::Proto::Alternation->new(@_); }
 sub pRepeatable { Test::Proto::Repeatable->new(@_); }
 my $rpt = pRepeatable(p);
 $rpt->max(2);
@@ -236,6 +238,16 @@ my $seriesTests = [
 },
 { # 10
 	prototype  => pSeries(pSeries('a','b')),
+	subject    => ['a','b'],
+	value      => 1,
+},
+{ # 11
+	prototype  => pAlternation(pSeries('a','b')),
+	subject    => ['a','b'],
+	value      => 1,
+},
+{ # 12
+	prototype  => pAlternation(pSeries('a'),pSeries('a','b')),
 	subject    => ['a','b'],
 	value      => 1,
 },
