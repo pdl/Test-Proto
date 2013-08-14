@@ -731,7 +731,7 @@ $bt_core = sub {
 		}
 		
 		#~ Add the next step to the history
-		push @$history, $next_step; # is this working?
+		push @$history, $next_step;
 		
 		#~ Determine if the next step can be executed
 		my $evaluation_result = $bt_eval_step->($runner, $subject, $expected, $history);
@@ -751,12 +751,11 @@ $bt_advance = sub {
 	#~ This method adds items to the end of the history stack, and never removes them.
 	my ($runner, $subject, $expected, $history) = @_;
 	my $l = $#$history;
-	$runner->subtest->diag('Advance '.$l.'!');
+	$runner->subtest(test_case=>$history)->diag('Advance '.$l.'!');
 	my $next_step; 
 	my $parent;
 	#~ todo: check if l == -1
 	if ($l == -1) {
-		$runner->subtest->diag('First advance!');
 		return {
 			self=>$expected,
 			parent=>undef,
@@ -764,17 +763,16 @@ $bt_advance = sub {
 		};
 	}
 	else {
-		$parent = $history->[-1]->{parent};
+		$parent = $history->[-1];
 	}
 	for my $i (CORE::reverse (0..$l)) {
 		my $step = $history->[$i];
-		if ($i==0 or ((!defined $parent) and $i == 0) or ((defined $parent) and ($step == $parent))) {
+		if (((!defined $parent) and $i == 0) or ((defined $parent) and ($step == $parent))) {
 			my $children;
 			if ((blessed $step->{self}) and $step->{self}->isa('Test::Proto::Series')) {
 				$children = $step->{children};
 				$children = [] unless defined $children; #:5.8
 				my $contents = $step->{self}->contents;
-				$runner->subtest->diag("CHILDREN: $#$children ; CONTENTS: $#$contents");
 				if ($#$children < $#$contents) {
 					#~ we conclude the series is not complete. Add a new step.
 					$next_step = {
@@ -795,8 +793,8 @@ $bt_advance = sub {
 				my $max = $step->{max}; #~ the maximum set by a backtrack action
 				$max = $step->{self}->max unless defined $max; # the maximum allowed by the repeatable
 				#~ NB: Repeatables are greedy, so go as far as they can unless a backtrack has caused them to try being less greedy.
-				unless ( ( defined $step->{self}->max ) and ( $#$children + 1 == $step->{self}->max ) ) {
-					#~ we conclude the repeatable is not complete. Add a new step.
+				unless ( ( defined $max ) and ( $#$children + 1 > $max ) ) {
+					#~ we conclude the repeatable is not exhausted. Add a new step.
 					$next_step = {
 						self=>$step->{self}->contents,
 						parent=>$step, #~ todo: weaken this? Or weaken the children? Need to prevent circular refs causing memory leakage.
@@ -809,7 +807,7 @@ $bt_advance = sub {
 					return undef if !defined $parent; #~ Cause a termination
 				}
 			}
-			elsif (blessed $step->{self} and $step->isa('Test::Proto::Alternation')) {
+			elsif ((blessed $step->{self}) and $step->{self}->isa('Test::Proto::Alternation')) {
 				#~ Pick first alternative
 				unless ( (defined $step->{children}) and @{$step->{children}}) {
 					$next_step = {
@@ -823,13 +821,13 @@ $bt_advance = sub {
 					return undef if !defined $parent; #~ Cause a termination
 				}
 			}
-			else { #~ shouldn't be required:
+			else { #~ shouldn't be required; in fact, is wrong
 				$parent = $step->{parent};
-				return undef if !defined $parent; #~ Cause a termination
+#				return undef if !defined $parent; #~ Cause a termination
 			}
 		}
 		if (defined $next_step) {
-			$runner->subtest->diag('Advanced ok');
+			$runner->subtest(test_case=>$history)->diag('Advanced ok');
 			return $next_step;
 		}
 		#~ Othewise next $i
@@ -843,19 +841,25 @@ $bt_eval_step = sub {
 	#~ However, if the current step is a series/repeatable/altenration, then this is not an issue. 
 	my ($runner, $subject, $expected, $history) = @_;
 	my $current_step = $history->[-1];
-	my $current_index = ((exists $history->[-2] ) ? defined $history->[-2]->{index}? $history->[-2]->{index}:-1 : -1); # current_index is what has been completed
+	my $current_index = ((exists $history->[1] ) ? (defined $history->[-2]->{index}? $history->[-2]->{index}:-1 ): -1); # current_index is what has been completed
 	if (exists $subject->[$current_index+1]) {
 		#~ if a series, repeatable, or alternation, we're always ok, we just need to update the index
 		#~ if a prototype, evaluate it.
-		if (ref ($current_step->{self}) =~ /^Test::Proto::(?:Series|Repeatable|Alternation)$/) {
-			$runner->subtest->diag('Starting a '.(ref $current_step->{self}));
+		if ((ref $current_step->{self}) and ref ($current_step->{self}) =~ /^Test::Proto::(?:Series|Repeatable|Alternation)$/) {
+			$runner->subtest(test_case=>$history)->diag('Starting a '.(ref $current_step->{self}));
 			$current_step->{index} = $current_index;
 			return 1; #~ always ok
 		}
 		else {
 			my $p = upgrade($current_step->{self});
+			$runner->subtest(test_case=>$history)->diag('Validating index '.($current_index+1));
 			my $result = $p->validate($subject->[$current_index+1], $runner->subtest());
-			$current_step->{index} = $current_index + 1 if $result;
+			if ($result) {
+				$current_step->{index} = $current_index + 1 ;
+			}
+			else {
+				$current_step->{index} = $current_index; # shouldn't read this
+			}
 			return $result;
 		}
 	}
@@ -870,7 +874,7 @@ $bt_eval_step = sub {
 		if (ref ($current_step->{self}) eq 'Test::Proto::Alternation') {
 			$current_step->{index} = $current_index;
 		}
-		elsif (ref ($current_step->{self}) eq 'Test::Proto::Alternation' and $current_step->{self}->min ==0) {
+		elsif (ref ($current_step->{self}) eq 'Test::Proto::Repeatable' and $current_step->{self}->min <= $#{$current_step->{children}}) {
 			$current_step->{index} = $current_index;
 		}
 		else {
@@ -882,7 +886,6 @@ $bt_eval_step = sub {
 
 $bt_backtrack = sub{
 	my ($runner, $subject, $expected, $history) = @_;
-	return undef;
 	#~ The purpose of this to find the latest repeatable and alternation which has not had all its options exhausted. 
 	#~ This method then removes all items from the history stack after that point and increments a counter on that history item.
 	#~ No extra steps are added.
@@ -890,6 +893,7 @@ $bt_backtrack = sub{
 	my $l = $#$history;
 	my $parent;
 	$runner->subtest()->diag('Backtracking... (last history item: '.$l.')');
+	return undef;
 	#~ todo: check if l == -1
 	for my $i ($l..0) {
 		my $step = $history->[$i];
@@ -925,7 +929,7 @@ $bt_backtrack = sub{
 						parent=>$parent, #~ todo: weaken this? Or weaken the children? Need to prevent circular refs causing memory leakage.
 						element=>$#$children+1
 					};
-					push @{$step->{children}}, $l+1;
+					push @{$step->{children}}, $next_step;
 				}
 				else {
 					$parent = $step->{parent};

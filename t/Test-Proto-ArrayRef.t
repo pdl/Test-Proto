@@ -232,7 +232,12 @@ my $seriesTests = [
 { # 9
 	prototype  => $rpt,
 	subject    => [0],
-	value      => 0,
+	value      => 1,
+},
+{ # 10
+	prototype  => pSeries(pSeries('a','b')),
+	subject    => ['a','b'],
+	value      => 1,
 },
 
 ];
