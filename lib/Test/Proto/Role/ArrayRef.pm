@@ -606,7 +606,7 @@ sub begins_with {
 }
 
 my $seriesMachine;
-my ($bt_core, $bt_advance, $bt_eval_step, $bt_backtrack);
+my ($bt_core, $bt_advance, $bt_eval_step, $bt_backtrack, $bt_backtrack_to);
 define_test 'begins_with' => sub {
 	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
 	#return $seriesMachine->($self, $self->subject, $data->{expected})->{runner};
@@ -735,7 +735,7 @@ $bt_core = sub {
 		
 		#~ Determine if the next step can be executed
 		my $evaluation_result = $bt_eval_step->($runner, $subject, $expected, $history);
-		unless ($evaluation_result) {
+		unless ($evaluation_result){
 			my $next_solution = $bt_backtrack->($runner, $subject, $expected, $history);
 			unless (defined $next_solution) {
 				return $runner->fail('no more alternatve solutions');
@@ -793,7 +793,7 @@ $bt_advance = sub {
 				my $max = $step->{max}; #~ the maximum set by a backtrack action
 				$max = $step->{self}->max unless defined $max; # the maximum allowed by the repeatable
 				#~ NB: Repeatables are greedy, so go as far as they can unless a backtrack has caused them to try being less greedy.
-				unless ( ( defined $max ) and ( $#$children + 1 > $max ) ) {
+				unless ( ( defined $max ) and ( $#$children + 1 >= $max ) ) {
 					#~ we conclude the repeatable is not exhausted. Add a new step.
 					$next_step = {
 						self=>$step->{self}->contents,
@@ -821,9 +821,8 @@ $bt_advance = sub {
 					return undef if !defined $parent; #~ Cause a termination
 				}
 			}
-			else { #~ shouldn't be required; in fact, is wrong
+			else { 
 				$parent = $step->{parent};
-#				return undef if !defined $parent; #~ Cause a termination
 			}
 		}
 		if (defined $next_step) {
@@ -842,6 +841,7 @@ $bt_eval_step = sub {
 	my ($runner, $subject, $expected, $history) = @_;
 	my $current_step = $history->[-1];
 	my $current_index = ((exists $history->[1] ) ? (defined $history->[-2]->{index}? $history->[-2]->{index}:-1 ): -1); # current_index is what has been completed
+	$current_step->{index} = $current_index; #:jic
 	if (exists $subject->[$current_index+1]) {
 		#~ if a series, repeatable, or alternation, we're always ok, we just need to update the index
 		#~ if a prototype, evaluate it.
@@ -873,11 +873,18 @@ $bt_eval_step = sub {
 		$runner->subtest()->diag('Reached end of subject, allowing only potentially empty patterns');
 		if (ref ($current_step->{self}) eq 'Test::Proto::Alternation') {
 			$current_step->{index} = $current_index;
+			return 1;
 		}
-		elsif (ref ($current_step->{self}) eq 'Test::Proto::Repeatable' and $current_step->{self}->min <= $#{$current_step->{children}}) {
+		# elsif ((ref $current_step->{self}) eq 'Test::Proto::Repeatable'){return 1;} #:debug
+		elsif (((ref $current_step->{self}) eq 'Test::Proto::Repeatable') and ($current_step->{self}->min <= ($#{$current_step->{children}} +1))) {
+			$current_step->{max} = $#{$current_step->{children}}+1 unless
+				defined ($current_step->{max}) 
+				and $current_step->{max} < ($#{$current_step->{children}}+1) ; #~ we need to consider it complete so we don't end up in a loop of adding and removing these.
 			$current_step->{index} = $current_index;
+			return 1;
 		}
 		else {
+			$current_step->{index} = $current_index;
 			return 0; #~ cause a backtrack
 		}
 
@@ -891,56 +898,55 @@ $bt_backtrack = sub{
 	#~ No extra steps are added.
 	#~ Consider taking the removed slice and keeping it in a 'failed branches' slot of the repeatable/alternation.
 	my $l = $#$history;
-	my $parent;
 	$runner->subtest()->diag('Backtracking... (last history item: '.$l.')');
-	return undef;
-	#~ todo: check if l == -1
-	for my $i ($l..0) {
+	my $parent = $history->[-1];
+	#~ todo: check if l == -1 ?
+	for my $i (CORE::reverse(0..$l)) {
 		my $step = $history->[$i];
-		#~ todo: check if parent is defined. if not, use $history->[0]->self
 		if ($step == $parent) {
-			if (blessed $step->{self} and $step->isa('Test::Proto::Series')) {
-				my $children = $step->{children};
-				$children = [] unless defined $children; #:5.8
-				my $contents = $step->{self}->contents;
-				unless ($#$children == $#$contents) {
-					#~ we conclude the step is not complete. Add a new step.
-					my $next_step = {
-						self=>$contents->[$#$children+1],
-						parent=>$parent,
-						element=>$#$children+1
-					};
-					push @{$step->{children}}, $l+1;
-				}
-				else {
-					$parent = $step->$parent;
-					return undef if !defined $parent; #~ Cause a termination
-				}
-			}
-			if (blessed $step->{self} and $step->isa('Test::Proto::Repeatable')) {
+			if ((blessed $step->{self}) and $step->{self}->isa('Test::Proto::Repeatable')) {
 				my $children = $step->{children};
 				$children = [] unless defined $children; #:5.8
 				my $max = $step->{max}; #~ the maximum set by a backtrack action
 				$max = $step->{self}->max unless defined $max; # the maximum allowed by the repeatable
-				unless ( ( defined $step->{self}->max ) and ( $#$children + 1 == $step->{self}->max ) ) {
-					#~ we conclude the step is not complete. Add a new step.
-					my $next_step = {
-						self=>$step->{self}->contents,
-						parent=>$parent, #~ todo: weaken this? Or weaken the children? Need to prevent circular refs causing memory leakage.
-						element=>$#$children+1
-					};
-					push @{$step->{children}}, $next_step;
+				my $new_max = $#{$step->{children}};
+				
+				unless ( $new_max < $step->{self}->min ) {
+					$step->{max} = $new_max;
+					$#{$step->{children}} = $new_max-1;
+					#if ($new_max == 0){
+					#	$bt_backtrack_to->($history, $step);
+					#}
+					#else {
+						$bt_backtrack_to->($runner, $history, $step->{children}->[$new_max]);
+					#}
+					return 1;
 				}
 				else {
 					$parent = $step->{parent};
 					return undef if !defined $parent; #~ Cause a termination
 				}
 			}
+			else {
+				$parent = $step->{parent};
+			}
 		}
 		#return $next_step if defined $next_step;
-	}	
+	}
+	return undef;
 
 };
 
+$bt_backtrack_to = sub {
+	my ($runner, $history, $target_step);
+	for my $i (CORE::reverse(0..$#$history)){
+		if ($history->[$i] == $target_step){
+			$runner->subtest(test_case=>(pop @$history))->diag("Backtracked to step $i");
+			return;
+		}
+		pop @$history;
+	}
+	# die if we fail?
+};
 1;
 
