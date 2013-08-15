@@ -727,18 +727,18 @@ $bt_core = sub {
 				or
 				($history->[-1]->{index} == $#$subject)
 			);
-			return $runner->fail('No next step; index reached: '.$history->[-1]->{index});
+			#return $runner->fail('No next step; index reached: '.$history->[-1]->{index});
 		}
 		
 		#~ Add the next step to the history
-		push @$history, $next_step;
+		push @$history, $next_step if defined $next_step;
 		
 		#~ Determine if the next step can be executed
 		my $evaluation_result = $bt_eval_step->($runner, $subject, $expected, $history);
-		unless ($evaluation_result){
+		unless ($evaluation_result and defined $next_step){
 			my $next_solution = $bt_backtrack->($runner, $subject, $expected, $history);
 			unless (defined $next_solution) {
-				return $runner->fail('no more alternatve solutions');
+				return $runner->fail('No more alternatve solutions');
 			}
 		}
 	}
@@ -907,7 +907,7 @@ $bt_backtrack = sub{
 	#~ todo: check if l == -1 ?
 	for my $i (CORE::reverse(0..$l)) {
 		my $step = $history->[$i];
-		if ($step == $parent) {
+		if (1){#($step == $parent) {
 			if ((blessed $step->{self}) and $step->{self}->isa('Test::Proto::Repeatable')) {
 				my $children = $step->{children};
 				$children = [] unless defined $children; #:5.8
@@ -916,9 +916,10 @@ $bt_backtrack = sub{
 				my $new_max = $#{$step->{children}};
 				
 				unless ( $new_max < $step->{self}->min ) {
+					$runner->subtest(test_case=>($step))->diag("Selected another branch at Repeatable at step $i");
 					$step->{max} = $new_max;
+					$bt_backtrack_to->($runner, $history, $step->{children}->[-1]);
 					$#{$step->{children}} = $new_max-1;
-					$bt_backtrack_to->($runner, $history, $step->{children}->[$new_max]);
 					return 1;
 				}
 				else {
@@ -927,9 +928,11 @@ $bt_backtrack = sub{
 				}
 			}
 			elsif ((blessed $step->{self}) and $step->{self}->isa('Test::Proto::Alternation')) {
-				if ( $step->{alt}+1 <= $#{ $step->{self}->{alternatives}} ) {
+				if ($step->{alt}+1 <= $#{ $step->{self}->{alternatives}} ) {
+					$runner->subtest(test_case=>($step))->diag("Selected another branch at Alternation at step $i");
 					$step->{alt}++;
 					$bt_backtrack_to->($runner, $history, $step->{children}->[0]);
+					$#{$step->{children}}=-1;
 					return 1;
 				}
 				else {
@@ -949,13 +952,15 @@ $bt_backtrack = sub{
 
 $bt_backtrack_to = sub {
 	my ($runner, $history, $target_step);
-	for my $i (CORE::reverse(0..$#$history)){
+	for my $i (CORE::reverse(1..$#$history)){
 		if ($history->[$i] == $target_step){
-			$runner->subtest(test_case=>(pop @$history))->diag("Backtracked to step $i");
+			$runner->subtest(test_case=>($history->[$i]))->diag("Backtracked to step $i");
+			$#$history = $i-1;
 			return;
 		}
-		pop @$history;
+		#pop @$history;
 	}
+	die if defined $target_step;
 	# die if we fail?
 };
 1;
