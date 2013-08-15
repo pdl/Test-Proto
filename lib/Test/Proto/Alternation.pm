@@ -35,7 +35,7 @@ Each argument is a different alternative.
 
 	die unless exists $alternation->alternatives->[0];
 
-A getter/setter method for the 
+A getter/setter method for the different alternatives available to the alternation.
 
 =cut
 
