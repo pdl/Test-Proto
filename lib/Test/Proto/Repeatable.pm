@@ -20,4 +20,37 @@ sub BUILDARGS {
 	return {contents=>Test::Proto::Series->new(@_)};
 }
 
+=head1 NAME
+
+Test::Proto::Repeatable - represent a repeatable element or series in array validation
+
+=head1 SYNOPSIS
+
+	pArray->contains_only(pRepeatable('a', 'b')); 
+	# will validate ['a', 'b'] and  ['a', 'b', 'a', 'b'] as true
+
+Used in array validation to represent a sequence qhich must be present in its entirety. Can contain, or be contained by, a L<Test::Proto::Series> or a L<Test::Proto::Alternation>.
+
+=head1 METHODS
+
+=head3 new
+
+Each argument is another element in the series. NB: A series is automatically created to hold all the contents.
+
+=head3 contents
+
+	die unless exists $alternation->contents->[0];
+
+A getter/setter method for the contents of the series.
+
+=head3 min
+
+Sets and/or returns the minimum number of occurrences required.
+
+=head3 max
+
+Sets and/or returns the maximum number of occurrences permitted.
+
+=cut
+
 1;
