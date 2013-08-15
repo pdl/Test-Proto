@@ -1,5 +1,6 @@
 Changes
 lib/Test/Proto.pm
+lib/Test/Proto/Alternation.pm
 lib/Test/Proto/Base.pm
 lib/Test/Proto/Role/Value.pm
 lib/Test/Proto/Common.pm
@@ -9,6 +10,8 @@ lib/Test/Proto/HashRef.pm
 lib/Test/Proto/Role/HashRef.pm
 lib/Test/Proto/ArrayRef.pm
 lib/Test/Proto/Role/ArrayRef.pm
+lib/Test/Proto/Repeatable.pm
+lib/Test/Proto/Series.pm
 lib/Test/Proto/Object.pm
 lib/Test/Proto/TestCase.pm
 lib/Test/Proto/TestRunner.pm
