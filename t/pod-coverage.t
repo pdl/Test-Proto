@@ -16,6 +16,6 @@ plan skip_all => "Pod::Coverage $min_pc required for testing POD coverage"
     if $@;
 my $trustparents = { 
 	coverage_class => 'Pod::Coverage::CountParents',
-	also_private => [qr/^BUILD$/],
+	also_private => [qr/^BUILD(?:ARGS)?$/],
 };
 all_pod_coverage_ok($trustparents);

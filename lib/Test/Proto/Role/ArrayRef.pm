@@ -734,8 +734,10 @@ $bt_core = sub {
 		push @$history, $next_step if defined $next_step;
 		
 		#~ Determine if the next step can be executed
-		my $evaluation_result = $bt_eval_step->($runner, $subject, $expected, $history);
-		unless ($evaluation_result and defined $next_step){
+		my $evaluation_result = defined $next_step ? 
+			$bt_eval_step->($runner, $subject, $expected, $history) 
+			: undef;
+		unless ($evaluation_result){
 			my $next_solution = $bt_backtrack->($runner, $subject, $expected, $history);
 			unless (defined $next_solution) {
 				return $runner->fail('No more alternatve solutions');
