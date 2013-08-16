@@ -306,12 +306,21 @@ my $seriesTests = [
 	subject    => ['a','b'],
 	value      => 1,
 },
-{ # 23
+{ # 24
 	prototype  => pSeries('a','b', pRepeatable(pAlternation('a','b')), 'c'),
 	subject    => ['a','b'],
 	value      => 0,
 },
-
+{ # 25
+	prototype  => pAlternation(pSeries('b'),pSeries('a','b')),
+	subject    => ['a','b'],
+	value      => 1,
+},
+{ # 26
+	prototype  => pAlternation(pSeries('a'),pSeries('b')),
+	subject    => ['a','b'],
+	value      => 0,
+},
 ];
 
 my $i = 0;
