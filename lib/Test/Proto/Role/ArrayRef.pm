@@ -915,14 +915,18 @@ $bt_backtrack = sub{
 				$children = [] unless defined $children; #:5.8
 				my $max = $step->{max}; #~ the maximum set by a backtrack action
 				$max = $step->{self}->max unless defined $max; # the maximum allowed by the repeatable
-				my $new_max = $#{$step->{children}};
-				
+				$max = $#{$step->{children}}+1 unless defined $max;
+				my $new_max = $max-1;
 				unless ( $new_max < $step->{self}->min ) {
 					$runner->subtest(test_case=>($step))->diag("Selected another branch at Repeatable at step $i");
 					$step->{max} = $new_max;
-					$bt_backtrack_to->($runner, $history, $step->{children}->[-1]);
-					$#{$step->{children}} = $new_max-1;
-					return 1;
+					if (defined $step->{children}->[0]){ # then the advance worked
+						$bt_backtrack_to->($runner, $history, $step->{children}->[0]);
+						$#{$step->{children}} = -1;
+						return 1;
+					}
+					$parent = $step->{parent};
+					return undef if !defined $parent; #~ Cause a termination					
 				}
 				else {
 					$parent = $step->{parent};
@@ -930,12 +934,16 @@ $bt_backtrack = sub{
 				}
 			}
 			elsif ((blessed $step->{self}) and $step->{self}->isa('Test::Proto::Alternation')) {
-				if ($step->{alt}+1 <= $#{ $step->{self}->{alternatives}} ) {
+				if ($step->{alt} <= $#{ $step->{self}->{alternatives}} ) {
 					$runner->subtest(test_case=>($step))->diag("Selected another branch at Alternation at step $i");
 					$step->{alt}++;
-					$bt_backtrack_to->($runner, $history, $step->{children}->[0]);
-					$#{$step->{children}}=-1;
-					return 1;
+					if (defined $step->{children}->[0]){ # then the advance worked
+						$bt_backtrack_to->($runner, $history, $step->{children}->[0]);
+						$#{$step->{children}}=-1;
+						return 1;
+					}
+					$parent = $step->{parent};
+					return undef if !defined $parent; #~ Cause a termination					
 				}
 				else {
 					$parent = $step->{parent};
@@ -946,24 +954,21 @@ $bt_backtrack = sub{
 				$parent = $step->{parent};
 			}
 		}
-		#return $next_step if defined $next_step;
 	}
 	return undef;
 
 };
 
 $bt_backtrack_to = sub {
-	my ($runner, $history, $target_step);
+	my ($runner, $history, $target_step) = @_;
 	for my $i (CORE::reverse(1..$#$history)){
 		if ($history->[$i] == $target_step){
 			$runner->subtest(test_case=>($history->[$i]))->diag("Backtracked to step $i");
 			$#$history = $i-1;
 			return;
 		}
-		#pop @$history;
 	}
-	die if defined $target_step;
-	# die if we fail?
+	die; #~ we should never reach this point
 };
 1;
 
