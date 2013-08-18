@@ -334,13 +334,14 @@ my $seriesTests = [
 ];
 
 my $i = 0;
+
 foreach my $t (@$seriesTests){
 	$i++;
 	if ( $t->{value} ) {
-		is_a_good_pass( pAr->begins_with($t->{prototype})->validate($t->{subject}), "Series Test $i must pass");
+		is_a_good_pass( pAr->contains_only($t->{prototype})->validate($t->{subject}), "Series Test $i must pass");
 	}
 	else {
-		is_a_good_fail( pAr->begins_with($t->{prototype})->validate($t->{subject}), "Series Test $i must fail" );
+		is_a_good_fail( pAr->contains_only($t->{prototype})->validate($t->{subject}), "Series Test $i must fail" );
 	}
 }
 

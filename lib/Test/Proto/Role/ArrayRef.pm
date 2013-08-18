@@ -3,7 +3,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::Proto::Common;
-use Scalar::Util 'blessed';
+use Scalar::Util qw'blessed weaken';
 use Moo::Role;
 
 =head1 NAME
@@ -591,12 +591,36 @@ $machine = sub {
 	return $runner->pass("Successful");
 };
 
+=head2 Series Validation
+
+Sometimes you need to check an array matches a certain complex 'pattern' including multiple units of variable length, like in a regular expression or an XML DTD or Schema. Using L<Test::Proto::Series>, L<Test::Proto::Repeatable>, and L<Test::Proto::Alternation>, you can describe these units, and the methods below can be used to iterate over such a structure. 
+
+=cut
+
 #~ Series handling
 
 
+=head3 contains_only
+
+	pArray->contains_only(pSeries(pRepeatable('a')->max(5)))->ok(['a','a','a']); # passes
+
+=cut
+
+sub contains_only {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('contains_only', { expected => $expected }, $reason);
+}
+
+my ($bt_core, $bt_advance, $bt_eval_step, $bt_backtrack, $bt_backtrack_to);
+define_test 'contains_only' => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	#return $seriesMachine->($self, $self->subject, $data->{expected})->{runner};
+	return $bt_core->($self, $self->subject, $data->{expected});
+};
+
 =head3 begins_with
 
-	pArray->begins_with(pSeries(pRepeat('a')->max(5)))->ok(['a','a','a']); # passes
+	pArray->begins_with(pSeries(pRepeatable('a')->max(2)))->ok(['a','a','a']); # passes
 
 =cut
 
@@ -605,115 +629,79 @@ sub begins_with {
 	$self->add_test('begins_with', { expected => $expected }, $reason);
 }
 
-my $seriesMachine;
-my ($bt_core, $bt_advance, $bt_eval_step, $bt_backtrack, $bt_backtrack_to);
+
 define_test 'begins_with' => sub {
 	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
 	#return $seriesMachine->($self, $self->subject, $data->{expected})->{runner};
-	return $bt_core->($self, $self->subject, $data->{expected});
+	for my $i (0..$#{$self->subject}) {
+		my $subset = [$self->subject->[0..$i]];
+		$self->pass("Succeeded with 0..$i") if $bt_core->($self->subtest(subject=>$subset), $subset, $data->{expected});
+	}
+	return $self->fail("No subsets passed");
 };
 
-# todo: implement branching
-$seriesMachine = sub {
-	my ($runner, $subject, $expected, ) = @_;
-	if ( blessed $expected and $expected->isa('Test::Proto::Series') ) {
-		my $working_copy = [@$subject];
-		my $i = 0;
-		foreach my $item (@{ $expected->contents }) {
-			return { runner => $runner->fail('No more items left in the test subject'), remainder => $working_copy } unless exists $working_copy->[0];
-			my $result = $seriesMachine->($runner->subtest(subject=>$working_copy), $working_copy, $item);
-			if ($result->{runner}){
-				$working_copy = $result->{remainder};
-			}
-			else {
-				return { runner => $runner->fail('Series failed on item '.$i), remainder => $working_copy};
-			}
-			$i++;
-		}
-		return { runner => $runner->pass('Series Matched'), remainder => $working_copy};
-	}
-	elsif ( blessed $expected and $expected->isa('Test::Proto::Repeatable') ) {
-		my $working_copy = [@$subject];
-		my $count = 0;
-		while ( (!defined $expected->max) or ($count < $expected->max) ){
-			$runner->subtest->diag('Repeatable instance '.$count);
-			my $result = $seriesMachine->($runner->subtest(subject=>$working_copy), $working_copy, $expected->contents, );
-			if ($result->{runner}){
-				$working_copy = $runner->{remainder};
-				$count++;
-			}
-			else {
-				last;
-			}
-		}
-		return { runner => $runner->pass('Repeatable met criteria (matched '.$count.' time(s))'), remainder => $working_copy } unless $count < $expected->min;
-		return { runner => $runner->fail('Repeatable failed to match enouch times (got '.$count.', needed'.$subject->min().')'), remainder => $working_copy };
-		
-	}
-	elsif ( blessed $expected and $expected->isa('Test::Proto::Alternation') ) {
-		my $i = 0;
-		foreach my $alt (@{ $expected->alternatives }) {
-			$runner->subtest->diag('Branching on Alternation '.$i);
-			my $result = $seriesMachine->($runner->subtest(subject=>$subject), $subject, $alt );
-			if ($result->{runner}) {
-				return {runner=> $runner->pass('Alternation '.$i. ' was successful'), $result->{remainder} };
-			}
-			$i++
-		}
-		return { runner => $runner->fail('None of the alternations succeeded'), remainder => $subject};
-	}
-	else {
-		my $working_copy = [@$subject];
-		return { runner => $runner->fail('No more items left in the test subject'), remainder => $working_copy } unless exists $working_copy->[0];
-		my $first_item = shift @$working_copy;
-		return { runner => upgrade($expected)->validate($first_item, $runner), remainder => $working_copy }; 
-	}
-};
+=head3 ends_with
 
-=pod
-
-1. To advance a step
-
-Find the most recent incomplete SERIES
-
-Get its next element.
-
-2. To get the next alternative (backreack)
-
-Find the most recent VARIABLE_UNIT
-
-If a repeatable, decrease it (they begin greedy)
-
-If an alternation, try the next alternative,
-
-If either of those cannot legally be done, it's no longer a variable unit so keep looking
-
-When you run out of history, fail
-
-
-So the backtracker should do the following:
-
-
-	backtracker (runner r, subject s, expected e, history h)
-		loop
-			next_step = advance (r, s, e, h)
-			if no next_step
-				return r->pass if index of last h is length of s
-			push next step onto history
-			result = evaluate
-			if result is not ok
-				next_solution = backtrack (r, s, e, h) # modifies h
-				if no next_solution
-					return r->fail
-				# implicit else continue and redo the loop
-		
+	pArray->ends_with(pSeries('b','c')->ok(['a','b','c']); # passes
 
 =cut
 
+sub ends_with {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('ends_with', { expected => $expected }, $reason);
+}
 
 
+define_test 'ends_with' => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	#return $seriesMachine->($self, $self->subject, $data->{expected})->{runner};
+	for my $i (CORE::reverse(0..$#{$self->subject})) {
+		my $subset = [$self->subject->[$i..$#{$self->subject}]];
+		$self->pass("Succeeded with ".$i."..".$#{$self->subject}) if $bt_core->($self->subtest(subject=>$subset), $subset, $data->{expected});
+	}
+	return $self->fail("No subsets passed");
+};
+
+#~ How the backtracker works
+#~ 
+#~ 1. To advance a step
+#~ 
+#~ Find the most recent incomplete SERIES
+#~ 
+#~ Get its next element.
+#~ 
+#~ 2. To get the next alternative (backreack)
+#~ 
+#~ Find the most recent VARIABLE_UNIT
+#~ 
+#~ If a repeatable, decrease it (they begin greedy)
+#~ 
+#~ If an alternation, try the next alternative,
+#~ 
+#~ If either of those cannot legally be done, it's no longer a variable unit so keep looking
+#~ 
+#~ When you run out of history, fail
+#~ 
+#~ 
+#~ So the backtracker should do the following:
+#~ 
+#~ 
+#~ 	backtracker (runner r, subject s, expected e, history h)
+#~ 		loop
+#~ 			next_step = advance (r, s, e, h)
+#~ 			if no next_step
+#~ 				return r->pass if index of last h is length of s
+#~ 			push next step onto history
+#~ 			result = evaluate
+#~ 			if result is not ok
+#~ 				next_solution = backtrack (r, s, e, h) # modifies h
+#~ 				if no next_solution
+#~ 					return r->fail
+#~ 				# implicit else continue and redo the loop
+#~ 		
+#~ 
 $bt_core = sub {
-	my ($runner, $subject, $expected, $history) = @_;
+	my ($runner, $subject, $expected, $history, $options) = @_;
 	$history = [] unless defined $history;
 	while (1) { #~ yeah, scary, I know, but better than diving headlong into recursion
 		
@@ -821,6 +809,7 @@ $bt_advance = sub {
 						parent=>$step, #~ todo: weaken this? Or weaken the children? Need to prevent circular refs causing memory leakage.
 						element=>0
 					};
+					
 					$step->{alt} = $alt;
 					push @{$step->{children}}, $next_step;
 				}
