@@ -189,6 +189,8 @@ sub pAlternation { Test::Proto::Alternation->new(@_); }
 sub pRepeatable { Test::Proto::Repeatable->new(@_); }
 my $rpt = pRepeatable(p);
 $rpt->max(2);
+isa_ok (pRepeatable, 'Test::Proto::Repeatable');
+isa_ok (pRepeatable->max(2), 'Test::Proto::Repeatable'); #~ test if method chaining works
 my $seriesTests = [
 
 { # 1

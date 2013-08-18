@@ -15,6 +15,22 @@ has 'max',
 	is      => 'rw',
 	default => sub {undef};
 
+around 'min', 'max' => sub {
+	#~ This means treat min and max as chainable accessors
+	my $orig = shift;
+	my $self = shift;
+	if (exists $_[0]){
+		#~ when setting, return self
+		$orig->($self, @_);
+		return $self;
+	}
+	else {
+		#~ when getting, return value
+		return $orig->($self, @_);
+	}
+
+};
+
 sub BUILDARGS {
 	my $class = shift;
 	return {contents=>Test::Proto::Series->new(@_)};
