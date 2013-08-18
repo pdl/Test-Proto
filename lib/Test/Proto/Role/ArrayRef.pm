@@ -744,7 +744,6 @@ $bt_advance = sub {
 	my $l = $#$history;
 	$runner->subtest(test_case=>$history)->diag('Advance '.$l.'!');
 	my $next_step; 
-	my $parent;
 	#~ todo: check if l == -1
 	if ($l == -1) {
 		return {
@@ -752,9 +751,6 @@ $bt_advance = sub {
 			parent=>undef,
 			index=>-1,
 		};
-	}
-	else {
-		$parent = $history->[-1];
 	}
 	for my $i (CORE::reverse (0..$l)) {
 		my $step = $history->[$i];
@@ -772,9 +768,6 @@ $bt_advance = sub {
 				};
 				weaken $next_step->{parent};
 				push @{$step->{children}}, ($next_step);
-			}
-			else {
-				$parent = $step->{parent};
 			}
 		}
 		elsif ((blessed $step->{self}) and $step->{self}->isa('Test::Proto::Repeatable')) {
@@ -794,9 +787,6 @@ $bt_advance = sub {
 				push @{$step->{children}}, $next_step;
 				$step->{max_tried} = $#{$step->{children}}+1;
 			}
-			else {
-				$parent = $step->{parent};
-			}
 		}
 		elsif ((blessed $step->{self}) and $step->{self}->isa('Test::Proto::Alternation')) {
 			#~ Pick first alternative
@@ -812,17 +802,10 @@ $bt_advance = sub {
 				$step->{alt} = $alt;
 				push @{$step->{children}}, $next_step;
 			}
-			else{
-				$parent = $step->{parent};
-			}
-		}
-		else { 
-			$parent = $step->{parent};
 		}
 		if (defined $next_step) {
 			return $next_step;
 		}
-		return undef if !defined $parent; #~ Cause a termination
 		#~ Otherwise, next $i.
 	}
 	return undef;
