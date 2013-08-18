@@ -602,7 +602,9 @@ Sometimes you need to check an array matches a certain complex 'pattern' includi
 
 =head3 contains_only
 
-	pArray->contains_only(pSeries(pRepeatable('a')->max(5)))->ok(['a','a','a']); # passes
+	pArray->contains_only(pSeries(pRepeatable(pAlternation('a', 'b'))->max(5)))->ok(['a','a','a']); # passes
+
+This passes if the series expected matches exactly the test subject, i.e. the series can legally stop at the point where the subject ends. 
 
 =cut
 
@@ -620,7 +622,9 @@ define_test 'contains_only' => sub {
 
 =head3 begins_with
 
-	pArray->begins_with(pSeries(pRepeatable('a')->max(2)))->ok(['a','a','a']); # passes
+	pArray->begins_with(pSeries('a','a',pRepeatable('a')->max(2)))->ok(['a','a','a']); # passes
+
+This passes if the full value of the series expected matches the test subject with some elements of the test subject optionally left over at the end.  
 
 =cut
 
@@ -644,6 +648,8 @@ define_test 'begins_with' => sub {
 
 	pArray->ends_with(pSeries('b','c')->ok(['a','b','c']); # passes
 
+This passes if the full value of the series expected matches the final items of the test subject with some elements of the test subject optionally preceding. 
+
 =cut
 
 sub ends_with {
@@ -651,10 +657,8 @@ sub ends_with {
 	$self->add_test('ends_with', { expected => $expected }, $reason);
 }
 
-
 define_test 'ends_with' => sub {
 	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
-	#return $seriesMachine->($self, $self->subject, $data->{expected})->{runner};
 	for my $i (CORE::reverse(0..$#{$self->subject})) {
 		my $subset = [$self->subject->[$i..$#{$self->subject}]];
 		$self->pass("Succeeded with ".$i."..".$#{$self->subject}) if $bt_core->($self->subtest(subject=>$subset), $subset, $data->{expected});
@@ -702,7 +706,7 @@ define_test 'ends_with' => sub {
 #~ 
 $bt_core = sub {
 	my ($runner, $subject, $expected, $history, $options) = @_;
-	$history = [] unless defined $history;
+	$history = [] unless defined $history; #:5.8
 	while (1) { #~ yeah, scary, I know, but better than diving headlong into recursion
 		
 		#~ Advance
