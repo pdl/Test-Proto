@@ -59,7 +59,7 @@ Returns the parent of the test.
 =cut
 
 has 'parent' =>
-	is => 'rwp'
+	is => 'rwp',
 	weak_ref => 1;
 
 =head3 is_complete
