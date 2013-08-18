@@ -758,79 +758,72 @@ $bt_advance = sub {
 	}
 	for my $i (CORE::reverse (0..$l)) {
 		my $step = $history->[$i];
-		if (1){#(((!defined $parent) and $i == 0) or ((defined $parent) and ($step == $parent))) {
-			my $children;
-			if ((blessed $step->{self}) and $step->{self}->isa('Test::Proto::Series')) {
-				$children = $step->{children};
-				$children = [] unless defined $children; #:5.8
-				my $contents = $step->{self}->contents;
-				if ($#$children < $#$contents) {
-					#~ we conclude the series is not complete. Add a new step.
-					$next_step = {
-						self=>$contents->[$#$children+1],
-						parent=>$step,
-						element=>$#$children+1
-					};
-					weaken $next_step->{parent};
-					push @{$step->{children}}, ($next_step);
-				}
-				else {
-					$parent = $step->{parent};
-					return undef if !defined $parent; #~ Cause a termination
-				}
+		my $children;
+		if ((blessed $step->{self}) and $step->{self}->isa('Test::Proto::Series')) {
+			$children = $step->{children};
+			$children = [] unless defined $children; #:5.8
+			my $contents = $step->{self}->contents;
+			if ($#$children < $#$contents) {
+				#~ we conclude the series is not complete. Add a new step.
+				$next_step = {
+					self=>$contents->[$#$children+1],
+					parent=>$step,
+					element=>$#$children+1
+				};
+				weaken $next_step->{parent};
+				push @{$step->{children}}, ($next_step);
 			}
-			elsif ((blessed $step->{self}) and $step->{self}->isa('Test::Proto::Repeatable')) {
-				$children = $step->{children};
-				$children = [] unless defined $children; #:5.8
-				my $max = $step->{max}; #~ the maximum set by a backtrack action
-				$max = $step->{self}->max unless defined $max; # the maximum allowed by the repeatable
-				#~ NB: Repeatables are greedy, so go as far as they can unless a backtrack has caused them to try being less greedy.
-				unless ( ( defined $max ) and ( $#$children + 1 >= $max ) ) {
-					#~ we conclude the repeatable is not exhausted. Add a new step.
-					$next_step = {
-						self=>$step->{self}->contents,
-						parent=>$step, #~ todo: weaken this? Or weaken the children? Need to prevent circular refs causing memory leakage.
-						element=>$#$children+1
-					};
-					weaken $next_step->{parent};
-					push @{$step->{children}}, $next_step;
-					$step->{max_tried} = $#{$step->{children}}+1;
-				}
-				else {
-					$parent = $step->{parent};
-					return undef if !defined $parent; #~ Cause a termination
-				}
-			}
-			elsif ((blessed $step->{self}) and $step->{self}->isa('Test::Proto::Alternation')) {
-				#~ Pick first alternative
-				unless ( (defined $step->{children}) and @{$step->{children}}) {
-					my $alt = 0;
-					$alt = $step->{alt} if defined $step->{alt};
-					$next_step = {
-						self=>$step->{self}->alternatives->[$alt],
-						parent=>$step, #~ todo: weaken this? Or weaken the children? Need to prevent circular refs causing memory leakage.
-						element=>0
-					};
-					weaken $next_step->{parent};					
-					$step->{alt} = $alt;
-					push @{$step->{children}}, $next_step;
-				}
-				else{
-					$parent = $step->{parent};
-					return undef if !defined $parent; #~ Cause a termination
-				}
-			}
-			else { 
+			else {
 				$parent = $step->{parent};
-				return undef if !defined $parent; #~ Cause a termination
 			}
-			if (defined $next_step) {
-				$runner->subtest(test_case=>$history->[-1]->{self})->diag('Advanced ok');
-				return $next_step;
-			}
-
 		}
-		#~ Othewise next $i
+		elsif ((blessed $step->{self}) and $step->{self}->isa('Test::Proto::Repeatable')) {
+			$children = $step->{children};
+			$children = [] unless defined $children; #:5.8
+			my $max = $step->{max}; #~ the maximum set by a backtrack action
+			$max = $step->{self}->max unless defined $max; # the maximum allowed by the repeatable
+			#~ NB: Repeatables are greedy, so go as far as they can unless a backtrack has caused them to try being less greedy.
+			unless ( ( defined $max ) and ( $#$children + 1 >= $max ) ) {
+				#~ we conclude the repeatable is not exhausted. Add a new step.
+				$next_step = {
+					self=>$step->{self}->contents,
+					parent=>$step, 
+					element=>$#$children+1
+				};
+				weaken $next_step->{parent};
+				push @{$step->{children}}, $next_step;
+				$step->{max_tried} = $#{$step->{children}}+1;
+			}
+			else {
+				$parent = $step->{parent};
+			}
+		}
+		elsif ((blessed $step->{self}) and $step->{self}->isa('Test::Proto::Alternation')) {
+			#~ Pick first alternative
+			unless ( (defined $step->{children}) and @{$step->{children}}) {
+				my $alt = 0;
+				$alt = $step->{alt} if defined $step->{alt};
+				$next_step = {
+					self=>$step->{self}->alternatives->[$alt],
+					parent=>$step,
+					element=>0
+				};
+				weaken $next_step->{parent};					
+				$step->{alt} = $alt;
+				push @{$step->{children}}, $next_step;
+			}
+			else{
+				$parent = $step->{parent};
+			}
+		}
+		else { 
+			$parent = $step->{parent};
+		}
+		if (defined $next_step) {
+			return $next_step;
+		}
+		return undef if !defined $parent; #~ Cause a termination
+		#~ Otherwise, next $i.
 	}
 	return undef;
 };
@@ -876,7 +869,6 @@ $bt_eval_step = sub {
 			$current_step->{index} = $current_index;
 			return 1;
 		}
-		# elsif ((ref $current_step->{self}) eq 'Test::Proto::Repeatable'){return 1;} #:debug
 		elsif (((ref $current_step->{self}) eq 'Test::Proto::Repeatable') and ($current_step->{self}->min <= ($#{$current_step->{children}} +1))) {
 			$current_step->{max} = $#{$current_step->{children}}+1 unless
 				defined ($current_step->{max}) 
@@ -900,54 +892,35 @@ $bt_backtrack = sub{
 	#~ Consider taking the removed slice and keeping it in a 'failed branches' slot of the repeatable/alternation.
 	my $l = $#$history;
 	$runner->subtest()->diag('Backtracking... (last history item: '.$l.')');
-	my $parent = $history->[-1];
 	#~ todo: check if l == -1 ?
 	for my $i (CORE::reverse(0..$l)) {
 		my $step = $history->[$i];
-		if (1){#($step == $parent) {
-			if ((blessed $step->{self}) and $step->{self}->isa('Test::Proto::Repeatable')) {
-				my $children = $step->{children};
-				$children = [] unless defined $children; #:5.8
-				my $max = $step->{max}; #~ the maximum set by a backtrack action
-				$max = $step->{self}->max unless defined $max; # the maximum allowed by the repeatable
-				# $max = $#{$step->{children}}+1 unless defined $max;
-				$max = $step->{max_tried} unless defined $max;
-				my $new_max = $max-1;
-				unless ( $new_max < $step->{self}->min ) {
-					$runner->subtest(test_case=>($step))->diag("Selected a new max of $new_max at Repeatable at step $i");
-					$step->{max} = $new_max;
-					if (defined $step->{children}->[0]){ # then the advance worked
-						$bt_backtrack_to->($runner, $history, $step->{children}->[0]);
-						$#{$step->{children}} = -1;
-						return 1;
-					}
-					$parent = $step->{parent};
-					return undef if !defined $parent; #~ Cause a termination					
-				}
-				else {
-					$parent = $step->{parent};
-					return undef if !defined $parent; #~ Cause a termination
+		if ((blessed $step->{self}) and $step->{self}->isa('Test::Proto::Repeatable')) {
+			my $children = $step->{children};
+			$children = [] unless defined $children; #:5.8
+			my $max = $step->{max}; #~ the maximum set by a backtrack action
+			$max = $step->{self}->max unless defined $max; # the maximum allowed by the repeatable
+			$max = $step->{max_tried} unless defined $max;
+			my $new_max = $max-1;
+			unless ( $new_max < $step->{self}->min ) {
+				$runner->subtest(test_case=>($step))->diag("Selected a new max of $new_max at Repeatable at step $i");
+				$step->{max} = $new_max;
+				if (defined $step->{children}->[0]){ # then the advance worked
+					$bt_backtrack_to->($runner, $history, $step->{children}->[0]);
+					$#{$step->{children}} = -1;
+					return 1;
 				}
 			}
-			elsif ((blessed $step->{self}) and $step->{self}->isa('Test::Proto::Alternation')) {
-				if ($step->{alt} < $#{ $step->{self}->{alternatives}} ) {
-					$runner->subtest(test_case=>($step))->diag("Selected branch ".($step->{alt}+1)." at Alternation at step $i");
-					$step->{alt}++;
-					if (defined $step->{children}->[0]){ # then the advance worked
-						$bt_backtrack_to->($runner, $history, $step->{children}->[0]);
-						$#{$step->{children}}=-1;
-						return 1;
-					}
-					$parent = $step->{parent};
-					return undef if !defined $parent; #~ Cause a termination					
+		}
+		elsif ((blessed $step->{self}) and $step->{self}->isa('Test::Proto::Alternation')) {
+			if ($step->{alt} < $#{ $step->{self}->{alternatives}} ) {
+				$runner->subtest(test_case=>($step))->diag("Selected branch ".($step->{alt}+1)." at Alternation at step $i");
+				$step->{alt}++;
+				if (defined $step->{children}->[0]){ # then the advance worked
+					$bt_backtrack_to->($runner, $history, $step->{children}->[0]);
+					$#{$step->{children}}=-1;
+					return 1;
 				}
-				else {
-					$parent = $step->{parent};
-					return undef if !defined $parent; #~ Cause a termination
-				}
-			}
-			else {
-				$parent = $step->{parent};
 			}
 		}
 	}
@@ -956,6 +929,7 @@ $bt_backtrack = sub{
 };
 
 $bt_backtrack_to = sub {
+	#~ Backtracks to the target step (inclsively, i.e. deletes the step).
 	my ($runner, $history, $target_step) = @_;
 	for my $i (CORE::reverse(1..$#$history)){
 		if ($history->[$i] == $target_step){
