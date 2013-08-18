@@ -608,15 +608,15 @@ This passes if the series expected matches exactly the test subject, i.e. the se
 
 =cut
 
+my ($bt_core, $bt_advance, $bt_eval_step, $bt_backtrack, $bt_backtrack_to);
+
 sub contains_only {
 	my ($self, $expected, $reason) = @_;
 	$self->add_test('contains_only', { expected => $expected }, $reason);
 }
 
-my ($bt_core, $bt_advance, $bt_eval_step, $bt_backtrack, $bt_backtrack_to);
 define_test 'contains_only' => sub {
 	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
-	#return $seriesMachine->($self, $self->subject, $data->{expected})->{runner};
 	return $bt_core->($self, $self->subject, $data->{expected});
 };
 
@@ -636,7 +636,6 @@ sub begins_with {
 
 define_test 'begins_with' => sub {
 	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
-	#return $seriesMachine->($self, $self->subject, $data->{expected})->{runner};
 	for my $i (0..$#{$self->subject}) {
 		my $subset = [$self->subject->[0..$i]];
 		$self->pass("Succeeded with 0..$i") if $bt_core->($self->subtest(subject=>$subset), $subset, $data->{expected});
