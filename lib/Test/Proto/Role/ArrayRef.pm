@@ -771,6 +771,7 @@ $bt_advance = sub {
 						parent=>$step,
 						element=>$#$children+1
 					};
+					weaken $next_step->{parent};
 					push @{$step->{children}}, ($next_step);
 				}
 				else {
@@ -791,6 +792,7 @@ $bt_advance = sub {
 						parent=>$step, #~ todo: weaken this? Or weaken the children? Need to prevent circular refs causing memory leakage.
 						element=>$#$children+1
 					};
+					weaken $next_step->{parent};
 					push @{$step->{children}}, $next_step;
 					$step->{max_tried} = $#{$step->{children}}+1;
 				}
@@ -809,7 +811,7 @@ $bt_advance = sub {
 						parent=>$step, #~ todo: weaken this? Or weaken the children? Need to prevent circular refs causing memory leakage.
 						element=>0
 					};
-					
+					weaken $next_step->{parent};					
 					$step->{alt} = $alt;
 					push @{$step->{children}}, $next_step;
 				}
