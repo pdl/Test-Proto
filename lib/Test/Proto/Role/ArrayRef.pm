@@ -728,6 +728,7 @@ $bt_core = sub {
 				($history->[-1]->{index} == $#$subject)
 			);
 			#return $runner->fail('No next step; index reached: '.$history->[-1]->{index});
+			$runner->subtest()->diag('No next step');
 		}
 		
 		#~ Add the next step to the history
@@ -769,7 +770,7 @@ $bt_advance = sub {
 	}
 	for my $i (CORE::reverse (0..$l)) {
 		my $step = $history->[$i];
-		if (((!defined $parent) and $i == 0) or ((defined $parent) and ($step == $parent))) {
+		if (1){#(((!defined $parent) and $i == 0) or ((defined $parent) and ($step == $parent))) {
 			my $children;
 			if ((blessed $step->{self}) and $step->{self}->isa('Test::Proto::Series')) {
 				$children = $step->{children};
@@ -803,6 +804,7 @@ $bt_advance = sub {
 						element=>$#$children+1
 					};
 					push @{$step->{children}}, $next_step;
+					$step->{max_tried} = $#{$step->{children}}+1;
 				}
 				else {
 					$parent = $step->{parent};
@@ -829,11 +831,13 @@ $bt_advance = sub {
 			}
 			else { 
 				$parent = $step->{parent};
+				return undef if !defined $parent; #~ Cause a termination
 			}
-		}
-		if (defined $next_step) {
-			$runner->subtest(test_case=>$history)->diag('Advanced ok');
-			return $next_step;
+			if (defined $next_step) {
+				$runner->subtest(test_case=>$history->[-1]->{self})->diag('Advanced ok');
+				return $next_step;
+			}
+
 		}
 		#~ Othewise next $i
 	}
@@ -915,10 +919,11 @@ $bt_backtrack = sub{
 				$children = [] unless defined $children; #:5.8
 				my $max = $step->{max}; #~ the maximum set by a backtrack action
 				$max = $step->{self}->max unless defined $max; # the maximum allowed by the repeatable
-				$max = $#{$step->{children}}+1 unless defined $max;
+				# $max = $#{$step->{children}}+1 unless defined $max;
+				$max = $step->{max_tried} unless defined $max;
 				my $new_max = $max-1;
 				unless ( $new_max < $step->{self}->min ) {
-					$runner->subtest(test_case=>($step))->diag("Selected another branch at Repeatable at step $i");
+					$runner->subtest(test_case=>($step))->diag("Selected a new max of $new_max at Repeatable at step $i");
 					$step->{max} = $new_max;
 					if (defined $step->{children}->[0]){ # then the advance worked
 						$bt_backtrack_to->($runner, $history, $step->{children}->[0]);
@@ -934,8 +939,8 @@ $bt_backtrack = sub{
 				}
 			}
 			elsif ((blessed $step->{self}) and $step->{self}->isa('Test::Proto::Alternation')) {
-				if ($step->{alt} <= $#{ $step->{self}->{alternatives}} ) {
-					$runner->subtest(test_case=>($step))->diag("Selected another branch at Alternation at step $i");
+				if ($step->{alt} < $#{ $step->{self}->{alternatives}} ) {
+					$runner->subtest(test_case=>($step))->diag("Selected branch ".($step->{alt}+1)." at Alternation at step $i");
 					$step->{alt}++;
 					if (defined $step->{children}->[0]){ # then the advance worked
 						$bt_backtrack_to->($runner, $history, $step->{children}->[0]);
@@ -964,6 +969,18 @@ $bt_backtrack_to = sub {
 	for my $i (CORE::reverse(1..$#$history)){
 		if ($history->[$i] == $target_step){
 			$runner->subtest(test_case=>($history->[$i]))->diag("Backtracked to step $i");
+			#~ If step $i or any step after it is a child of a parent earlier in the history, it should no longer be a child, because it will shortly no longer exist.
+			my @delenda = $i..$#$history;
+			foreach my $j (0..($i-1)){
+				if (defined $history->[$j]->{children}){
+					foreach my $childIndex (0..$#{$history->[$j]->{children}}) {
+						if (grep {$history->[$j]->{children}->[$childIndex] == $history->[$_]} @delenda) {
+							$#{$history->[$j]->{children}} = $childIndex-1;
+							last;
+						}
+					}
+				}
+			}
 			$#$history = $i-1;
 			return;
 		}

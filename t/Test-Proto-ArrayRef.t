@@ -321,6 +321,16 @@ my $seriesTests = [
 	subject    => ['a','b'],
 	value      => 0,
 },
+{ # 27
+	prototype  => pRepeatable('a','b'),
+	subject    => ['a','b','a','b'],
+	value      => 1,
+},
+{ # 28
+	prototype  => pRepeatable('a','b'),
+	subject    => ['a'],
+	value      => 0,
+},
 ];
 
 my $i = 0;
