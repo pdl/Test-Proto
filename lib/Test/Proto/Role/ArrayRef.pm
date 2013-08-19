@@ -638,7 +638,7 @@ define_test 'begins_with' => sub {
 	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
 	for my $i (0..$#{$self->subject}) {
 		my $subset = [@{$self->subject}[0..$i]];
-		$self->pass("Succeeded with 0..$i") if $bt_core->($self->subtest(subject=>$subset), $subset, $data->{expected});
+		return $self->pass("Succeeded with 0..$i") if $bt_core->($self->subtest(subject=>$subset), $subset, $data->{expected});
 	}
 	return $self->fail("No subsets passed");
 };
@@ -660,7 +660,7 @@ define_test 'ends_with' => sub {
 	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
 	for my $i (CORE::reverse(0..$#{$self->subject})) {
 		my $subset = [@{$self->subject}[$i..$#{$self->subject}]];
-		$self->pass("Succeeded with ".$i."..".$#{$self->subject}) if $bt_core->($self->subtest(subject=>$subset), $subset, $data->{expected});
+		return $self->pass("Succeeded with ".$i."..".$#{$self->subject}) if $bt_core->($self->subtest(subject=>$subset), $subset, $data->{expected});
 	}
 	return $self->fail("No subsets passed");
 };
