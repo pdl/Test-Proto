@@ -221,7 +221,7 @@ my $seriesTests = [
 { # 6
 	prototype  => pSeries('a','b'),
 	subject    => ['a','b','c'],
-	value      => 0,
+	value      => 'begins_with',
 },
 { # 7
 	prototype  => $rpt,
@@ -231,7 +231,7 @@ my $seriesTests = [
 { # 8
 	prototype  => $rpt,
 	subject    => ['a','b','c'],
-	value      => 0,
+	value      => 'begins_with ends_with',
 },
 { # 9
 	prototype  => $rpt,
@@ -256,7 +256,7 @@ my $seriesTests = [
 { # 13
 	prototype  => pAlternation(pSeries('a')),
 	subject    => ['a', 'b'],
-	value      => 0,
+	value      => 'begins_with',
 },
 { # 14
 	prototype  => pAlternation(pSeries('a'),pRepeatable('a'),pSeries('a')),
@@ -321,7 +321,7 @@ my $seriesTests = [
 { # 26
 	prototype  => pAlternation(pSeries('a'),pSeries('b')),
 	subject    => ['a','b'],
-	value      => 0,
+	value      => 'ends_with begins_with',
 },
 { # 27
 	prototype  => pRepeatable('a','b'),
@@ -339,11 +339,13 @@ my $i = 0;
 
 foreach my $t (@$seriesTests){
 	$i++;
-	if ( $t->{value} ) {
-		is_a_good_pass( pAr->contains_only($t->{prototype})->validate($t->{subject}), "Series Test $i must pass");
-	}
-	else {
-		is_a_good_fail( pAr->contains_only($t->{prototype})->validate($t->{subject}), "Series Test $i must fail" );
+	foreach my $method (qw(begins_with contains_only ends_with)){
+		if ( ($t->{value} eq 1) or $t->{value} =~ /$method/ ) {
+			is_a_good_pass( pAr->$method($t->{prototype})->validate($t->{subject}), "Series Test $i must pass $method");
+		}
+		else {
+			is_a_good_fail( pAr->$method($t->{prototype})->validate($t->{subject}), "Series Test $i must fail" );
+		}
 	}
 }
 
