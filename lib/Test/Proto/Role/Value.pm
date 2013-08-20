@@ -3,6 +3,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::Proto::Common;
+use Scalar::Util qw(blessed weaken isweak);
 use Moo::Role;
 
 =head1 NAME
@@ -346,6 +347,73 @@ sub also {
 define_test also => sub{
 	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
 	return upgrade($data->{expected})->validate($self->subject, $self); 
+};
+
+=head3 any_of
+
+	$positive = p->num_gt(0);
+	$all = p->eq('all');
+	$integer->any([$positive, $all]);
+	$integer->ok(42); # passes
+	$integer->ok('all'); # passes
+
+Tests that the subject also matches one of the protoypes given in the arrayref. If a member of the arrayref given is not a prototype, the argument is upgraded to become one.
+
+=cut
+
+sub any_of {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('any_of', { expected => $expected }, $reason);
+}
+
+define_test any_of => sub{
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	my $i = 0;
+	foreach my $candidate (@{ $data->{expected} }){
+		my $result = upgrade($candidate)->validate($self->subject, $self->subtest);
+		return $self->pass("Candidate $i was successful") if $result;
+	}
+	return $self->fail("No candidate of any was successful");
+};
+
+=head3 is_weak_ref
+
+DOES NOT WORK
+
+Tests that the subject is a weak reference using is_weak from L<Scalar::Util>.
+
+=cut
+
+sub is_weak_ref {
+	my ($self, $reason) = @_;
+	$self->add_test('is_weak_ref', {}, $reason);
+}
+
+define_test is_weak_ref => sub{
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	return $self->fail("Not a reference") unless CORE::ref $self->subject;
+	return $self->fail("Not weak") unless isweak $self->subject;
+	return $self->pass("Weak reference");
+};
+
+=head3 is_strong_ref
+
+DOES NOT WORK
+
+Tests that the subject is not a weak reference using is_weak from L<Scalar::Util>.
+
+=cut
+
+sub is_strong_ref {
+	my ($self, $reason) = @_;
+	$self->add_test('is_strong_ref', {}, $reason);
+}
+
+define_test is_strong_ref => sub{
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	return $self->fail("Not a reference") unless CORE::ref $self->subject;
+	return $self->fail("Weak reference") if isweak $self->subject;
+	return $self->pass("Not a weak reference");
 };
 
 =head1 OTHER INFORMATION

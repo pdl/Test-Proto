@@ -106,10 +106,35 @@ is_a_good_fail(p->try(sub{'a' eq shift})->validate('b'), "'sub{'a' eq shift}->('
 
 is_a_good_pass(p->also(p->eq('a'))->validate('a'), "also will correctly pass");
 is_a_good_fail(p->also(p->eq('a'))->validate('b'), "also will correctly fail");
-is_a_good_pass(p->also('a')->validate('a'), "also will correctly fail (upgrading)");
+is_a_good_pass(p->also('a')->validate('a'), "also will correctly pass (upgrading)");
 is_a_good_fail(p->also('a')->validate('b'), "also will correctly fail (upgrading)");
 
-# is_a_good_exception(p->eq('a')->validate(undef), "undef eq 'a' should fail"); # Doesn't die, though, so maybe this is fine as a fail.
+
+is_a_good_pass(p->any_of([p->eq('a'), p->eq('b')])->validate('a'), "any_of will correctly pass");
+is_a_good_pass(p->any_of([p->eq('a'), p->eq('b')])->validate('b'), "any_of will correctly pass");
+is_a_good_fail(p->any_of([p->eq('a'), p->eq('b')])->validate('c'), "any_of will correctly pass");
+is_a_good_pass(p->any_of(['a','b'])->validate('a'), "any_of will correctly pass (upgrading)");
+is_a_good_pass(p->any_of(['a','b'])->validate('b'), "any_of will correctly pass (upgrading)");
+is_a_good_fail(p->any_of(['a','b'])->validate('c'), "any_of will correctly fail (upgrading)");
+
+
+TODO:{
+	local $TODO = "https://github.com/pdl/Test-Proto/issues/37";
+	my $trueval = {};
+	my $weakref = \$trueval;
+	use Scalar::Util 'weaken';
+	weaken $weakref;
+	my $strongref = \$trueval;
+
+	is_a_good_pass(p->is_weak_ref->validate($weakref), "is_weak_ref will correctly pass");
+	is_a_good_fail(p->is_weak_ref->validate($strongref), "is_weak_ref will correctly fail on strong refs");
+	is_a_good_fail(p->is_weak_ref->validate('a'), "is_weak_ref will correctly fail on non-refs");
+	is_a_good_pass(p->is_strong_ref->validate($strongref), "is_strong_ref will correctly pass");
+	is_a_good_fail(p->is_strong_ref->validate($weakref), "is_strong_ref will correctly fail on weak refs");
+	is_a_good_fail(p->is_strong_ref->validate('a'), "is_strong_ref will correctly fail on non-refs");
+};
+
+# is_a_good_exception(p->eq('a')->validate(undef), "undef eq 'a' should fail"); # Doesn't die, though, so maybe this is fine as a fail. ##????
 
 {
 	$_ = 3;
