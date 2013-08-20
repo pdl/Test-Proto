@@ -353,7 +353,7 @@ define_test also => sub{
 
 	$positive = p->num_gt(0);
 	$all = p->eq('all');
-	$integer->any([$positive, $all]);
+	$integer->any_of([$positive, $all]);
 	$integer->ok(42); # passes
 	$integer->ok('all'); # passes
 
@@ -372,8 +372,63 @@ define_test any_of => sub{
 	foreach my $candidate (@{ $data->{expected} }){
 		my $result = upgrade($candidate)->validate($self->subject, $self->subtest);
 		return $self->pass("Candidate $i was successful") if $result;
+		$i++;
 	}
-	return $self->fail("No candidate of any was successful");
+	return $self->fail("None of the $i candidates were successful");
+};
+
+=head3 none_of
+
+	$positive = p->num_gt(0);
+	$all = p->like(qr/[02468]$/);
+	$integer->none_of([$positive, $all]);
+	$integer->ok(-1); # passes
+	$integer->ok(-2); # fails
+	$integer->ok(1); # fails
+
+Tests that the subject does not match any of the protoypes given in the arrayref. If a member of the arrayref given is not a prototype, the argument is upgraded to become one.
+
+=cut
+
+sub none_of {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('none_of', { expected => $expected }, $reason);
+}
+
+define_test none_of => sub{
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	my $i = 0;
+	foreach my $candidate (@{ $data->{expected} }){
+		my $result = upgrade($candidate)->validate($self->subject, $self->subtest);
+		return $self->fail("Candidate $i was successful") if $result;
+		$i++;
+	}
+	return $self->pass("None of the $i candidates were successful");
+};
+
+=head3 some_of
+
+	p->some_of([qr/cheap/, qr/fast/, qr/good/], 2, 'Pick two!');
+
+Tests that the subject some, all, or none of the protoypes given in the arrayref; the number of successful matches is tested against the second argument. If a member of the arrayref given is not a prototype, the argument is upgraded to become one.
+
+=cut
+
+
+sub some_of {
+	my ($self, $expected, $count, $reason) = @_;
+	$count = p->gt(0) unless defined $count;
+	$self->add_test('some_of', { expected => $expected, count=>$count }, $reason);
+}
+
+define_test some_of => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	my $i = 0;
+	foreach my $candidate (@{ $data->{expected} }){
+		$i++ if upgrade($candidate)->validate($self->subject, $self->subtest);
+	}
+	return $self->pass if upgrade($data->{count})->validate($i,$self->subtest);
+	return $self->fail;
 };
 
 =head3 is_weak_ref

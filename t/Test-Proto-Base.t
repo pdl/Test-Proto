@@ -112,10 +112,26 @@ is_a_good_fail(p->also('a')->validate('b'), "also will correctly fail (upgrading
 
 is_a_good_pass(p->any_of([p->eq('a'), p->eq('b')])->validate('a'), "any_of will correctly pass");
 is_a_good_pass(p->any_of([p->eq('a'), p->eq('b')])->validate('b'), "any_of will correctly pass");
-is_a_good_fail(p->any_of([p->eq('a'), p->eq('b')])->validate('c'), "any_of will correctly pass");
+is_a_good_fail(p->any_of([p->eq('a'), p->eq('b')])->validate('c'), "any_of will correctly fail");
 is_a_good_pass(p->any_of(['a','b'])->validate('a'), "any_of will correctly pass (upgrading)");
 is_a_good_pass(p->any_of(['a','b'])->validate('b'), "any_of will correctly pass (upgrading)");
 is_a_good_fail(p->any_of(['a','b'])->validate('c'), "any_of will correctly fail (upgrading)");
+
+is_a_good_fail(p->none_of([p->eq('a'), p->eq('b')])->validate('a'), "none_of will correctly fail");
+is_a_good_fail(p->none_of([p->eq('a'), p->eq('b')])->validate('b'), "none_of will correctly fail");
+is_a_good_pass(p->none_of([p->eq('a'), p->eq('b')])->validate('c'), "none_of will correctly pass");
+is_a_good_fail(p->none_of(['a','b'])->validate('a'), "none_of will correctly fail (upgrading)");
+is_a_good_fail(p->none_of(['a','b'])->validate('b'), "none_of will correctly fail (upgrading)");
+is_a_good_pass(p->none_of(['a','b'])->validate('c'), "none_of will correctly pass (upgrading)");
+
+
+is_a_good_pass(p->some_of([qr/cheap/,qr/fast/,qr/good/,],2)->validate('cheap and fast'), "some_of will correctly pass 1");		
+is_a_good_pass(p->some_of([qr/cheap/,qr/fast/,qr/good/,],2)->validate('cheap and good'), "some_of will correctly pass 2");
+is_a_good_pass(p->some_of([qr/cheap/,qr/fast/,qr/good/,],2)->validate('good and fast'), "some_of will correctly pass 3");
+is_a_good_fail(p->some_of([qr/cheap/,qr/fast/,qr/good/,],2)->validate('cheap and fast and good'), "some_of will correctly fail 4");
+is_a_good_fail(p->some_of([qr/cheap/,qr/fast/,qr/good/,],2)->validate('cheap'), "some_of will correctly fail 5");
+is_a_good_fail(p->some_of([qr/cheap/,qr/fast/,qr/good/,],p->gt(2))->validate('cheap'), "some_of will correctly fail 6");
+is_a_good_pass(p->some_of([qr/cheap/,qr/fast/,qr/good/,],p->gt(2))->validate('cheap and fast and good'), "some_of will correctly pass 7");
 
 
 TODO:{
