@@ -51,10 +51,11 @@ Applies the first argument (a prototype) onto each member of the array; if it re
 
 sub grep {
 	my ($self, $code, $expected, $reason) = @_;
-	if (defined $expected) {
+	if (defined $expected and CORE::ref $expected) { #~ CORE::ref used because boolean grep might have a reason
 		$self->add_test('grep', { match => $code, expected => $expected }, $reason);
 	}
 	else {
+		$reason = $expected;
 		$self->add_test('array_any', { match => $code }, $reason);
 	}
 }
