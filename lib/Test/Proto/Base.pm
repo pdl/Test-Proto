@@ -86,7 +86,7 @@ sub ok {
 
 =head3 clone
 
-This method returns a copy of the current object. The new object can have tests added without affecting the existing test.
+This method returns a copy of the current object. The new object can have tests added without affecting the existing test. However, existing tests are not cloned, so if you want to tag them, you will need to clone them too.
 
 =cut
 
