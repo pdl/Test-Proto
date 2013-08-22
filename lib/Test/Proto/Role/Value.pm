@@ -377,6 +377,35 @@ define_test any_of => sub{
 	return $self->fail("None of the $i candidates were successful");
 };
 
+=head3 all_of
+
+	$positive = p->num_gt(0);
+	$under_a_hundred = p->num_lt(100);
+	$integer->all_of([$positive, $under_a_hundred]);
+	$integer->ok(42); # passes
+	$integer->ok('101'); # fails
+
+Tests that the subject also matches one of the protoypes given in the arrayref. If a member of the arrayref given is not a prototype, the argument is upgraded to become one.
+
+=cut
+
+sub all_of {
+	my ($self, $expected, $reason) = @_;
+	$self->add_test('all_of', { expected => $expected }, $reason);
+}
+
+define_test all_of => sub{
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	my $i = 0;
+	foreach my $candidate (@{ $data->{expected} }){
+		my $result = upgrade($candidate)->validate($self->subject, $self->subtest);
+		return $self->fail("Candidate $i was unsuccessful") unless $result;
+		$i++;
+	}
+	return $self->pass("All of the $i candidates were successful");
+};
+
+
 =head3 none_of
 
 	$positive = p->num_gt(0);

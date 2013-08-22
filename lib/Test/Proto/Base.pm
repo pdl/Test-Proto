@@ -7,6 +7,12 @@ use Test::Proto::TestRunner;
 use Test::Proto::Formatter::TestBuilder;
 use Test::Proto::TestCase;
 use Moo;
+use overload 
+	'&'=>\&_overload_AND,
+	'|'=>\&_overload_OR,
+	'^'=>\&_overload_XOR,
+	'!'=>\&_overload_NOT,
+;
 with('Test::Proto::Role::Value');
 with('Test::Proto::Role::Tagged');
 our $VERSION = '0.011';
@@ -26,7 +32,7 @@ Test::Proto::Base - Base Class for Test Prototypes
 
 This is a base class for test prototypes. 
 
-Note that it is a Moo class.
+Throughout this documentation, C<p> will be used as a shorthand for C<< Test::Proto::Base->new >>.
 
 =cut
 
@@ -100,7 +106,18 @@ sub clone
 	return $pkg->new(%args);
 }
 
+=head2 OPERATOR OVERLOADING
 
+Prototypes can be combined with the operators C<&>, C<|>, C<^>, and negated: C<!>. In all cases, a new prototype is returned.
+
+	$x & $y => p->all_of([$x, $y])
+	$x | $y => p->any_of([$x, $y])
+	$x ^ $y => p->some_of([$x, $y], 1)
+	!$x     => p->none_of([$x])
+
+Remember that this only works with prototypes. C<'A' & 'B'> still returns C<'@'>.
+
+=cut
 
 =head2 PROTOTYPER METHODS
 
@@ -222,7 +239,6 @@ sub run_tests{
 
 	add_test_method 'is_uppercase', sub { $_[1]->subject =~ !/[a-z]/ }
 
-
 =cut
 
 =head1 OTHER INFORMATION
@@ -230,5 +246,24 @@ sub run_tests{
 For author, version, bug reports, support, etc, please see L<Test::Proto>. 
 
 =cut
+
+
+sub _overload_AND {
+	my ($left, $right) = @_;
+	return __PACKAGE__->new->all_of([$left, $right]);
+}
+sub _overload_OR {
+	my ($left, $right) = @_;
+	return __PACKAGE__->new->any_of([$left, $right]);
+}
+sub _overload_XOR {
+	my ($left, $right) = @_;
+	return __PACKAGE__->new->some_of([$left, $right], 1);
+}
+sub _overload_NOT {
+	my ($left) = @_;
+	return __PACKAGE__->new->none_of([$left], 1);
+}
+
 
 1;

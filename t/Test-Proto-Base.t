@@ -163,5 +163,15 @@ isa_ok(p->clone, 'Test::Proto::Base');
 is_a_good_pass(p->eq('a')->clone->validate('a'));
 is_a_good_fail(p->eq('a')->clone->validate('b'));
 
+is_a_good_pass((p->ne('a') & p->ne('b'))->validate('c'), 'overload & works: pass');
+is_a_good_fail((p->ne('a') & p->ne('b'))->validate('b'), 'overload & works: fail');
+is_a_good_pass((p->ne('a') | p->ne('b'))->validate('c'), 'overload | works: pass');
+is_a_good_fail((p->num_lt(0) | p->num_gt(10))->validate('5'), 'overload | works: fail');
+is_a_good_pass((p->ne('a') ^ p->ne('b'))->validate('b'), 'overload ^ works: pass');
+is_a_good_fail((p->ne('a') ^ p->ne('b'))->validate('c'), 'overload ^ works: fail');
+is_a_good_pass((!p->ne('a'))->validate('a'), 'overload ! works: pass');
+is_a_good_fail((!p->ne('a'))->validate('b'), 'overload ! works: fail');
+
+
 done_testing;
 
