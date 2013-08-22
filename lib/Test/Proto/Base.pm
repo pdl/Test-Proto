@@ -93,10 +93,11 @@ This method returns a copy of the current object. The new object can have tests 
 sub clone
 {
 	my $self = shift;
-	my $new = bless {
-		script=>$self->{'script'}, # that won't work!
-	}, CORE::ref $self;
-	return $new;
+	my $pkg = CORE::ref $self;
+	my %args = (
+		map{ $_ => $self->$_ } qw(natural_script user_script)
+	);
+	return $pkg->new(%args);
 }
 
 

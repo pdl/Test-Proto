@@ -159,6 +159,9 @@ TODO:{
 	is_a_good_pass(p->undefined->validate(sub{undef}->()), "validate undef is still undef even when \$_ is defined, and undef is created by an anon sub");
 }
 
+isa_ok(p->clone, 'Test::Proto::Base');
+is_a_good_pass(p->eq('a')->clone->validate('a'));
+is_a_good_fail(p->eq('a')->clone->validate('b'));
 
 done_testing;
 
