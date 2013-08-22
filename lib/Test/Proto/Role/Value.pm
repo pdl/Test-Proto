@@ -460,6 +460,46 @@ define_test some_of => sub {
 	return $self->fail;
 };
 
+=head3 looks_like_number
+
+	p->looks_like_number->ok('3'); # passes
+	p->looks_like_number->ok('a'); # fails
+
+If the test subject looks like a number according to Perl's internal rules (specifically, using Scalar::Util::looks_like_number), then pass.
+
+=cut
+
+sub looks_like_number {
+	my ($self, $expected, $count, $reason) = @_;
+	$self->add_test('looks_like_number', $reason);
+}
+
+define_test looks_like_number => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	return $self->pass if Scalar::Util::looks_like_number($self->subject);
+	return $self->fail;
+};
+
+=head3 looks_unlike_number
+
+	p->looks_unlike_number->ok('3'); # fails
+	p->looks_unlike_number->ok('a'); # passes
+
+If the test subject looks like a number according to Perl's internal rules (specifically, using Scalar::Util::looks_like_number), then fail.
+
+=cut
+
+sub looks_unlike_number {
+	my ($self, $expected, $count, $reason) = @_;
+	$self->add_test('looks_unlike_number', $reason);
+}
+
+define_test looks_unlike_number => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	return $self->fail if Scalar::Util::looks_like_number($self->subject);
+	return $self->pass;
+};
+
 =head3 is_weak_ref
 
 DOES NOT WORK

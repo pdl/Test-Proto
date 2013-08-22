@@ -172,6 +172,17 @@ is_a_good_fail((p->ne('a') ^ p->ne('b'))->validate('c'), 'overload ^ works: fail
 is_a_good_pass((!p->ne('a'))->validate('a'), 'overload ! works: pass');
 is_a_good_fail((!p->ne('a'))->validate('b'), 'overload ! works: fail');
 
+for my $s (qw(1 2 2_00 2_0 _0 p a i 1i 0x0a 0x0 0 x0 0b0 0d0 0a 09 00 0 -0 -.1 1.0a 0x01a)) {
+	if (Scalar::Util::looks_like_number($s)) {
+		is_a_good_pass ( p->looks_like_number->validate($s),  "$s should look like a number");
+		is_a_good_fail ( p->looks_unlike_number->validate($s),"$s should not look unlike a number");
+	}
+	else {
+		is_a_good_pass ( p->looks_unlike_number->validate($s),"$s should look unlike a number");
+		is_a_good_fail ( p->looks_like_number->validate($s),  "$s should not look like a number");
+	}
+}
+
 
 done_testing;
 

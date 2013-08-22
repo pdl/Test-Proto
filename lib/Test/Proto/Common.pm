@@ -135,7 +135,7 @@ sub upgrade {
 			return Test::Proto::Base->new()->like($expected) if ref $expected eq 'Regexp';
 			return Test::Proto::Base->new()->try($expected) if ref $expected eq 'CODE';
 		}
-		return Test::Proto::Base->new()->num_eq($expected) if looks_like_number ($expected);
+		return Test::Proto::Base->new()->num_eq($expected) if Scalar::Util::looks_like_number ($expected);
 		return Test::Proto::Base->new()->eq($expected);
 	}
 }
