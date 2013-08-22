@@ -34,7 +34,7 @@ Note that it is a Moo class.
 
 =head2 PUBLIC METHODS
 
-These are the methods intended for use when writing tests.
+These are the methods intended for use when execcuting tests. All the methods for writing tests can be found at L<Test::Proto::Role::Value>.
 
 =cut
 
@@ -107,11 +107,6 @@ sub clone
 These are for documentation purposes only.
 
 =cut
-
-#sub initialise
-#{
-#	return $_[0];
-#}
 
 =head3 natural_type
 
