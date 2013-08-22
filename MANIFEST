@@ -12,6 +12,7 @@ lib/Test/Proto/ArrayRef.pm
 lib/Test/Proto/Role/ArrayRef.pm
 lib/Test/Proto/Repeatable.pm
 lib/Test/Proto/Series.pm
+lib/Test/Proto/Role/Tagged.pm
 lib/Test/Proto/Object.pm
 lib/Test/Proto/TestCase.pm
 lib/Test/Proto/TestRunner.pm
@@ -32,4 +33,5 @@ t/Test-Proto-Formatter-TestBuilder.t
 t/Test-Proto-Object.t
 t/Test-Proto-TestRunner.t
 t/Test-Proto-TestCase.t
+t/Test-Proto-Role-Tagged.t
 
