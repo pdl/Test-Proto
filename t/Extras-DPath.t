@@ -25,7 +25,7 @@ subtest 'Test Data::DPath integration' => sub {
 	ok (! (p->dpath_true('/BBB')->validate($data)), 'dpath_true fails correctly');
 	ok p->dpath_false('/BBB')->validate($data);
 	ok (! (p->dpath_false('/AAA')->validate($data)), 'dpath_false fails correctly');
-	ok p->dpath_results('/AAA/*', pArray->array_length(3) )->validate($data);
+	ok p->dpath_results('/AAA/*', pArray->count_items(3) )->validate($data);
 
 };
 
