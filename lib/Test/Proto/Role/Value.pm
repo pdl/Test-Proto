@@ -595,19 +595,19 @@ Evaluates the dpath expression and then uses the second argument (which should b
 
 	define_test dpath_true => sub{
 		my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
-		my $result = scalar(Data::DPath::match($self->subject, $data->{path}));
+		my $result = scalar(Data::DPath::dpath($data->{path})->match($self->subject));
 		return $self->pass if $result;
 		return $self->fail;
 	};
 	define_test dpath_false => sub{
 		my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
-		my $result = scalar(Data::DPath::match($self->subject, $data->{path}));
+		my $result = scalar(Data::DPath::dpath($data->{path})->match($self->subject));
 		return $self->fail if $result;
 		return $self->pass;
 	};
 	define_test dpath_results => sub{
 		my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
-		my $result = [Data::DPath::match($self->subject, $data->{path})];
+		my $result = [Data::DPath::dpath($data->{path})->match($self->subject)];
 		return upgrade($result)->validate($data->{path}, $self);
 	};
 
