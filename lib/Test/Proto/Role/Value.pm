@@ -552,6 +552,7 @@ define_test is_strong_ref => sub{
 The following functions will load if you have Data::DPath installed.
 
 =cut
+
 eval {
 	require Data::DPath;
 	Data::DPath->import();

@@ -24,6 +24,7 @@ t/00-load.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+t/Extras-DPath.t
 t/Test-Proto.t
 t/Test-Proto-ArrayRef.t
 t/Test-Proto-Base.t
