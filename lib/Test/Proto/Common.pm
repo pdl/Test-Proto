@@ -129,9 +129,14 @@ sub upgrade {
 		use Scalar::Util qw(blessed looks_like_number);
 		if (defined ref $expected) {
 			if (blessed $expected){
+				return Test::Proto::ArrayRef->new()->contains_only($expected) if 
+					$expected->isa('Test::Proto::Series') 
+					or $expected->isa('Test::Proto::Repeatable') 
+					or $expected->isa('Test::Proto::Alternation');
 				return $expected if $expected->isa('Test::Proto::Base');
 			}
 			return Test::Proto::ArrayRef->new()->array_eq($expected) if ref $expected eq 'ARRAY';
+			return Test::Proto::HashRef->new()->superhash_of($expected) if ref $expected eq 'HASH';
 			return Test::Proto::Base->new()->like($expected) if ref $expected eq 'Regexp';
 			return Test::Proto::Base->new()->try($expected) if ref $expected eq 'CODE';
 		}

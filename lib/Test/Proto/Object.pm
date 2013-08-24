@@ -4,6 +4,9 @@ use strict;
 use warnings;
 use Moo;
 extends 'Test::Proto::Base';
+with 'Test::Proto::Role::Value';
+with 'Test::Proto::Role::ArrayRef';
+with 'Test::Proto::Role::HashRef';
 use Test::Proto::Common;
 
 =head1 NAME

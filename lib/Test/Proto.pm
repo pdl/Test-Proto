@@ -11,6 +11,7 @@ use Test::Proto::Series;
 use Test::Proto::Repeatable;
 use Test::Proto::Alternation;
 use Test::Proto::Common ();
+use Scalar::Util qw(blessed refaddr);
 use base "Exporter";
 our @EXPORT_OK = qw(&p &pArray &pHash &pObject &pSeries &pRepeatable &pAlternation); # symbols to export on request
 
@@ -97,13 +98,32 @@ sub pHash {
 
 =head2 pObject
 
+	pObject('')
+
 Returns a prototype for an object. See L<Test::Proto::Object>.
 
 =cut
 
 sub pObject {
-	return Test::Proto::Common::upgrade ($_[0]) if 1 == scalar @_;
-	return Test::Proto::Object->new(@_);
+	if (1 == scalar @_) {
+		my $p = Test::Proto::Object->new();
+		if (!ref $_[0]) {
+			$p->is_a($_[0]);
+		}
+		elsif ((blessed $_[0]) and $_[0]->isa('Test::Proto::Base')) {
+			$p->is_also($_[0]);
+		}
+		elsif (ref $_[0] =~ /^(?:HASH|ARRAY)$/) {
+			$p->is_also(Test::Proto::Common::upgrade ($_[0]));
+		}
+		else {
+			$p->refaddr(refaddr $_[0]) if blessed $_[0];
+		}
+		return $p;
+	}
+	else {
+		return Test::Proto::Object->new(@_);
+	}
 }
 
 

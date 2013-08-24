@@ -20,7 +20,9 @@ foreach my $upg (
 	ok (!$upg_result->validate('b'), $upg_text.' produces a prototype that validates \'b\' as \'a\' and gives a negative result');
 }
 isa_ok(upgrade(['a']), 'Test::Proto::ArrayRef');
+
 ok(upgrade(['a'])->validate(['a']));
+ok(upgrade({'a'=>'b'})->validate({'a'=>'b'}));
 ok(!upgrade(2)->validate(1));
 
 done_testing();

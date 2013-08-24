@@ -268,9 +268,16 @@ define_test 'ref' => sub {
 =head3 is_a
 
 	p->is_a('')->ok('b');
+	p->is_a('ARRAY')->ok([]);
 	p->is_a('less')->ok(less);
 
-Tests the result of the 'is_a'. Must be a string.
+A test which bundles C<isa> and C<ref> together. 
+
+If the subject is not a reference, C<undef> or C<''> in the first argument passes.
+
+If the subject is a reference to a builtin type like HASH, the C<ref> of that type passes.
+
+If the subject is a blessed reference, then C<isa> is used.
 
 =cut
 
@@ -286,7 +293,7 @@ define_test is_a => sub {
 			return $self->pass;
 		}
 	}
-	elsif(CORE::ref $self->subject) {
+	elsif(Scalar::Util::blessed $self->subject) {		
 		if($self->subject->isa($data->{expected})) {
 			return $self->pass; 
 		}
