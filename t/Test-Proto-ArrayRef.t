@@ -44,6 +44,12 @@ is_a_good_pass(pAr->grep(sub {$_[0] eq uc $_[0]}, ['A'])->validate(['A','b']), "
 is_a_good_pass(pAr->grep(sub {$_[0] eq uc $_[0]}, [])->validate(['a','b']), "grep passes when nothing matches");
 is_a_good_fail(pAr->grep(sub {$_[0] eq uc $_[0]}, ['a','b'])->validate(['A','b']), "grep fails when expected does not match");
 
+# indexes_of
+is_a_good_pass(pAr->indexes_of(sub {$_[0] eq uc $_[0]}, [0,2])->validate(['A','b', 'C']), "indexes_of passes");
+is_a_good_pass(pAr->indexes_of(sub {$_[0] eq uc $_[0]}, [])->validate(['a','b']), "indexes_of passes when nothing matches");
+is_a_good_fail(pAr->indexes_of(sub {$_[0] eq uc $_[0]}, [0,2])->validate(['A','b']), "indexes_of fails when expected does not match");
+
+
 # grep (1 arg form)
 is_a_good_pass(pAr->grep(sub {$_[0] eq uc $_[0]})->validate(['A','b']), "boolean grep passes when something matches");
 is_a_good_fail(pAr->grep(sub {$_[0] eq uc $_[0]})->validate(['a','b']), "boolean grep fails when nothing matches");

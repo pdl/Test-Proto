@@ -297,6 +297,32 @@ define_test group_when => sub {
 	return upgrade($data->{expected})->validate($newArray, $self);
 };
 
+
+=head3 indexes_of
+
+	pArray->indexes_of('a', [0,2])->ok(['a','b','a']);
+
+Finds the indexes which match the first argument, and compares that list as an arrayref with the second list.
+
+=cut
+
+sub indexes_of {
+	my ($self, $match, $expected, $reason) = @_;
+	$self->add_test('indexes_of', { match => $match, expected => $expected }, $reason);
+}
+
+define_test indexes_of => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	my $indexes = [];
+	for my $i (0..$#{$self->subject}){
+		push @$indexes, $i if upgrade($data->{match})->validate($self->subject->[$i], $self->subtest(status_message=>"Testing index $i"));
+	}
+	my $result = upgrade($data->{expected})->validate($indexes, $self->subtest(status_message=>'Checking indexes against expected list'));
+	return $self->pass if $result;
+	return $self->fail;
+};
+
+
 =head3 array_eq
 
 	pArray->array_eq(['a','b'])->ok(['a','b']);
