@@ -547,6 +547,71 @@ define_test is_strong_ref => sub{
 	return $self->pass("Not a weak reference");
 };
 
+=head2 Data::DPath
+
+The following functions will load if you have Data::DPath installed.
+
+=cut
+eval {
+	require Data::DPath;
+	Data::DPath->import();
+};
+unless($@){
+	#~ Data::DPath loaded ok
+
+=head3 dpath_true
+
+Evaluates the dpath expression and passes if it finds a match.
+
+=cut
+
+	sub dpath_true {
+		my ($self, $path, $reason) = @_;
+		$self->add_test('dpath_true', { path =>$path }, $reason);
+	}
+
+=head3 dpath_false
+
+Evaluates the dpath expression and passes if it does not find a match.
+
+=cut
+
+	sub dpath_false {
+		my ($self, $path, $reason) = @_;
+		$self->add_test('dpath_false', { path =>$path }, $reason);
+	}
+
+=head3 dpath_results
+
+Evaluates the dpath expression and then uses the second argument (which should be upgradeable to a L<Test::Proto::ArrayRef>) to validate the list of matches.
+
+=cut
+
+	sub dpath_results {
+		my ($self, $path, $expected, $reason) = @_;
+		$self->add_test('dpath_results', { path =>$path, expected=>$expected }, $reason);
+	}
+
+	define_test dpath_true => sub{
+		my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+		my $result = scalar(Data::DPath::match($self->subject, $data->{path}));
+		return $self->pass if $result;
+		return $self->fail;
+	};
+	define_test dpath_false => sub{
+		my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+		my $result = scalar(Data::DPath::match($self->subject, $data->{path}));
+		return $self->fail if $result;
+		return $self->pass;
+	};
+	define_test dpath_results => sub{
+		my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+		my $result = [Data::DPath::match($self->subject, $data->{path})];
+		return upgrade($result)->validate($data->{path}, $self);
+	};
+
+}
+
 =head1 OTHER INFORMATION
 
 For author, version, bug reports, support, etc, please see L<Test::Proto>. 
