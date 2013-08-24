@@ -6,9 +6,13 @@ use warnings;
 use Test::Proto::Base;
 use Test::Proto::ArrayRef;
 use Test::Proto::HashRef;
+use Test::Proto::Object;
+use Test::Proto::Series;
+use Test::Proto::Repeatable;
+use Test::Proto::Alternation;
 use Test::Proto::Common ();
 use base "Exporter";
-our @EXPORT_OK = qw(&p &pArray &pHash); # symbols to export on request
+our @EXPORT_OK = qw(&p &pArray &pHash &pObject &pSeries &pRepeatable &pAlternation); # symbols to export on request
 
 =head1 NAME
 
@@ -89,6 +93,48 @@ Returns a prototype for a hash/HashRef. See L<Test::Proto::HashRef>.
 sub pHash {
 	return Test::Proto::Common::upgrade ($_[0]) if 1 == scalar @_;
 	return Test::Proto::HashRef->new(@_);
+}
+
+=head2 pObject
+
+Returns a prototype for an object. See L<Test::Proto::Object>.
+
+=cut
+
+sub pObject {
+	return Test::Proto::Common::upgrade ($_[0]) if 1 == scalar @_;
+	return Test::Proto::Object->new(@_);
+}
+
+
+=head2 pSeries
+
+Returns a series object for use in validating lists. See L<Test::Proto::Series>.
+
+=cut
+
+sub pSeries {
+	return Test::Proto::Series->new(@_);
+}
+
+=head2 pRepeatable
+
+Returns a repeatable series object for use in validating lists. See L<Test::Proto::Repeatable>.
+
+=cut
+
+sub pRepeatable {
+	return Test::Proto::Repeatable->new(@_);
+}
+
+=head2 pAlternation
+
+Returns an alternation for use in validating lists. See L<Test::Proto::Altenration>.
+
+=cut
+
+sub pAlternation {
+	return Test::Proto::Alternation->new(@_);
 }
 
 
