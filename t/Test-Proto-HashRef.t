@@ -5,6 +5,7 @@ use Data::Dumper;
 
 use Test::More;
 use Test::Proto::HashRef;
+use Test::Proto::ArrayRef;
 
 ok (1, 'ok is ok');
 
@@ -42,6 +43,13 @@ is_a_good_fail(pHr->key_exists('a')->validate({}), "key_exists should fail when 
 is_a_good_pass(pHr->count_keys(1)->validate({'a'=>'b'}), "count_keys should pass when the number matches");
 is_a_good_pass(pHr->count_keys(0)->validate({}), "count_keys should pass when the number is 0 and the hash is empty");
 is_a_good_fail(pHr->count_keys(5)->validate({'a'=>'b'}), "count_keys should fail when the number does not match");
+
+# keys
+is_a_good_pass(pHr->keys(['a'])->validate({'a'=>'b'}), "count_keys should pass when there is one key");
+is_a_good_pass(pHr->keys([])->validate({}), "keys should pass with [] when the hash is empty");
+is_a_good_pass(pHr->keys(Test::Proto::ArrayRef->new->bag_of(['a','c']))->validate({a=>'b',c=>'d'}), "keys should pass there is more than one key, using bag_of");
+is_a_good_fail(pHr->keys(['b'])->validate({'a'=>'b'}), "count_keys should fail when appropriate");
+
 
 # superhash_of
 is_a_good_pass(pHr->superhash_of({'a'=>'b'})->validate({'a'=>'b'}), "superhash_of should pass when expected matches");
