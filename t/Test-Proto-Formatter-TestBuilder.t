@@ -10,6 +10,7 @@ sub p { Test::Proto::Base->new(); }
 
 p->num_gt(0)->num_lt(10)->ok(1);
 # p->num_gt(0)->num_lt(10)->ok(11);
+
 use Test::Proto::ArrayRef;
 Test::Proto::ArrayRef->new->in_groups(2,[['a','b'],['c','d'],['e']])->ok(['a','b','c','d','e'], 'Because...');
 
