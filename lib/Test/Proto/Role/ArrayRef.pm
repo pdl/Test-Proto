@@ -485,7 +485,13 @@ define_test 'array_after' => sub {
 	return $self->fail('None matched');
 };
 
-# Unordered comparisons
+=head2 Unordered Comparisons
+
+These methods are useful for when you know what the array should contain but do not know what order the elements are in, for example when testing the keys of a hash. 
+
+The principle is similar to the C<set> and C<bag> tests documented L<List::Util>, but does not use the same implementation and does not suffer from the known bug documented there.
+
+=cut
 
 =head3 set_of
 
