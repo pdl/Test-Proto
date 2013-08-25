@@ -413,6 +413,19 @@ sub array_before {
 	$self->add_test('array_before', { match => $match, expected => $expected }, $reason);
 }
 
+=head3 array_before_inclusive
+
+	pArray->array_before_inclusive('b',['a', 'b'])->ok(['a','b', 'c']); # passes
+
+Applies the first argument (a prototype) onto each member of the array; if any member returns true, the second argument is validated against a new arrayref containing all the preceding members of the array, plus the element matched.
+
+=cut
+
+sub array_before_inclusive {
+	my ($self, $match, $expected, $reason) = @_;
+	$self->add_test('array_before', { match => $match, expected => $expected, include_self=>1 }, $reason);
+}
+
 define_test 'array_before' => sub {
 	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
 	my $i = 0;
@@ -430,7 +443,7 @@ define_test 'array_before' => sub {
 
 =head3 array_after
 
-	pArray->after('a',['b'])->ok(['a','b']); # passes
+	pArray->array_after('a',['b'])->ok(['a','b']); # passes
 
 Applies the first argument (a prototype) onto each member of the array; if any member returns true, the second argument is validated against a new arrayref containing all the following members of the array.
 
@@ -442,6 +455,20 @@ sub array_after {
 	$self->add_test('array_after', { match => $match, expected => $expected }, $reason);
 }
 
+=head3 array_after_inclusive
+
+	pArray->array_after_inclusive('b',['b','c'])->ok(['a','b','c']); # passes
+
+Applies the first argument (a prototype) onto each member of the array; if any member returns true, the second argument is validated against a new arrayref containing the element matched, plus all the following members of the array.
+
+=cut
+
+
+sub array_after_inclusive {
+	my ($self, $match, $expected, $reason) = @_;
+	$self->add_test('array_after', { match => $match, expected => $expected, include_self=>1 }, $reason);
+}
+
 define_test 'array_after' => sub {
 	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
 	my $i = 0;
@@ -450,7 +477,7 @@ define_test 'array_after' => sub {
 			# $self->add_info("Item $i matched")
 			my $last_index = $#{$self->subject};
 			my $after = [ @{ $self->subject }[$i..$last_index] ];
-			pop @$after unless $data->{include_self};
+			shift @$after unless $data->{include_self};
 			return upgrade($data->{expected})->validate($after, $self);
 		}
 		$i++;

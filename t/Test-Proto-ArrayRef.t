@@ -113,10 +113,25 @@ is_a_good_pass(pAr->range('0..1,1..3', ['a','b','b','c','d'])->validate(['a','b'
 is_a_good_pass(pAr->reverse([qw (d c b a)])->validate(['a','b','c','d']), "reverse passes when expected matches");
 is_a_good_fail(pAr->reverse([qw (a b c d)])->validate(['a','b','c','d']), "reverse fails when expected does not match");
 
-# before
+# array_before
 is_a_good_pass(pAr->array_before('c', ['a','b'])->validate(['a','b','c','d']), "array_before passes when expected matches");
 is_a_good_pass(pAr->array_before('a',[])->validate(['a','b','c','d']), "array_before passes when expected matches and is empty");
 is_a_good_fail(pAr->array_before('c',[])->validate(['a','b','c','d']), "array_before fails when expected does not match");
+
+# array_before_inclusive
+is_a_good_pass(pAr->array_before_inclusive('c', ['a','b','c'])->validate(['a','b','c','d']), "array_before_inclusive passes when expected matches");
+is_a_good_pass(pAr->array_before_inclusive('a',['a'])->validate(['a','b','c','d']), "array_before_inclusive passes when expected matches and is alone");
+is_a_good_fail(pAr->array_before_inclusive('c',[])->validate(['a','b','c','d']), "array_before_inclusive fails when expected does not match");
+
+# array_after
+is_a_good_pass(pAr->array_after('b', ['c','d'])->validate(['a','b','c','d']), "array_after passes when expected matches");
+is_a_good_pass(pAr->array_after('d',[])->validate(['a','b','c','d']), "array_after passes when expected matches and is empty");
+is_a_good_fail(pAr->array_after('c',[])->validate(['a','b','c','d']), "array_after fails when expected does not match");
+
+# array_after
+is_a_good_pass(pAr->array_after_inclusive('b', ['b','c','d'])->validate(['a','b','c','d']), "array_after_inclusive passes when expected matches");
+is_a_good_pass(pAr->array_after_inclusive('d',['d'])->validate(['a','b','c','d']), "array_after_inclusive passes when expected matches and is alone");
+is_a_good_fail(pAr->array_after_inclusive('c',[])->validate(['a','b','c','d']), "array_after_inclusive fails when expected does not match");
 
 # subset_of, superset_of, subbag_of, superbag_of
 
