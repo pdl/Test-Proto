@@ -15,9 +15,10 @@ Test::Proto::Object - Test an object's behaviour
 
 =head3 method
 
-	$p->method('open', ['test.txt','>'], [$fh])->ok($subject);
+	$p->method('open')->ok($subject); # i.e. method_exists
+	$p->method('open', ['test.txt','>'], [$fh])->ok($subject); # method_list_context
 
-Takes three arguments, a method, the arguments to use with the method, and the expected return value. Calls the method on the test subject, with the arguments, and tests the return value. 
+Either with one argument, takes the method, and checks if it exists, or takes three arguments, a method, the arguments to use with the method, and the expected return value. Calls the method on the test subject, with the arguments, and tests the return value. 
 
 The arguments and return value should be arrayrefs; the method is evaluated in list context.
 
@@ -25,7 +26,12 @@ The arguments and return value should be arrayrefs; the method is evaluated in l
 
 sub method {
 	my ($self) = shift;
-	$self->method_list_context(@_);
+	if ((! exists $_[1]) or (!defined ref $_[1]) or ((ref $_[1]) ne 'ARRAY')){
+		$self->method_exists(@_);
+	}
+	else {
+		$self->method_list_context(@_);
+	}
 }
 
 =head3 method_void_context
@@ -112,5 +118,28 @@ define_test method_list_context => sub {
 	my $response = [$self->subject->$method(@$args)];
 	return $expected->validate($response, $self);
 };
+
+=head3 method_exists
+
+	$p->method_exists('open')->ok($subject);
+
+Determines if the named method is present on the test subject. Implemented with C<can>, and does not pick up methods available via C<AUTOLOAD>.
+
+=cut
+
+sub method_exists {
+	my ($self, $method, $args, $expected, $reason) = @_;
+	$self->add_test('method_exists', {
+		method => $method,
+	}, $reason);
+}
+
+define_test method_exists => sub {
+	my ($self, $data, $reason) = @_; # self is the runner
+	my $method = $data->{method};
+	return $self->pass if ($self->subject->can($method));
+	return $self->fail;
+};
+
 
 1;

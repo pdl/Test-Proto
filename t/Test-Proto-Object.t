@@ -50,9 +50,14 @@ my $parrot = MyDummyClass->new(parrot=>1);
 my $dies = MyDummyClass->new(dies=>1);
 
 is_a_good_pass(pOb->method('frob', [], [qw(list context)])->validate($s), '->method passes ok');
+is_a_good_pass(pOb->method('frob')->validate($s), '->method passes ok as method_exists');
+is_a_good_pass(pOb->method('frob', 'Because')->validate($s), '->method passes ok as method_exists with an explanation');
+is_a_good_fail(pOb->method('click')->validate($s), '->method fails correctly as method_exists');
 is_a_good_pass(pOb->method_list_context('frob', [], [qw(list context)])->validate($s), '->method_list_context passes ok');
 is_a_good_pass(pOb->method_scalar_context('frob', [], 'scalar')->validate($s), '->method_scalar_context passes ok');
 is_a_good_pass(pOb->method_void_context('frob', [])->validate($s), '->method_void_context passes ok');
+is_a_good_pass(pOb->method_exists('frob')->validate($s), '->method_exists passes ok');
+is_a_good_fail(pOb->method_exists('click')->validate($s), '->method_exists fails correctly');
 
 
 
