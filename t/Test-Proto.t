@@ -3,13 +3,14 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::Proto qw(p pArray pHash pObject pSeries pRepeatable pAlternation);
+use Test::Proto qw(p pArray pHash pCode pObject pSeries pRepeatable pAlternation);
 
 isa_ok(p, 'Test::Proto::Base');
 
 isa_ok(pArray, 'Test::Proto::ArrayRef');
 isa_ok(pHash, 'Test::Proto::HashRef');
 isa_ok(pObject, 'Test::Proto::Object');
+isa_ok(pCode, 'Test::Proto::CodeRef');
 
 isa_ok(pSeries, 'Test::Proto::Series');
 isa_ok(pRepeatable, 'Test::Proto::Repeatable');

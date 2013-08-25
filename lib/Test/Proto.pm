@@ -6,6 +6,7 @@ use warnings;
 use Test::Proto::Base;
 use Test::Proto::ArrayRef;
 use Test::Proto::HashRef;
+use Test::Proto::CodeRef;
 use Test::Proto::Object;
 use Test::Proto::Series;
 use Test::Proto::Repeatable;
@@ -13,7 +14,7 @@ use Test::Proto::Alternation;
 use Test::Proto::Common ();
 use Scalar::Util qw(blessed refaddr);
 use base "Exporter";
-our @EXPORT_OK = qw(&p &pArray &pHash &pObject &pSeries &pRepeatable &pAlternation); # symbols to export on request
+our @EXPORT_OK = qw(&p &pArray &pHash &pCode &pObject &pSeries &pRepeatable &pAlternation); # symbols to export on request
 
 =head1 NAME
 
@@ -32,9 +33,9 @@ our $VERSION = ${Test::Proto::Base::VERSION};
 
 This module provides an expressive interface for validating deep structures and objects.
 
-	use Test::Proto qw(p pAr pHr);
+	use Test::Proto qw(p pArray pHash pSeries);
 	
-	pAr	->contains_only('', pHr, 
+	pArray	->contains_only(pSeries('', pHash), 
 			"ArrayRef must contain only an empty string followed by a hashref")
 		->ok(["", {a=>'b'}]);
 		# provides diagnostics, including subtests as TAP, using Test::Builder
@@ -44,10 +45,10 @@ This module provides an expressive interface for validating deep structures and 
 		->validate('123');
 		# returns an object with a true value
 	
-	pOb	->is_a('XML::LibXML::Node', 'must inherit from XML::LibXML::Node')
+	pObject	->is_a('XML::LibXML::Node', 'must inherit from XML::LibXML::Node')
 		->is_a('XML::LibXML::Element', 'what it really is')
-		->can_do('findnodes', 'must have the findnodes method')
-		->try_can('localName', [], 
+		->method_exists('findnodes', 'must have the findnodes method')
+		->method_scalar_context('localName', [], 
 			p->like(qr/blockquote|li|p/, 'We can add normal text here')
 		)
 		->ok(XML::LibXML::Element->new('li'));
@@ -94,6 +95,16 @@ Returns a prototype for a hash/HashRef. See L<Test::Proto::HashRef>.
 sub pHash {
 	return Test::Proto::Common::upgrade ($_[0]) if 1 == scalar @_;
 	return Test::Proto::HashRef->new(@_);
+}
+
+=head2 pCode
+
+Returns a prototype for a CodeRef. See L<Test::Proto::CodeRef>.
+
+=cut
+
+sub pCode {
+	return Test::Proto::CodeRef->new(@_);
 }
 
 =head2 pObject
