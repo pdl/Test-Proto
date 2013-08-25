@@ -5,7 +5,10 @@ use Test::More;
 BEGIN {
 	foreach (qw(
 		Test::Proto
+
 		Test::Proto::Base
+		Test::Proto::Role::Value
+
 		Test::Proto::Common
 		Test::Proto::TestCase
 		Test::Proto::TestRunner
@@ -17,6 +20,9 @@ BEGIN {
 		Test::Proto::Role::HashRef
 		Test::Proto::ArrayRef
 		Test::Proto::Role::ArrayRef
+
+		Test::Proto::CodeRef
+		Test::Proto::Object
 	))
 	{
     	use_ok( $_ ) || print "Bail out!\n";
