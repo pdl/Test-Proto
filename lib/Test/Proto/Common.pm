@@ -145,5 +145,30 @@ sub upgrade {
 	}
 }
 
+=head3 chainable
+
+	around 'attr', 'other_attr', \&Test::Proto::Common::chainable;
+
+	...
+
+	$object->attr(2)->some_method;
+
+Use this to make a Moo attribute chainable.
+	
+=cut
+
+sub chainable {
+	my $orig = shift;
+	my $self = shift;
+	if (exists $_[0]){
+		#~ when setting, return self
+		$orig->($self, @_);
+		return $self;
+	}
+	else {
+		#~ when getting, return value
+		return $orig->($self, @_);
+	}
+};
 
 1;

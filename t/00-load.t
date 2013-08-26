@@ -23,6 +23,9 @@ BEGIN {
 
 		Test::Proto::CodeRef
 		Test::Proto::Object
+
+		Test::Proto::Compare
+		Test::Proto::Compare::Numeric
 	))
 	{
     	use_ok( $_ ) || print "Bail out!\n";

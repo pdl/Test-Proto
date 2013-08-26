@@ -5,6 +5,8 @@ lib/Test/Proto/Base.pm
 lib/Test/Proto/Role/Value.pm
 lib/Test/Proto/CodeRef.pm
 lib/Test/Proto/Common.pm
+lib/Test/Proto/Compare.pm
+lib/Test/Proto/Compare/Numeric.pm
 lib/Test/Proto/Formatter.pm
 lib/Test/Proto/Formatter/TestBuilder.pm
 lib/Test/Proto/HashRef.pm
@@ -31,6 +33,7 @@ t/Test-Proto-ArrayRef.t
 t/Test-Proto-Base.t
 t/Test-Proto-CodeRef.t
 t/Test-Proto-Common.t
+t/Test-Proto-Compare.t
 t/Test-Proto-HashRef.t
 t/Test-Proto-Formatter.t
 t/Test-Proto-Formatter-TestBuilder.t
