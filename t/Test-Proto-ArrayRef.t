@@ -133,6 +133,17 @@ is_a_good_pass(pAr->array_after_inclusive('b', ['b','c','d'])->validate(['a','b'
 is_a_good_pass(pAr->array_after_inclusive('d',['d'])->validate(['a','b','c','d']), "array_after_inclusive passes when expected matches and is alone");
 is_a_good_fail(pAr->array_after_inclusive('c',[])->validate(['a','b','c','d']), "array_after_inclusive fails when expected does not match");
 
+# sorted
+is_a_good_pass(pAr->sorted(['a','c','e'])->validate(['a','e','c']), "sorted passes correctly");
+is_a_good_fail(pAr->sorted(['a','e','c'])->validate(['a','e','c']), "sorted fails correctly");
+is_a_good_pass(pAr->sorted([])->validate([]), "sorted passes correctly on empty array");
+
+use Test::Proto::Compare;
+my $cmp_rev = Test::Proto::Compare->new()->reverse;
+is_a_good_pass(pAr->sorted(['e','c','a'], $cmp_rev)->validate(['a','e','c']), "sorted passes correctly in reverse");
+is_a_good_fail(pAr->sorted(['a','e','c'], $cmp_rev)->validate(['a','e','c']), "sorted fails correctly in reverse");
+is_a_good_pass(pAr->sorted([], $cmp_rev)->validate([]), "sorted passes correctly on empty array in reverse");
+
 # array_max
 is_a_good_pass(pAr->array_max('e')->validate(['a','e','c']), "array_max passes correctly");
 is_a_good_fail(pAr->array_max('e')->validate(['a','e','f']), "array_max fails correctly when a better candidate exists");

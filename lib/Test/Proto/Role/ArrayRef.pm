@@ -485,6 +485,33 @@ define_test 'array_after' => sub {
 	return $self->fail('None matched');
 };
 
+
+=head3 sorted
+
+	pArray->sorted(['a','c','e'])->ok(['a','e','c']); # passes
+	pArray->sorted([2,10,11], cNumeric)->ok([11,2,10]); # passes
+
+This will sort the subject and compare the result against the protoype.
+
+=cut
+
+sub sorted {
+	my ($self, $expected, $compare, $reason) = @_;
+	$self->add_test('sorted', { compare => $compare, expected => $expected }, $reason);
+}
+
+
+define_test 'sorted' => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	my $compare = upgrade_comparison($data->{compare});
+	#my $got = [sort { $compare->($a, $b) } @{$self->subject}];
+	my $got = [sort {$compare->compare($a, $b)} @{$self->subject}];
+	
+	return upgrade($data->{expected})->validate($got, $self);
+};
+
+
+
 =head3 array_max
 
 	pArray->array_max('e')->ok(['a','e','c']); # passes
