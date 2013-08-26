@@ -24,6 +24,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README
 t/00-load.t			Do all the modules load?
+t/kwalitee.t			Author test: fail if it will cause problems for CPAN
 t/manifest.t			Author test: does the manifest work?
 t/pod-coverage.t			Author test: is the documentation complete?
 t/pod.t			Author test: is the documentation valid?
