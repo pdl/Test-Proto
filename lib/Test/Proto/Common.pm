@@ -4,7 +4,8 @@ use strict;
 use warnings;
 use Sub::Name;
 use Exporter 'import';
-our @EXPORT = qw(define_test define_simple_test simple_test upgrade);
+use Scalar::Util qw(blessed looks_like_number);
+our @EXPORT = qw(define_test define_simple_test simple_test upgrade upgrade_comparison);
 
 our $TEST_PREFIX = '_TEST_';
 
@@ -126,7 +127,7 @@ sub upgrade {
 		require Test::Proto::Base;
 		require Test::Proto::HashRef;
 		require Test::Proto::ArrayRef;
-		use Scalar::Util qw(blessed looks_like_number);
+
 		if (defined ref $expected) {
 			if (blessed $expected){
 				return Test::Proto::ArrayRef->new()->contains_only($expected) if 
@@ -143,6 +144,29 @@ sub upgrade {
 		return Test::Proto::Base->new()->num_eq($expected) if Scalar::Util::looks_like_number ($expected);
 		return Test::Proto::Base->new()->eq($expected);
 	}
+}
+
+=head3 upgrade_comparison
+
+=cut
+
+sub upgrade_comparison {
+	require Test::Proto::Compare;
+	require Test::Proto::Compare::Numeric;
+	my ($comparison) = @_; 
+	if (defined ref $comparison) {
+		if (ref $comparison eq 'CODE'){
+			return Test::Proto::Compare->new($comparison)->summary('Unknown comparison');
+		}
+		if (blessed $comparison and $comparison->isa('Test::Proto::Compare')){
+			return $comparison;		
+		}
+	}
+	elsif (defined $comparison) {
+		return Test::Proto::Compare->new if $comparison eq 'cmp';
+		return Test::Proto::Compare::Numeric->new if $comparison eq '<=>';
+	}
+	return Test::Proto::Compare->new;
 }
 
 =head3 chainable

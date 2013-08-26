@@ -36,6 +36,15 @@ sub compare {
 	}
 }
 
+sub eq {shift->compare(@_)==0}
+sub ne {shift->compare(@_)!=0}
+
+sub gt {shift->compare(@_)>0}
+sub ge {shift->compare(@_)>=0}
+
+sub lt {shift->compare(@_)<0}
+sub le {shift->compare(@_)<=0}
+
 sub BUILDARGS {
 	my $class = shift;
 	return {
@@ -81,6 +90,10 @@ Chainable attribute. 1 if the comparison is reversed, 0 otherwise. Default is 0.
 =head3 reverse
 
 A chainable method which takes no arguments, and causes C<reversed> to be either 1 or 0 (whichever it previously wasn't).
+
+=head3 eq, ne, gt, lt, ge, le
+
+These run compare and return a true or false value depending on what compare returned.
 
 =cut
 

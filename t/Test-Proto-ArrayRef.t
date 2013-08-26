@@ -133,6 +133,18 @@ is_a_good_pass(pAr->array_after_inclusive('b', ['b','c','d'])->validate(['a','b'
 is_a_good_pass(pAr->array_after_inclusive('d',['d'])->validate(['a','b','c','d']), "array_after_inclusive passes when expected matches and is alone");
 is_a_good_fail(pAr->array_after_inclusive('c',[])->validate(['a','b','c','d']), "array_after_inclusive fails when expected does not match");
 
+# array_all_unique
+is_a_good_pass(pAr->array_all_unique->validate(['a','b','c','d']), "array_all_unique passes correctly");
+is_a_good_pass(pAr->array_all_unique->validate([]), "array_all_unique passes correctly for []");
+is_a_good_pass(pAr->array_all_unique->validate([]), "array_all_unique passes correctly for ['a']");
+is_a_good_fail(pAr->array_all_unique->validate(['a','a','a','a']), "array_all_unique fails correctly");
+
+# array_all_same
+is_a_good_pass(pAr->array_all_same->validate(['a','a','a','a']), "array_all_same passes correctly");
+is_a_good_pass(pAr->array_all_same->validate([]), "array_all_same passes correctly for []");
+is_a_good_pass(pAr->array_all_same->validate([]), "array_all_same passes correctly for ['a']");
+is_a_good_fail(pAr->array_all_same->validate(['a','b','c','d']), "array_all_same fails correctly");
+
 # subset_of, superset_of, subbag_of, superbag_of
 
 my $testCases = [

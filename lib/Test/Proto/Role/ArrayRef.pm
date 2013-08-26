@@ -485,6 +485,68 @@ define_test 'array_after' => sub {
 	return $self->fail('None matched');
 };
 
+=head3 array_all_unique
+
+	pArray->array_all_unique->ok(['a','b','c']); # passes
+	pArray->array_all_unique(cNumeric)->ok(['0','0e0','0.0']); # fails
+
+This will pass if all of the members of the array are unique, using the comparison provided (or cmp).
+
+=cut
+
+
+sub array_all_unique {
+	my ($self, $compare, $reason) = @_;
+	$self->add_test('array_all_unique', { compare => $compare }, $reason);
+}
+
+define_test 'array_all_unique' => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	my $i = 0;
+	my $compare = upgrade_comparison($data->{compare});
+	return $self->pass('Empty array unique by definition') if $#{$self->subject} == -1;
+	return $self->pass('Array with one element unique by definition') if $#{$self->subject} == 0;
+	foreach my $single_subject ( @{ $self->subject } ) {
+		if ( $i != 0 ) {
+			return $self->fail("Item $i matches item 0") if $compare->eq($self->subject->[0], $single_subject);
+		}
+		$i++;
+	}
+	return $self->pass('All unique');
+};
+
+=head3 array_all_same
+
+	pArray->array_all_same->ok(['a','a']); # passes
+	pArray->array_all_same(cNumeric)->ok(['0','0e0','0.0']); # passes
+	pArray->array_all_same->ok(['0','0e0','0.0']); # fails
+
+This will pass if all of the members of the array are the same, using the comparison provided (or cmp).
+
+=cut
+
+
+sub array_all_same {
+	my ($self, $compare, $reason) = @_;
+	$self->add_test('array_all_same', { compare => $compare }, $reason);
+}
+
+define_test 'array_all_same' => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	my $i = 0;
+	my $compare = upgrade_comparison($data->{compare});
+	return $self->pass('Empty array all same by definition') if $#{$self->subject} == -1;
+	return $self->pass('Array with one element all same by definition') if $#{$self->subject} == 0;
+	foreach my $single_subject ( @{ $self->subject } ) {
+		if ( $i != 0 ) {
+			return $self->fail("Item $i does not match item 0") if $compare->ne($self->subject->[0], $single_subject);
+		}
+		$i++;
+	}
+	return $self->pass('All the same');
+};
+
+
 =head2 Unordered Comparisons
 
 These methods are useful for when you know what the array should contain but do not know what order the elements are in, for example when testing the keys of a hash. 

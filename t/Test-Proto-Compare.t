@@ -29,6 +29,21 @@ is(cNum->compare(5,20), -1);
 is(cNum->compare(5,5),  0);
 is(cNum->compare(20,5),  1);
 
+ok(cNum->lt(5,20));
+ok(cNum->le(5,20));
+ok(!cNum->lt(20,5));
+ok(!cNum->le(20,5));
+ok(!cNum->lt(5,5));
+ok(cNum->le(5,5));
+
+ok(cNum->gt(20,5),);
+ok(cNum->ge(20,5),);
+ok(!cNum->gt(5,20),);
+ok(!cNum->ge(5,20),);
+ok(!cNum->gt(5,5));
+ok(cNum->ge(5,5));
+
+
 is(cNum->reverse->compare(5,20),  1);
 is(cNum->reverse->compare(5,5),  0);
 is(cNum->reverse->compare(20,5), -1);
