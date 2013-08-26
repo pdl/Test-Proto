@@ -133,6 +133,66 @@ is_a_good_pass(pAr->array_after_inclusive('b', ['b','c','d'])->validate(['a','b'
 is_a_good_pass(pAr->array_after_inclusive('d',['d'])->validate(['a','b','c','d']), "array_after_inclusive passes when expected matches and is alone");
 is_a_good_fail(pAr->array_after_inclusive('c',[])->validate(['a','b','c','d']), "array_after_inclusive fails when expected does not match");
 
+# array_max
+is_a_good_pass(pAr->array_max('e')->validate(['a','e','c']), "array_max passes correctly");
+is_a_good_fail(pAr->array_max('e')->validate(['a','e','f']), "array_max fails correctly when a better candidate exists");
+is_a_good_fail(pAr->array_max('f')->validate(['a','e','c']), "array_max fails correctly when prototype fails");
+is_a_good_fail(pAr->array_max('e')->validate([]), "array_max fails correctly for []");
+
+my $cmp_lc = sub {lc shift cmp lc shift};
+
+is_a_good_pass(pAr->array_max('E', $cmp_lc)->validate(['a','E','c']), "array_max passes correctly with lc");
+is_a_good_pass(pAr->array_max('E', $cmp_lc)->validate(['a','e','E','c']), "array_max passes correctly with lc - 2 winners");
+is_a_good_pass(pAr->array_max('E', $cmp_lc)->validate(['a','E','e','c']), "array_max passes correctly with lc - 2 winners, reversed");
+is_a_good_fail(pAr->array_max('E', $cmp_lc)->validate(['a','E','f']), "array_max fails correctly when a better candidate exists with lc");
+is_a_good_fail(pAr->array_max('E', $cmp_lc)->validate(['a','e','E','f']), "array_max fails correctly when a better candidate exists with lc");
+is_a_good_fail(pAr->array_max('f', $cmp_lc)->validate(['a','E','c']), "array_max fails correctly when prototype fails with lc");
+is_a_good_fail(pAr->array_max('E', $cmp_lc)->validate([]), "array_max fails correctly for [] with lc");
+
+# array_index_of_max
+is_a_good_pass(pAr->array_index_of_max(1)->validate(['a','e','c']), "array_index_of_max passes correctly");
+is_a_good_fail(pAr->array_index_of_max(1)->validate(['a','e','f']), "array_index_of_max fails correctly when a better candidate exists");
+is_a_good_fail(pAr->array_index_of_max(2)->validate(['a','e','c']), "array_index_of_max fails correctly when prototype fails");
+is_a_good_fail(pAr->array_index_of_max(1)->validate([]), "array_index_of_max fails correctly for []");
+
+is_a_good_pass(pAr->array_index_of_max(1, $cmp_lc)->validate(['a','E','c']), "array_index_of_max passes correctly with lc");
+is_a_good_pass(pAr->array_index_of_max(1, $cmp_lc)->validate(['a','e','E','c']), "array_index_of_max passes correctly with lc - 2 winners");
+is_a_good_pass(pAr->array_index_of_max(1, $cmp_lc)->validate(['a','E','e','c']), "array_index_of_max passes correctly with lc - 2 winners, reversed");
+is_a_good_fail(pAr->array_index_of_max(1, $cmp_lc)->validate(['a','E','f']), "array_index_of_max fails correctly when a better candidate exists with lc");
+is_a_good_fail(pAr->array_index_of_max(1, $cmp_lc)->validate(['a','e','E','f']), "array_index_of_max fails correctly when a better candidate exists with lc");
+is_a_good_fail(pAr->array_index_of_max(2, $cmp_lc)->validate(['a','E','c']), "array_index_of_max fails correctly when prototype fails with lc");
+is_a_good_fail(pAr->array_index_of_max(1, $cmp_lc)->validate([]), "array_index_of_max fails correctly for [] with lc");
+
+
+# array_min
+is_a_good_pass(pAr->array_min('e')->validate(['g','e','h']), "array_min passes correctly");
+is_a_good_fail(pAr->array_min('e')->validate(['g','e','d']), "array_min fails correctly when a better candidate exists");
+is_a_good_fail(pAr->array_min('f')->validate(['g','e','h']), "array_min fails correctly when prototype fails");
+is_a_good_fail(pAr->array_min('e')->validate([]), "array_min fails correctly for []");
+
+is_a_good_pass(pAr->array_min('E', $cmp_lc)->validate(['g','E','h']), "array_min passes correctly with lc");
+is_a_good_pass(pAr->array_min('E', $cmp_lc)->validate(['g','e','E','h']), "array_min passes correctly with lc - 2 winners");
+is_a_good_pass(pAr->array_min('E', $cmp_lc)->validate(['g','E','e','h']), "array_min passes correctly with lc - 2 winners, reversed");
+is_a_good_fail(pAr->array_min('E', $cmp_lc)->validate(['g','E','d']), "array_min fails correctly when a better candidate exists with lc");
+is_a_good_fail(pAr->array_min('E', $cmp_lc)->validate(['g','e','E','d']), "array_min fails correctly when a better candidate exists with lc");
+is_a_good_fail(pAr->array_min('f', $cmp_lc)->validate(['g','E','h']), "array_min fails correctly when prototype fails with lc");
+is_a_good_fail(pAr->array_min('E', $cmp_lc)->validate([]), "array_min fails correctly for [] with lc");
+
+# array_index_of_min
+is_a_good_pass(pAr->array_index_of_min(1)->validate(['g','e','h']), "array_index_of_min passes correctly");
+is_a_good_fail(pAr->array_index_of_min(1)->validate(['g','e','d']), "array_index_of_min fails correctly when a better candidate exists");
+is_a_good_fail(pAr->array_index_of_min(2)->validate(['g','e','h']), "array_index_of_min fails correctly when prototype fails");
+is_a_good_fail(pAr->array_index_of_min(1)->validate([]), "array_index_of_min fails correctly for []");
+
+is_a_good_pass(pAr->array_index_of_min(1, $cmp_lc)->validate(['g','E','h']), "array_index_of_min passes correctly with lc");
+is_a_good_pass(pAr->array_index_of_min(1, $cmp_lc)->validate(['g','e','E','h']), "array_index_of_min passes correctly with lc - 2 winners");
+is_a_good_pass(pAr->array_index_of_min(1, $cmp_lc)->validate(['g','E','e','h']), "array_index_of_min passes correctly with lc - 2 winners, reversed");
+is_a_good_fail(pAr->array_index_of_min(1, $cmp_lc)->validate(['g','E','d']), "array_index_of_min fails correctly when a better candidate exists with lc");
+is_a_good_fail(pAr->array_index_of_min(1, $cmp_lc)->validate(['g','e','E','d']), "array_index_of_min fails correctly when a better candidate exists with lc");
+is_a_good_fail(pAr->array_index_of_min(2, $cmp_lc)->validate(['g','E','h']), "array_index_of_min fails correctly when prototype fails with lc");
+is_a_good_fail(pAr->array_index_of_min(1, $cmp_lc)->validate([]), "array_index_of_min fails correctly for [] with lc");
+
+
 # array_all_unique
 is_a_good_pass(pAr->array_all_unique->validate(['a','b','c','d']), "array_all_unique passes correctly");
 is_a_good_pass(pAr->array_all_unique->validate([]), "array_all_unique passes correctly for []");

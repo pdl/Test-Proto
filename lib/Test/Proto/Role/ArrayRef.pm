@@ -485,6 +485,117 @@ define_test 'array_after' => sub {
 	return $self->fail('None matched');
 };
 
+=head3 array_max
+
+	pArray->array_max('e')->ok(['a','e','c']); # passes
+	pArray->array_max(p->num_gt(10), cNumeric)->ok(['2','11','10']); # passes
+
+This will find the maximum value using the optional comparator in the second argument, and check it against the first argument.
+
+=cut
+
+
+sub array_max {
+	my ($self, $expected, $compare, $reason) = @_;
+	$self->add_test('array_best', { 
+		expected => $expected, 
+		must_match => 'any', 
+		compare => $compare, 
+		dir=>'max' 
+	}, $reason);
+}
+
+=head3 array_min
+
+	pArray->array_min('a')->ok(['a','e','c']); # passes
+	pArray->array_min(p->num_lt(10), cNumeric)->ok(['2','11','10']); # passes
+
+This will find the minimum value using the optional comparator in the second argument, and check it against the first argument.
+
+=cut
+
+sub array_min {
+	my ($self, $expected, $compare, $reason) = @_;
+	$self->add_test('array_best', { 
+		expected => $expected, 
+		must_match => 'any', 
+		compare => $compare, 
+		dir=>'min' 
+	}, $reason);
+}
+
+=head3 array_index_of_max
+
+	pArray->array_index_of_max(1)->ok(['a','e','c']); # passes
+	pArray->array_index_of_max(1, cNumeric)->ok(['2','11','10']); # passes
+
+This will find the index of the maximum value using the optional comparator in the second argument, and check it against the first argument.
+
+=cut
+
+
+sub array_index_of_max {
+	my ($self, $expected, $compare, $reason) = @_;
+	$self->add_test('array_best', { 
+		expected => $expected, 
+		must_match => 'any index', 
+		compare => $compare, 
+		dir=>'max' 
+	}, $reason);
+}
+
+=head3 array_index_of_min
+
+	pArray->array_index_of_min(0)->ok(['a','e','c']); # passes
+	pArray->array_index_of_min(0, cNumeric)->ok(['2','11','10']); # passes
+
+This will find the index of the minimum value using the optional comparator in the second argument, and check it against the first argument.
+
+=cut
+
+sub array_index_of_min {
+	my ($self, $expected, $compare, $reason) = @_;
+	$self->add_test('array_best', { 
+		expected => $expected, 
+		must_match => 'any index', 
+		compare => $compare, 
+		dir=>'min' 
+	}, $reason);
+}
+
+define_test 'array_best' => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	my $i = 0;
+	return $self->fail('Empty array has no max by definition') if $#{$self->subject} == -1;
+	my $compare = upgrade_comparison($data->{compare});
+	my $better = (defined $data->{dir} and $data->{dir} eq 'min' ? sub {shift() > 0} : sub {shift() < 0});
+	my $best = [$self->subject->[0]];
+	my $best_idx = [0];
+	foreach my $single_subject ( @{ $self->subject } ) {
+		if ( $i != 0 ) {
+			my $cmp_result = $compare->compare($best->[0], $single_subject);
+			if ($better->($cmp_result)) {
+				$best = [$single_subject];
+				$best_idx = [$i];
+			}
+			elsif ($cmp_result == 0) {
+				push @$best, $single_subject;
+				push @$best_idx, $i;
+			}
+		}
+		$i++;
+	}
+	my $got = $best;
+	$got = $best_idx if $data->{must_match} =~ 'index';
+	if ($data->{must_match} =~ 'any'){
+		return Test::Proto::ArrayRef->new()->array_any($data->{expected})->validate($got, $self);
+	}
+	else {
+		return upgrade($data->{expected})->validate($got, $self);
+	}
+};
+
+
 =head3 array_all_unique
 
 	pArray->array_all_unique->ok(['a','b','c']); # passes
