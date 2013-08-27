@@ -133,24 +133,40 @@ is_a_good_pass(pAr->array_after_inclusive('b', ['b','c','d'])->validate(['a','b'
 is_a_good_pass(pAr->array_after_inclusive('d',['d'])->validate(['a','b','c','d']), "array_after_inclusive passes when expected matches and is alone");
 is_a_good_fail(pAr->array_after_inclusive('c',[])->validate(['a','b','c','d']), "array_after_inclusive fails when expected does not match");
 
+# functions requiring comparison
+use Test::Proto::Compare;
+my $cmp_rev = Test::Proto::Compare->new()->reverse;
+my $cmp_lc = sub {lc shift cmp lc shift};
+
 # sorted
 is_a_good_pass(pAr->sorted(['a','c','e'])->validate(['a','e','c']), "sorted passes correctly");
 is_a_good_fail(pAr->sorted(['a','e','c'])->validate(['a','e','c']), "sorted fails correctly");
 is_a_good_pass(pAr->sorted([])->validate([]), "sorted passes correctly on empty array");
 
-use Test::Proto::Compare;
-my $cmp_rev = Test::Proto::Compare->new()->reverse;
 is_a_good_pass(pAr->sorted(['e','c','a'], $cmp_rev)->validate(['a','e','c']), "sorted passes correctly in reverse");
 is_a_good_fail(pAr->sorted(['a','e','c'], $cmp_rev)->validate(['a','e','c']), "sorted fails correctly in reverse");
 is_a_good_pass(pAr->sorted([], $cmp_rev)->validate([]), "sorted passes correctly on empty array in reverse");
+
+# ascending
+
+is_a_good_pass(pAr->ascending->validate(['a','c','e']), "ascending passes correctly");
+is_a_good_fail(pAr->ascending->validate(['a','e','c']), "ascending fails correctly");
+is_a_good_pass(pAr->ascending->validate([]), "ascending passes correctly on empty array");
+is_a_good_pass(pAr->ascending->validate([]), "ascending passes correctly on single item array");
+
+# descending
+
+is_a_good_pass(pAr->descending->validate(['e','c','a']), "descending passes correctly");
+is_a_good_pass(pAr->descending($cmp_lc)->validate(['e','C','a']), "descending passes correctly with lc");
+is_a_good_fail(pAr->descending->validate(['e','a','c']), "descending fails correctly");
+is_a_good_pass(pAr->descending->validate([]), "descending passes correctly on empty array");
+is_a_good_pass(pAr->descending->validate([]), "descending passes correctly on single item array");
 
 # array_max
 is_a_good_pass(pAr->array_max('e')->validate(['a','e','c']), "array_max passes correctly");
 is_a_good_fail(pAr->array_max('e')->validate(['a','e','f']), "array_max fails correctly when a better candidate exists");
 is_a_good_fail(pAr->array_max('f')->validate(['a','e','c']), "array_max fails correctly when prototype fails");
 is_a_good_fail(pAr->array_max('e')->validate([]), "array_max fails correctly for []");
-
-my $cmp_lc = sub {lc shift cmp lc shift};
 
 is_a_good_pass(pAr->array_max('E', $cmp_lc)->validate(['a','E','c']), "array_max passes correctly with lc");
 is_a_good_pass(pAr->array_max('E', $cmp_lc)->validate(['a','e','E','c']), "array_max passes correctly with lc - 2 winners");

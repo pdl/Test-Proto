@@ -510,6 +510,55 @@ define_test 'sorted' => sub {
 	return upgrade($data->{expected})->validate($got, $self);
 };
 
+=head3 ascending
+
+	pArray->ascending->ok(['a','c','e']); # passes
+	pArray->ascending->ok(['a','c','c','e']); # passes
+	pArray->ascending(cNumeric)->ok([2,10,11]); # passes
+
+This will return true if the elements are already in ascending order. Elements which compare as equal as the previous element are permitted.
+
+=cut
+
+sub ascending {
+	my ($self, $compare, $reason) = @_;
+	$self->add_test('in_order', { compare => $compare, dir => 'ascending' }, $reason);
+}
+
+=head3 descending
+
+	pArray->descending->ok(['e','c','a']); # passes
+	pArray->descending->ok(['e','c','c','a']); # passes
+	pArray->descending(cNumeric)->ok([11,10,2]); # passes
+
+This will return true if the elements are already in descending order. Elements which compare as equal as the previous element are permitted.
+
+=cut
+
+
+sub descending {
+	my ($self, $compare, $reason) = @_;
+	$self->add_test('in_order', { compare => $compare, dir => 'descending' }, $reason);
+}
+
+define_test 'in_order' => sub {
+	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	return $self->pass('Empty array is ascending by definition') if $#{$self->subject} == -1;
+	return $self->pass('Single-item array is ascending by definition') if $#{$self->subject} == 0;
+	my $dir = defined $data->{dir}? $data->{dir} : 'ascending';
+	my $compare = upgrade_comparison($data->{compare});
+	my @range = 0 .. $#{$self->subject};
+	@range = CORE::reverse( @range ) if $dir eq 'descending';
+	my $prev = shift @range;
+	for my $i (@range) {
+		$self->subtest->diag("Comparing items $prev and $i");
+		my $result = $compare->le($self->subject->[$prev], $self->subject->[$i]);
+		return $self->fail("Item $prev > item $i") unless $result;
+		$prev = $i;
+	}
+	return $self->pass;
+};
+
 
 
 =head3 array_max
