@@ -88,8 +88,14 @@ is_a_good_fail(pAr->in_groups(2,[])->validate(['a','b','c','d']), "in_groups fai
 is_a_good_exception(pAr->in_groups(0,[['a'],['b'],['c'],['d']])->validate(['a','b','c','d']), "in_groups throws exceptions when n<1");
 
 # group_when
-is_a_good_pass(pAr->group_when(sub {$_[0] eq uc $_[0]} ,[['A'],['B','c','d'],['E']])->validate(['A','B','c','d','E']), "group_when works");
-is_a_good_pass(pAr->group_when(sub {$_[0] eq uc $_[0]} ,[['a','b','c','d','e']])->validate(['a','b','c','d','e']), "group_when works when it matches nothing");
+is_a_good_pass(pAr->group_when(sub {$_[0] eq uc $_[0]}, [['A'],['B','c','d'],['E']])->validate(['A','B','c','d','E']), "group_when works");
+is_a_good_pass(pAr->group_when(sub {$_[0] eq uc $_[0]}, [['a','b','c','d','e']])->validate(['a','b','c','d','e']), "group_when works when it matches nothing");
+is_a_good_fail(pAr->group_when(sub {$_[0] eq uc $_[0]}, [['a','e','e','e','e']])->validate(['a','b','c','d','e']), "group_when fails appropriately");
+
+# group_when_index
+is_a_good_pass(pAr->group_when_index(p->num_gt(2), [['A','B','c'],['d'],['E']])->validate(['A','B','c','d','E']), "group_when_index works");
+is_a_good_pass(pAr->group_when_index(p->num_gt(5), [['a','b','c','d','e']])->validate(['a','b','c','d','e']), "group_when_index works when it matches nothing");
+is_a_good_fail(pAr->group_when_index(p->num_gt(2), [['a','e','e','e','e']])->validate(['a','b','c','d','e']), "group_when fails appropriately");
 
 # count_items
 is_a_good_pass(pAr->count_items(2)->validate(['a','b']), "count_items 2 on ['a','b'] passes");

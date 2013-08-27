@@ -269,8 +269,8 @@ define_test in_groups => sub {
 
 =head3 group_when
 
-	pArray->group_when(sub {$_[eq uc $_[0]} ,[['A'],['B','c','d'],['E']])->ok(['A','B','c','d','E']);
-	pArray->group_when(sub {$_[0] eq $_[0]} ,[['a','b','c','d','e']])->ok(['a','b','c','d','e']);
+	pArray->group_when(sub {$_[eq uc $_[0]}, [['A'],['B','c','d'],['E']])->ok(['A','B','c','d','E']);
+	pArray->group_when(sub {$_[0] eq $_[0]}, [['a','b','c','d','e']])->ok(['a','b','c','d','e']);
 
 Bundles the contents of the test subject in groups; a new group is created when the member matches the first argument (a prototype). The resulting arrayref is compared to the second argument.
 
@@ -278,7 +278,22 @@ Bundles the contents of the test subject in groups; a new group is created when 
 
 sub group_when {
 	my ($self, $condition, $expected, $reason) = @_;
-	$self->add_test('group_when', { 'condition' => $condition, expected => $expected }, $reason);
+	$self->add_test('group_when', { 'condition' => $condition, expected => $expected, must_match=>'value' }, $reason);
+}
+
+=head3 group_when_index
+
+	pArray->group_when_index(p(0)|p(1)|p(4), [['A'],['B','c','d'],['E']])->ok(['A','B','c','d','E']);
+	pArray->group_when_index(p->num_gt(2), [['a','b','c','d','e']])->ok(['a','b','c','d','e']);
+
+Bundles the contents of the test subject in groups; a new group is created when the index matches the first argument (a prototype). The resulting arrayref is compared to the second argument.
+
+=cut
+
+
+sub group_when_index {
+	my ($self, $condition, $expected, $reason) = @_;
+	$self->add_test('group_when', { 'condition' => $condition, expected => $expected, must_match=>'index' }, $reason);
 }
 
 define_test group_when => sub {
@@ -286,12 +301,16 @@ define_test group_when => sub {
 	my $newArray = [];
 	my $currentGroup = [];
 	my $condition = upgrade ($data->{condition});
+	my $i = 0;
 	foreach my $item (@{ $self->subject }) {
-		if ($condition->validate($item)){
+		my $got = $item;
+		$got = $i if $data->{must_match}=~/index/;
+		if ($condition->validate($got)){
 			push @$newArray, $currentGroup if defined $currentGroup and @$currentGroup;
 			$currentGroup = [];
 		}
 		push @$currentGroup, $item;
+		$i++;
 	}
 	push @$newArray, $currentGroup if defined $currentGroup and @$currentGroup;
 	return upgrade($data->{expected})->validate($newArray, $self);
