@@ -179,6 +179,7 @@ Returns a comparison (string,by default). See L<Test::Proto::Compare>.
 sub c {
 	return Test::Proto::Compare->new(@_);
 }
+
 =head2 cNumeric
 
 Returns a numeric comparison. See L<Test::Proto::Compare::Numeric>.
