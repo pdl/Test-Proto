@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::Proto qw(p pArray pHash pCode pObject pSeries pRepeatable pAlternation);
+use Test::Proto qw(p pArray pHash pCode pObject pSeries pRepeatable pAlternation c cNumeric);
 
 isa_ok(p, 'Test::Proto::Base');
 
@@ -22,6 +22,9 @@ ok(!(p(1)->validate(2)));
 
 isa_ok(pArray([]), 'Test::Proto::ArrayRef');
 isa_ok(pHash({}), 'Test::Proto::HashRef');
+
+isa_ok(c, 'Test::Proto::Compare');
+isa_ok(cNumeric, 'Test::Proto::Compare::Numeric');
 
 {
 	package Test::Proto::Acme::ArrayRefObject;

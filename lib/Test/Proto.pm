@@ -11,10 +11,12 @@ use Test::Proto::Object;
 use Test::Proto::Series;
 use Test::Proto::Repeatable;
 use Test::Proto::Alternation;
+use Test::Proto::Compare;
+use Test::Proto::Compare::Numeric;
 use Test::Proto::Common ();
 use Scalar::Util qw(blessed refaddr);
 use base "Exporter";
-our @EXPORT_OK = qw(&p &pArray &pHash &pCode &pObject &pSeries &pRepeatable &pAlternation); # symbols to export on request
+our @EXPORT_OK = qw(&p &pArray &pHash &pCode &pObject &pSeries &pRepeatable &pAlternation &c &cNumeric); # symbols to export on request
 
 =head1 NAME
 
@@ -168,6 +170,24 @@ sub pAlternation {
 	return Test::Proto::Alternation->new(@_);
 }
 
+=head2 c
+
+Returns a comparison (string,by default). See L<Test::Proto::Compare>.
+
+=cut
+
+sub c {
+	return Test::Proto::Compare->new(@_);
+}
+=head2 cNumeric
+
+Returns a numeric comparison. See L<Test::Proto::Compare::Numeric>.
+
+=cut
+
+sub cNumeric {
+	return Test::Proto::Compare::Numeric->new(@_);
+}
 
 =head1 AUTHOR
 
