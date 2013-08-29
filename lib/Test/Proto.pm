@@ -196,6 +196,18 @@ Begun by Daniel Perrett, C<< <perrettdl at googlemail.com> >>
 
 Michael Schwern
 
+=head1 SEE ALSO
+
+L<Data::DPath>
+
+L<Data::Sah>
+
+L<Data::Verifier>
+
+L<Test::Deep>
+
+L<Validation::Class>
+
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-test-proto at rt.cpan.org>, or through
