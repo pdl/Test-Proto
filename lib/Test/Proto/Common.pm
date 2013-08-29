@@ -41,16 +41,17 @@ Optionally, you can set the package to which this method is to be added as a thi
 
 =cut
 
-sub define_test{
-	my ($testName, $testSub, $customPackage) = @_;
-	my ($package, $filename, $line) = caller;
+sub define_test {
+	my ( $testName, $testSub,  $customPackage ) = @_;
+	my ( $package,  $filename, $line )          = caller;
 	$package = $customPackage if defined $customPackage;
 	{
 		no strict 'refs';
-		my $fullName = $package.'::'.$TEST_PREFIX.$testName;
-		*$fullName = subname ($TEST_PREFIX.$testName , $testSub); # Consider Sub::Install here, per Khisanth on irc.freenode.net#perl
+		my $fullName = $package . '::' . $TEST_PREFIX . $testName;
+		*$fullName = subname( $TEST_PREFIX . $testName, $testSub );    # Consider Sub::Install here, per Khisanth on irc.freenode.net#perl
 	}
-	# return value of this not specified 
+
+	# return value of this not specified
 }
 
 =head3 define_simple_test
@@ -59,19 +60,23 @@ Adds a test definition to the class. In this case, the subroutine passed evaluat
 
 =cut
 
-sub define_simple_test{
-	my ($testName, $testSub, $customPackage) = @_;
-	my ($package, $filename, $line) = caller;
+sub define_simple_test {
+	my ( $testName, $testSub,  $customPackage ) = @_;
+	my ( $package,  $filename, $line )          = caller;
 	$package = $customPackage if defined $customPackage;
-	define_test ($testName, sub{
-		my ($self, $data, $reason) = (shift, shift, shift); # self is the runner, NOT the prototype
-		if($testSub->($self->subject, $data->{expected})) {
-			return $self->pass;
-		}
-		else {
-			return $self->fail;
-		}
-	}, $package);
+	define_test(
+		$testName,
+		sub {
+			my ( $self, $data, $reason ) = ( shift, shift, shift );    # self is the runner, NOT the prototype
+			if ( $testSub->( $self->subject, $data->{expected} ) ) {
+				return $self->pass;
+			}
+			else {
+				return $self->fail;
+			}
+		},
+		$package
+	);
 }
 
 =head3 simple_test
@@ -90,20 +95,23 @@ The test method itself takes one argument, the expected value.
 
 =cut
 
-sub simple_test{
-	my ($testName, $testSub) = @_;
-	my ($package, $filename, $line) = caller;
+sub simple_test {
+	my ( $testName, $testSub ) = @_;
+	my ( $package, $filename, $line ) = caller;
 	{
 		no strict 'refs';
 		{
 			#package $package;
-			define_simple_test($testName, $testSub, $package);
+			define_simple_test( $testName, $testSub, $package );
 		}
-		my $fullName = $package.'::'.$testName;
-		*$fullName = subname ($testName , sub {
-			my ($self, $expected, $reason) = (shift, shift, shift);
-			$self->add_test($testName, { expected => $expected }, $reason);
-		}); # Consider Sub::Install here, per Khisanth on irc.freenode.net#perl
+		my $fullName = $package . '::' . $testName;
+		*$fullName = subname(
+			$testName,
+			sub {
+				my ( $self, $expected, $reason ) = ( shift, shift, shift );
+				$self->add_test( $testName, { expected => $expected }, $reason );
+			}
+		);    # Consider Sub::Install here, per Khisanth on irc.freenode.net#perl
 	}
 }
 
@@ -128,20 +136,20 @@ sub upgrade {
 		require Test::Proto::HashRef;
 		require Test::Proto::ArrayRef;
 
-		if (defined ref $expected) {
-			if (blessed $expected){
-				return Test::Proto::ArrayRef->new()->contains_only($expected) if 
-					$expected->isa('Test::Proto::Series') 
-					or $expected->isa('Test::Proto::Repeatable') 
+		if ( defined ref $expected ) {
+			if ( blessed $expected) {
+				return Test::Proto::ArrayRef->new()->contains_only($expected)
+					if $expected->isa('Test::Proto::Series')
+					or $expected->isa('Test::Proto::Repeatable')
 					or $expected->isa('Test::Proto::Alternation');
 				return $expected if $expected->isa('Test::Proto::Base');
 			}
-			return Test::Proto::ArrayRef->new()->array_eq($expected) if ref $expected eq 'ARRAY';
+			return Test::Proto::ArrayRef->new()->array_eq($expected)    if ref $expected eq 'ARRAY';
 			return Test::Proto::HashRef->new()->superhash_of($expected) if ref $expected eq 'HASH';
-			return Test::Proto::Base->new()->like($expected) if ref $expected eq 'Regexp';
-			return Test::Proto::Base->new()->try($expected) if ref $expected eq 'CODE';
+			return Test::Proto::Base->new()->like($expected)            if ref $expected eq 'Regexp';
+			return Test::Proto::Base->new()->try($expected)             if ref $expected eq 'CODE';
 		}
-		return Test::Proto::Base->new()->num_eq($expected) if Scalar::Util::looks_like_number ($expected);
+		return Test::Proto::Base->new()->num_eq($expected) if Scalar::Util::looks_like_number($expected);
 		return Test::Proto::Base->new()->eq($expected);
 	}
 }
@@ -153,17 +161,17 @@ sub upgrade {
 sub upgrade_comparison {
 	require Test::Proto::Compare;
 	require Test::Proto::Compare::Numeric;
-	my ($comparison) = @_; 
-	if (defined ref $comparison) {
-		if (ref $comparison eq 'CODE'){
+	my ($comparison) = @_;
+	if ( defined ref $comparison ) {
+		if ( ref $comparison eq 'CODE' ) {
 			return Test::Proto::Compare->new($comparison)->summary('Unknown comparison');
 		}
-		if (blessed $comparison and $comparison->isa('Test::Proto::Compare')){
-			return $comparison;		
+		if ( blessed $comparison and $comparison->isa('Test::Proto::Compare') ) {
+			return $comparison;
 		}
 	}
-	elsif (defined $comparison) {
-		return Test::Proto::Compare->new if $comparison eq 'cmp';
+	elsif ( defined $comparison ) {
+		return Test::Proto::Compare->new          if $comparison eq 'cmp';
 		return Test::Proto::Compare::Numeric->new if $comparison eq '<=>';
 	}
 	return Test::Proto::Compare->new;
@@ -184,15 +192,16 @@ Use this to make a Moo attribute chainable.
 sub chainable {
 	my $orig = shift;
 	my $self = shift;
-	if (exists $_[0]){
+	if ( exists $_[0] ) {
+
 		#~ when setting, return self
-		$orig->($self, @_);
+		$orig->( $self, @_ );
 		return $self;
 	}
 	else {
 		#~ when getting, return value
-		return $orig->($self, @_);
+		return $orig->( $self, @_ );
 	}
-};
+}
 
 1;

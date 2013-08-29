@@ -33,19 +33,16 @@ Takes one argument: the arguments to use with the method, as an arrayref. Calls 
 
 =cut
 
-
 sub call_void_context {
-	my ($self, $args, $reason) = @_;
-	$self->add_test('call_void_context', {
-		args => $args,
-	}, $reason);
+	my ( $self, $args, $reason ) = @_;
+	$self->add_test( 'call_void_context', { args => $args, }, $reason );
 }
 
 define_test "call_void_context" => sub {
-	my ($self, $data, $reason) = @_; # self is the runner
+	my ( $self, $data, $reason ) = @_;    # self is the runner
 	my $args = $data->{args};
 	$self->subject->(@$args);
-	return $self->pass; #~ void context so we pass unless it dies.
+	return $self->pass;                   #~ void context so we pass unless it dies.
 };
 
 =head3 call_scalar_context
@@ -58,21 +55,24 @@ The arguments should be an arrayref, and the expected value should be a prototyp
 
 =cut
 
-
 sub call_scalar_context {
-	my ($self, $args, $expected, $reason) = @_;
-	$self->add_test('call_scalar_context', {
-		args => $args,
-		expected => $expected 
-	}, $reason);
+	my ( $self, $args, $expected, $reason ) = @_;
+	$self->add_test(
+		'call_scalar_context',
+		{
+			args     => $args,
+			expected => $expected
+		},
+		$reason
+	);
 }
 
 define_test "call_scalar_context" => sub {
-	my ($self, $data, $reason) = @_; # self is the runner
-	my $args = $data->{args};
-	my $expected = upgrade($data->{expected});
+	my ( $self, $data, $reason ) = @_;    # self is the runner
+	my $args     = $data->{args};
+	my $expected = upgrade( $data->{expected} );
 	my $response = $self->subject->(@$args);
-	return $expected->validate($response, $self);
+	return $expected->validate( $response, $self );
 };
 
 =head3 call_list_context
@@ -85,21 +85,24 @@ The arguments and return value should be arrayrefs; the code is evaluated in lis
 
 =cut
 
-
 sub call_list_context {
-	my ($self, $args, $expected, $reason) = @_;
-	$self->add_test('call_list_context', {
-		args => $args,
-		expected => $expected 
-	}, $reason);
+	my ( $self, $args, $expected, $reason ) = @_;
+	$self->add_test(
+		'call_list_context',
+		{
+			args     => $args,
+			expected => $expected
+		},
+		$reason
+	);
 }
 
 define_test call_list_context => sub {
-	my ($self, $data, $reason) = @_; # self is the runner
-	my $args = $data->{args};
-	my $expected = upgrade($data->{expected});
-	my $response = [$self->subject->(@$args)];
-	return $expected->validate($response, $self);
+	my ( $self, $data, $reason ) = @_;    # self is the runner
+	my $args     = $data->{args};
+	my $expected = upgrade( $data->{expected} );
+	my $response = [ $self->subject->(@$args) ];
+	return $expected->validate( $response, $self );
 };
 
 1;

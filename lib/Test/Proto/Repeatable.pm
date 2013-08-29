@@ -5,21 +5,21 @@ use Moo;
 
 has 'contents',
 	is      => 'rw',
-	default => sub {Test::Proto::Series->new(@_)};
+	default => sub { Test::Proto::Series->new(@_) };
 
 has 'min',
 	is      => 'rw',
-	default => sub {0};
+	default => sub { 0 };
 
 has 'max',
 	is      => 'rw',
-	default => sub {undef};
+	default => sub { undef };
 
 around 'min', 'max' => \&Test::Proto::Common::chainable;
 
 sub BUILDARGS {
 	my $class = shift;
-	return {contents=>Test::Proto::Series->new(@_)};
+	return { contents => Test::Proto::Series->new(@_) };
 }
 
 =head1 NAME

@@ -23,9 +23,8 @@ Returns the associated tags.
 
 =cut
 
-has tags => 
-	is=> 'rw',
-	default => sub{ [] };
+has tags    => is  => 'rw',
+	default => sub { [] };
 
 =head3 add_tag
 
@@ -36,9 +35,9 @@ Adds the tag to the object, and returns the object.
 =cut
 
 sub add_tag {
-	my ($self, $tag) = @_;
+	my ( $self, $tag ) = @_;
 	my $tags = $self->tags;
-	push @$tags, $tag unless grep {$_ eq $tag} @$tags;
+	push @$tags, $tag unless grep { $_ eq $tag } @$tags;
 	return $self;
 }
 
@@ -50,10 +49,9 @@ Determines if the object has this tag. Exact matches only.
 
 =cut
 
-
 sub has_tag {
-	my ($self, $tag) = @_;
-	foreach my $t (@{ $self->tags }) {
+	my ( $self, $tag ) = @_;
+	foreach my $t ( @{ $self->tags } ) {
 		return 1 if $t eq $tag;
 	}
 	return 0;
@@ -68,22 +66,21 @@ Removes the tag and returns the object. Does nothing if the tag was not present 
 =cut
 
 sub remove_tag {
-	my ($self, $tag) = @_;
+	my ( $self, $tag ) = @_;
 	my $tags = $self->tags;
 	return $self unless @$tags;
-	for my $i (0..$#{ $tags} ) {
-		if ($tag eq $tags->[$i]) {
+	for my $i ( 0 .. $#{$tags} ) {
+		if ( $tag eq $tags->[$i] ) {
 			delete $tags->[$i];
 		}
 	}
 	return $self;
-};
+}
 
 =head1 OTHER INFORMATION
 
 For author, version, bug reports, support, etc, please see L<Test::Proto>. 
 
 =cut
-
 
 1;

@@ -28,9 +28,8 @@ Returns the name of the test.
 
 =cut
 
-has 'name' =>
-	default=> sub{ '[Anonymous Test Case]' },
-	is => 'rw';
+has 'name' => default => sub { '[Anonymous Test Case]' },
+	is     => 'rw';
 
 =head3 code
 
@@ -38,8 +37,7 @@ Returns the code.
 
 =cut
 
-has 'code' =>
-	is => 'rw';
+has 'code' => is => 'rw';
 
 =head3 data
 
@@ -47,8 +45,7 @@ Returns the data.
 
 =cut
 
-has 'data' =>
-	is => 'rw',
+has 'data'  => is  => 'rw',
 	default => sub { {}; };
 
 1;

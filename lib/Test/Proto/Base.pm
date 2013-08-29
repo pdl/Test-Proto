@@ -7,12 +7,12 @@ use Test::Proto::TestRunner;
 use Test::Proto::Formatter::TestBuilder;
 use Test::Proto::TestCase;
 use Moo;
-use overload 
-	'&'=>\&_overload_AND,
-	'|'=>\&_overload_OR,
-	'^'=>\&_overload_XOR,
-	'!'=>\&_overload_NOT,
-;
+use overload
+	'&' => \&_overload_AND,
+	'|' => \&_overload_OR,
+	'^' => \&_overload_XOR,
+	'!' => \&_overload_NOT,
+	;
 with('Test::Proto::Role::Value');
 with('Test::Proto::Role::Tagged');
 our $VERSION = '0.011';
@@ -58,12 +58,12 @@ If you have an existing TestRunner, you can pass it that as well;
 =cut
 
 sub validate {
-	my ($self, $subject, $context) = @_;
+	my ( $self, $subject, $context ) = @_;
 	$subject = $_ unless exists $_[1];
-	if (!defined $context or !CORE::ref($context)){ # if context is not a TestRunner
+	if ( !defined $context or !CORE::ref($context) ) {    # if context is not a TestRunner
 		my $reason = $context;
-		$context = Test::Proto::TestRunner->new(subject=>$subject);
-		if (defined $reason) {
+		$context = Test::Proto::TestRunner->new( subject => $subject );
+		if ( defined $reason ) {
 			$context->subtest->diag($reason);
 		}
 	}
@@ -80,15 +80,14 @@ sub validate {
 =cut
 
 sub ok {
-	my ($self, $subject, $context) = @_;
-	my $reason = $context; 
-	$context = Test::Proto::TestRunner->new(formatter=>Test::Proto::Formatter::TestBuilder->new()) unless ((defined $context) and (CORE::ref $context));
-	if (defined $reason) {
+	my ( $self, $subject, $context ) = @_;
+	my $reason = $context;
+	$context = Test::Proto::TestRunner->new( formatter => Test::Proto::Formatter::TestBuilder->new() ) unless ( ( defined $context ) and ( CORE::ref $context ) );
+	if ( defined $reason ) {
 		$context->subtest->diag($reason);
 	}
-	$self->validate($subject, $context);
+	$self->validate( $subject, $context );
 }
-
 
 =head3 clone
 
@@ -96,13 +95,10 @@ This method returns a copy of the current object. The new object can have tests 
 
 =cut
 
-sub clone
-{
+sub clone {
 	my $self = shift;
-	my $pkg = CORE::ref $self;
-	my %args = (
-		map{ $_ => $self->$_ } qw(natural_script user_script tags)
-	);
+	my $pkg  = CORE::ref $self;
+	my %args = ( map { $_ => $self->$_ } qw(natural_script user_script tags) );
 	return $pkg->new(%args);
 }
 
@@ -134,9 +130,10 @@ This is documented for information purposes only and is not intended to be used 
 =cut
 
 has natural_type => (
-	is=>'rw',
-	default=>sub{''},,
-); # roughly corresponds to ref.
+	is      => 'rw',
+	default => sub { '' },
+	,
+);    # roughly corresponds to ref.
 
 =head3 natural_script
 
@@ -147,9 +144,9 @@ This is documented for information purposes only and is not intended to be used 
 =cut
 
 has natural_script => (
-	is=>'rw',
-	default=>sub{[]},
-); 
+	is      => 'rw',
+	default => sub { [] },
+);
 
 =head3 user_script
 
@@ -159,10 +156,9 @@ This is documented for information purposes only and is not intended to be used 
 
 =cut
 
-
 has user_script => (
-	is=>'rw',
-	default=>sub{[]},
+	is      => 'rw',
+	default => sub { [] },
 );
 
 =head3 script
@@ -173,10 +169,7 @@ This method returns an arrayref containing the contents of the C<natural_script>
 
 sub script {
 	my $self = shift;
-	return [
-		@{ $self->natural_script },
-		@{ $self->user_script },
-	];
+	return [ @{ $self->natural_script }, @{ $self->user_script }, ];
 }
 
 =head3 add_test
@@ -187,29 +180,29 @@ This is documented for information purposes only and is not intended to be used 
 
 =cut
 
-sub add_test{
-	my ($self, $name, $data, $reason)  = @_;
-	my $package = CORE::ref ($self); 
-  
-	my $testMethodName = $package.'::'.${Test::Proto::Common::TEST_PREFIX}.$name;
-	my $code = sub {
-		my $runner = shift;
+sub add_test {
+	my ( $self, $name, $data, $reason ) = @_;
+	my $package = CORE::ref($self);
+
+	my $testMethodName = $package . '::' . ${Test::Proto::Common::TEST_PREFIX} . $name;
+	my $code           = sub {
+		my $runner  = shift;
 		my $subject = $runner->subject;
 		{
 			no strict 'refs';
-			eval { &{$testMethodName} ($runner, $data, $reason); };
-			$runner->exception("Failed during $name\n".$@) if $@;
+			eval { &{$testMethodName}( $runner, $data, $reason ); };
+			$runner->exception( "Failed during $name\n" . $@ ) if $@;
 		}
 	};
-	push @{ $self->user_script }, Test::Proto::TestCase->new(
-		name=>$name,
-		code=>$code,
-		data=>$data,
-		reason=>$reason,
-	);
+	push @{ $self->user_script },
+		Test::Proto::TestCase->new(
+		name   => $name,
+		code   => $code,
+		data   => $data,
+		reason => $reason,
+		);
 	return $self;
 }
-
 
 =head3 run_tests
 
@@ -221,19 +214,18 @@ This is documented for information purposes only and is not intended to be used 
 
 =cut
 
-sub run_tests{
-	my ($self, $context) = @_;
-	my $runner = $context->subtest(test_case=>$self);
-	foreach my $test (@{ $self->script }){
+sub run_tests {
+	my ( $self, $context ) = @_;
+	my $runner = $context->subtest( test_case => $self );
+	foreach my $test ( @{ $self->script } ) {
+
 		# $self->run_test($test, $runner);
-		$runner->run_test($test, $self);
+		$runner->run_test( $test, $self );
 		return $self if $runner->is_exception;
 	}
-	$runner->done("A ". (ref $self). " must pass all its subtests.");
+	$runner->done( "A " . ( ref $self ) . " must pass all its subtests." );
 	return $self;
 }
-
-
 
 =head3 add_test_method
 
@@ -247,23 +239,24 @@ For author, version, bug reports, support, etc, please see L<Test::Proto>.
 
 =cut
 
-
 sub _overload_AND {
-	my ($left, $right) = @_;
-	return __PACKAGE__->new->all_of([$left, $right]);
+	my ( $left, $right ) = @_;
+	return __PACKAGE__->new->all_of( [ $left, $right ] );
 }
+
 sub _overload_OR {
-	my ($left, $right) = @_;
-	return __PACKAGE__->new->any_of([$left, $right]);
+	my ( $left, $right ) = @_;
+	return __PACKAGE__->new->any_of( [ $left, $right ] );
 }
+
 sub _overload_XOR {
-	my ($left, $right) = @_;
-	return __PACKAGE__->new->some_of([$left, $right], 1);
+	my ( $left, $right ) = @_;
+	return __PACKAGE__->new->some_of( [ $left, $right ], 1 );
 }
+
 sub _overload_NOT {
 	my ($left) = @_;
-	return __PACKAGE__->new->none_of([$left], 1);
+	return __PACKAGE__->new->none_of( [$left], 1 );
 }
-
 
 1;

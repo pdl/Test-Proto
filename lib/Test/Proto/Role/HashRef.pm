@@ -29,13 +29,13 @@ Returns true if the key exists (even if the value is undefined).
 =cut
 
 sub key_exists {
-	my ($self, $key, $reason) = @_;
-	$self->add_test('key_exists', { key => $key }, $reason);
+	my ( $self, $key, $reason ) = @_;
+	$self->add_test( 'key_exists', { key => $key }, $reason );
 }
 define_test key_exists => sub {
-	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
-	return $self->pass if exists $self->subject->{$data->{key}}; 
-	return $self->fail; 
+	my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
+	return $self->pass if exists $self->subject->{ $data->{key} };
+	return $self->fail;
 };
 
 =head3 key_has_value
@@ -48,15 +48,21 @@ Returns the value of corresponding to the key provided within the subject, and t
 =cut
 
 sub key_has_value {
-	my ($self, $key, $expected, $reason) = @_;
-	$self->add_test('key_has_value', { key => $key, expected => $expected }, $reason);
+	my ( $self, $key, $expected, $reason ) = @_;
+	$self->add_test(
+		'key_has_value',
+		{
+			key      => $key,
+			expected => $expected
+		},
+		$reason
+	);
 }
 define_test key_has_value => sub {
-	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
-	my $subject = $self->subject->{$data->{key}}; 
-	return upgrade($data->{expected})->validate($subject, $self);
+	my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
+	my $subject = $self->subject->{ $data->{key} };
+	return upgrade( $data->{expected} )->validate( $subject, $self );
 };
-
 
 =head3 superhash_of
 
@@ -68,17 +74,17 @@ Tests whether each of the key-value pairs in the second argument are present and
 =cut
 
 sub superhash_of {
-	my ($self, $expected, $reason) = @_;
-	$self->add_test('superhash_of', { expected => $expected }, $reason);
+	my ( $self, $expected, $reason ) = @_;
+	$self->add_test( 'superhash_of', { expected => $expected }, $reason );
 }
 define_test superhash_of => sub {
-	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
 	my $subproto = Test::Proto::HashRef->new();
-	foreach my $key (keys %{ $data->{expected} }){
+	foreach my $key ( keys %{ $data->{expected} } ) {
 		my $expected = $data->{expected}->{$key};
-		$subproto->key_has_value($key, $expected);
+		$subproto->key_has_value( $key, $expected );
 	}
-	return $subproto->validate($self->subject, $self);
+	return $subproto->validate( $self->subject, $self );
 };
 
 =head3 count_keys
@@ -91,14 +97,14 @@ Counts the keys of the hashref and compares them to the prototype provided. Ther
 =cut
 
 sub count_keys {
-	my ($self, $expected, $reason) = @_;
-	$self->add_test('count_keys', { expected => $expected }, $reason);
+	my ( $self, $expected, $reason ) = @_;
+	$self->add_test( 'count_keys', { expected => $expected }, $reason );
 }
 
 define_test count_keys => sub {
-	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
 	my $subject = scalar CORE::keys %{ $self->subject };
-	return upgrade($data->{expected})->validate($subject, $self);
+	return upgrade( $data->{expected} )->validate( $subject, $self );
 };
 
 =head3 keys
@@ -111,16 +117,15 @@ In the above example, the C<ok> passes if the prototype C<$tests_keys> returns a
 
 =cut
 
-
 sub keys {
-	my ($self, $expected, $reason) = @_;
-	$self->add_test('keys', { expected => $expected }, $reason);
+	my ( $self, $expected, $reason ) = @_;
+	$self->add_test( 'keys', { expected => $expected }, $reason );
 }
 
 define_test 'keys' => sub {
-	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
-	my $subject = [CORE::keys %{ $self->subject }];
-	return upgrade($data->{expected})->validate($subject, $self);
+	my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
+	my $subject = [ CORE::keys %{ $self->subject } ];
+	return upgrade( $data->{expected} )->validate( $subject, $self );
 };
 
 =head3 values
@@ -134,14 +139,14 @@ In the above example, the C<ok> passes if the prototype C<$tests_values> returns
 =cut
 
 sub values {
-	my ($self, $expected, $reason) = @_;
-	$self->add_test('values', { expected => $expected }, $reason);
+	my ( $self, $expected, $reason ) = @_;
+	$self->add_test( 'values', { expected => $expected }, $reason );
 }
 
 define_test 'values' => sub {
-	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
-	my $subject = [CORE::values %{ $self->subject }];
-	return upgrade($data->{expected})->validate($subject, $self);
+	my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
+	my $subject = [ CORE::values %{ $self->subject } ];
+	return upgrade( $data->{expected} )->validate( $subject, $self );
 };
 
 =head3 enumerated
@@ -155,17 +160,16 @@ In the above example, the prototype C<$tests_key_value_pairs> should return a pa
 =cut
 
 sub enumerated {
-	my ($self, $expected, $reason) = @_;
-	$self->add_test('enumerated', { expected => $expected }, $reason);
+	my ( $self, $expected, $reason ) = @_;
+	$self->add_test( 'enumerated', { expected => $expected }, $reason );
 }
 
 define_test 'enumerated' => sub {
-	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
 	my $subject = [];
-	push @$subject, [$_, $self->subject->{$_}] foreach (CORE::keys %{ $self->subject });
-	return upgrade($data->{expected})->validate($subject, $self);
+	push @$subject, [ $_, $self->subject->{$_} ] foreach ( CORE::keys %{ $self->subject } );
+	return upgrade( $data->{expected} )->validate( $subject, $self );
 };
-
 
 # simple_test count_keys => sub {
 # 	my ($subject, $expected) = @_; # self is the runner, NOT the prototype
@@ -177,6 +181,5 @@ define_test 'enumerated' => sub {
 For author, version, bug reports, support, etc, please see L<Test::Proto>. 
 
 =cut
-
 
 1;

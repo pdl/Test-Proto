@@ -26,7 +26,7 @@ The arguments and return value should be arrayrefs; the method is evaluated in l
 
 sub method {
 	my ($self) = shift;
-	if ((! exists $_[1]) or (!defined ref $_[1]) or ((ref $_[1]) ne 'ARRAY')){
+	if ( ( !exists $_[1] ) or ( !defined ref $_[1] ) or ( ( ref $_[1] ) ne 'ARRAY' ) ) {
 		$self->method_exists(@_);
 	}
 	else {
@@ -44,21 +44,24 @@ The arguments should be na arrayref; the method is evaluated in void context. Th
 
 =cut
 
-
 sub method_void_context {
-	my ($self, $method, $args, $reason) = @_;
-	$self->add_test('method_void_context', {
-		method => $method,
-		args => $args,
-	}, $reason);
+	my ( $self, $method, $args, $reason ) = @_;
+	$self->add_test(
+		'method_void_context',
+		{
+			method => $method,
+			args   => $args,
+		},
+		$reason
+	);
 }
 
 define_test "method_void_context" => sub {
-	my ($self, $data, $reason) = @_; # self is the runner
-	my $args = $data->{args};
+	my ( $self, $data, $reason ) = @_;    # self is the runner
+	my $args   = $data->{args};
 	my $method = $data->{method};
 	$self->subject->$method(@$args);
-	return $self->pass; # void context so we pass unless it dies.
+	return $self->pass;                   # void context so we pass unless it dies.
 };
 
 =head3 method_scalar_context
@@ -71,23 +74,26 @@ The arguments should be an arrayref, and the expected value should be a prototyp
 
 =cut
 
-
 sub method_scalar_context {
-	my ($self, $method, $args, $expected, $reason) = @_;
-	$self->add_test('method_scalar_context', {
-		method => $method,
-		args => $args,
-		expected => $expected 
-	}, $reason);
+	my ( $self, $method, $args, $expected, $reason ) = @_;
+	$self->add_test(
+		'method_scalar_context',
+		{
+			method   => $method,
+			args     => $args,
+			expected => $expected
+		},
+		$reason
+	);
 }
 
 define_test "method_scalar_context" => sub {
-	my ($self, $data, $reason) = @_; # self is the runner
-	my $args = $data->{args};
-	my $method = $data->{method};
-	my $expected = upgrade($data->{expected});
+	my ( $self, $data, $reason ) = @_;    # self is the runner
+	my $args     = $data->{args};
+	my $method   = $data->{method};
+	my $expected = upgrade( $data->{expected} );
 	my $response = $self->subject->$method(@$args);
-	return $expected->validate($response, $self);
+	return $expected->validate( $response, $self );
 };
 
 =head3 method_list_context
@@ -100,23 +106,26 @@ The arguments and return value should be arrayrefs; the method is evaluated in l
 
 =cut
 
-
 sub method_list_context {
-	my ($self, $method, $args, $expected, $reason) = @_;
-	$self->add_test('method_list_context', {
-		method => $method,
-		args => $args,
-		expected => $expected 
-	}, $reason);
+	my ( $self, $method, $args, $expected, $reason ) = @_;
+	$self->add_test(
+		'method_list_context',
+		{
+			method   => $method,
+			args     => $args,
+			expected => $expected
+		},
+		$reason
+	);
 }
 
 define_test method_list_context => sub {
-	my ($self, $data, $reason) = @_; # self is the runner
-	my $args = $data->{args};
-	my $method = $data->{method};
-	my $expected = upgrade($data->{expected});
-	my $response = [$self->subject->$method(@$args)];
-	return $expected->validate($response, $self);
+	my ( $self, $data, $reason ) = @_;    # self is the runner
+	my $args     = $data->{args};
+	my $method   = $data->{method};
+	my $expected = upgrade( $data->{expected} );
+	my $response = [ $self->subject->$method(@$args) ];
+	return $expected->validate( $response, $self );
 };
 
 =head3 method_exists
@@ -128,18 +137,15 @@ Determines if the named method is present on the test subject. Implemented with 
 =cut
 
 sub method_exists {
-	my ($self, $method, $args, $expected, $reason) = @_;
-	$self->add_test('method_exists', {
-		method => $method,
-	}, $reason);
+	my ( $self, $method, $args, $expected, $reason ) = @_;
+	$self->add_test( 'method_exists', { method => $method, }, $reason );
 }
 
 define_test method_exists => sub {
-	my ($self, $data, $reason) = @_; # self is the runner
+	my ( $self, $data, $reason ) = @_;    # self is the runner
 	my $method = $data->{method};
-	return $self->pass if ($self->subject->can($method));
+	return $self->pass if ( $self->subject->can($method) );
 	return $self->fail;
 };
-
 
 1;

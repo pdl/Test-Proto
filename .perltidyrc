@@ -1,0 +1,13 @@
+-l=0
+-et=4
+-t
+-ci=4
+-cti=0
+-nolq
+-nola
+-nokw
+-notr
+-sot
+-nsct
+-wbb="+ - / * . "
+-cab=0

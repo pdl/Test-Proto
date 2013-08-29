@@ -16,7 +16,7 @@ use Test::Proto::Compare::Numeric;
 use Test::Proto::Common ();
 use Scalar::Util qw(blessed refaddr);
 use base "Exporter";
-our @EXPORT_OK = qw(&p &pArray &pHash &pCode &pObject &pSeries &pRepeatable &pAlternation &c &cNumeric); # symbols to export on request
+our @EXPORT_OK = qw(&p &pArray &pHash &pCode &pObject &pSeries &pRepeatable &pAlternation &c &cNumeric);    # symbols to export on request
 
 =head1 NAME
 
@@ -29,7 +29,6 @@ Version 0.011
 =cut
 
 our $VERSION = ${Test::Proto::Base::VERSION};
-
 
 =head1 SYNOPSIS
 
@@ -73,7 +72,7 @@ Returns a basic prototype. See L<Test::Proto::Base>.
 =cut
 
 sub p {
-	return Test::Proto::Common::upgrade ($_[0]) if 1 == scalar @_;
+	return Test::Proto::Common::upgrade( $_[0] ) if 1 == scalar @_;
 	return Test::Proto::Base->new(@_);
 }
 
@@ -84,7 +83,7 @@ Returns a prototype for an array/ArrayRef. See L<Test::Proto::ArrayRef>.
 =cut
 
 sub pArray {
-	return Test::Proto::Common::upgrade ($_[0]) if 1 == scalar @_;
+	return Test::Proto::Common::upgrade( $_[0] ) if 1 == scalar @_;
 	return Test::Proto::ArrayRef->new(@_);
 }
 
@@ -95,7 +94,7 @@ Returns a prototype for a hash/HashRef. See L<Test::Proto::HashRef>.
 =cut
 
 sub pHash {
-	return Test::Proto::Common::upgrade ($_[0]) if 1 == scalar @_;
+	return Test::Proto::Common::upgrade( $_[0] ) if 1 == scalar @_;
 	return Test::Proto::HashRef->new(@_);
 }
 
@@ -118,19 +117,19 @@ Returns a prototype for an object. See L<Test::Proto::Object>.
 =cut
 
 sub pObject {
-	if (1 == scalar @_) {
+	if ( 1 == scalar @_ ) {
 		my $p = Test::Proto::Object->new();
-		if (!ref $_[0]) {
-			$p->is_a($_[0]);
+		if ( !ref $_[0] ) {
+			$p->is_a( $_[0] );
 		}
-		elsif ((blessed $_[0]) and $_[0]->isa('Test::Proto::Base')) {
-			$p->is_also($_[0]);
+		elsif ( ( blessed $_[0] ) and $_[0]->isa('Test::Proto::Base') ) {
+			$p->is_also( $_[0] );
 		}
-		elsif (ref $_[0] =~ /^(?:HASH|ARRAY)$/) {
-			$p->is_also(Test::Proto::Common::upgrade ($_[0]));
+		elsif ( ref $_[0] =~ /^(?:HASH|ARRAY)$/ ) {
+			$p->is_also( Test::Proto::Common::upgrade( $_[0] ) );
 		}
 		else {
-			$p->refaddr(refaddr $_[0]) if blessed $_[0];
+			$p->refaddr( refaddr $_[0] ) if blessed $_[0];
 		}
 		return $p;
 	}
@@ -138,7 +137,6 @@ sub pObject {
 		return Test::Proto::Object->new(@_);
 	}
 }
-
 
 =head2 pSeries
 
@@ -248,4 +246,4 @@ See http://dev.perl.org/licenses/ for more information.
 
 =cut
 
-return 1; # module loaded ok
+return 1;    # module loaded ok

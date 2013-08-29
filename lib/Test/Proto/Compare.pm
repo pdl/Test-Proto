@@ -3,53 +3,54 @@ use strict;
 use warnings;
 use Moo;
 use Test::Proto::Common;
-use overload '&{}'=>\&compare, '""'=> sub {$_[0]->summary};
+use overload
+	'&{}' => \&compare,
+	'""'  => sub { $_[0]->summary };
 
 has 'code',
 	is      => 'rw',
-	default => sub{sub {$_[0] cmp $_[1]}};
+	default => sub {
+	sub { $_[0] cmp $_[1] }
+	};
 
 has 'reversed',
 	is      => 'rw',
-	default => sub {0};
+	default => sub { 0 };
 
 has 'summary',
 	is      => 'rw',
-	default => sub {'cmp'};
-
+	default => sub { 'cmp' };
 
 around 'code', 'reversed', 'summary', \&Test::Proto::Common::chainable;
 
 sub reverse {
 	my $self = shift;
-	$self->reversed(!$self->reversed);
+	$self->reversed( !$self->reversed );
 	return $self;
 }
 
 sub compare {
-	my ($self, $A, $B) = @_;
-	if ($self->reversed) {
-		return $self->code->($B, $A)
+	my ( $self, $A, $B ) = @_;
+	if ( $self->reversed ) {
+		return $self->code->( $B, $A );
 	}
 	else {
-		return $self->code->($A, $B)
+		return $self->code->( $A, $B );
 	}
 }
 
-sub eq {shift->compare(@_)==0}
-sub ne {shift->compare(@_)!=0}
+sub eq { shift->compare(@_) == 0 }
+sub ne { shift->compare(@_) != 0 }
 
-sub gt {shift->compare(@_)>0}
-sub ge {shift->compare(@_)>=0}
+sub gt { shift->compare(@_) > 0 }
+sub ge { shift->compare(@_) >= 0 }
 
-sub lt {shift->compare(@_)<0}
-sub le {shift->compare(@_)<=0}
+sub lt { shift->compare(@_) < 0 }
+sub le { shift->compare(@_) <= 0 }
 
 sub BUILDARGS {
 	my $class = shift;
-	return {
-		( exists $_[0] ? (code => $_[0]) : () )
-	};
+	return { ( exists $_[0] ? ( code => $_[0] ) : () ) };
 }
 
 =head1 NAME

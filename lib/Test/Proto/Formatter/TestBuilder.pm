@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Moo;
 extends 'Test::Builder::Module';
-my $CLASS= __PACKAGE__;
+my $CLASS = __PACKAGE__;
 
 =pod
 
@@ -35,21 +35,21 @@ Used in Test::Proto::TestRunner to inform the formatter of progress. Event types
 =cut
 
 has '_object_id_register',
-	is=> 'rw',
+	is      => 'rw',
 	default => sub { {} };
 
 sub _explain_test_case {
-	my $self = shift;
+	my $self      = shift;
 	my $test_case = shift;
-	if (ref $test_case){
-		if ($test_case->isa('Test::Proto::TestCase')){
+	if ( ref $test_case ) {
+		if ( $test_case->isa('Test::Proto::TestCase') ) {
 			my $report = '';
 			$report .= $test_case->name;
-			$report .= "\nexpected: ".$test_case->data->{expected} if defined($test_case->data->{expected});
-			if (scalar keys %{$test_case->data}>1){	
-				$report.= "\nOther data:";
-				foreach my $key (grep {'expected' ne $_} keys %{$test_case->data}){
-					$report.="\n  $key: ". $test_case->data->{$key};
+			$report .= "\nexpected: " . $test_case->data->{expected} if defined( $test_case->data->{expected} );
+			if ( scalar keys %{ $test_case->data } > 1 ) {
+				$report .= "\nOther data:";
+				foreach my $key ( grep { 'expected' ne $_ } keys %{ $test_case->data } ) {
+					$report .= "\n  $key: " . $test_case->data->{$key};
 				}
 			}
 			return $report;
@@ -62,35 +62,31 @@ sub _explain_test_case {
 }
 
 sub event {
-	my $self = shift;
-	my $runner = shift;
+	my $self      = shift;
+	my $runner    = shift;
 	my $eventType = shift;
-	if ('new' eq $eventType) {
-		my $name = defined($runner->test_case) ? 
-			$runner->test_case->can('name') ? 
-				$runner->test_case->name 
-			: ref $runner->test_case
-		: undef;
-		if (defined $runner->parent) {
-			$self->_object_id_register->{$runner->object_id} = $self->_object_id_register->{$runner->parent->object_id}->child($name);
+	if ( 'new' eq $eventType ) {
+		my $name =
+			  defined( $runner->test_case )
+			? $runner->test_case->can('name')
+				? $runner->test_case->name
+				: ref $runner->test_case
+			: undef;
+		if ( defined $runner->parent ) {
+			$self->_object_id_register->{ $runner->object_id } = $self->_object_id_register->{ $runner->parent->object_id }->child($name);
 		}
 		else {
-			$self->_object_id_register->{$runner->object_id} = $CLASS->builder->child($name);
+			$self->_object_id_register->{ $runner->object_id } = $CLASS->builder->child($name);
 		}
 	}
-	elsif ('done' eq $eventType) {
-		if ( my $tb = $self->_object_id_register->{$runner->object_id} ){
-			$tb->ok($runner, 
-				$runner->status 
-			." - got: ". ( defined $runner->subject ? $runner->subject : '[undefined]' )
-			."\n". $self->_explain_test_case($runner->test_case)
-			. (defined $runner->status_message ? "\n". $runner->status_message : '')
-			);
+	elsif ( 'done' eq $eventType ) {
+		if ( my $tb = $self->_object_id_register->{ $runner->object_id } ) {
+			$tb->ok( $runner, $runner->status . " - got: " . ( defined $runner->subject ? $runner->subject : '[undefined]' ) . "\n" . $self->_explain_test_case( $runner->test_case ) . ( defined $runner->status_message ? "\n" . $runner->status_message : '' ) );
 			$tb->done_testing;
 			$tb->finalize;
 		}
 		else {
-			die ('Have not registered object '. $runner->object_id );
+			die( 'Have not registered object ' . $runner->object_id );
 		}
 	}
 	return $self;
@@ -104,22 +100,18 @@ Outputs information from a test runner that is already complete but did not expe
 
 =cut
 
-
 sub format {
-	my $self = shift;
+	my $self   = shift;
 	my $runner = shift;
-	$self->event($runner, 'done');
+	$self->event( $runner, 'done' );
 	return $self;
 }
 
-
 1;
-
 
 =head1 OTHER INFORMATION
 
 For author, version, bug reports, support, etc, please see L<Test::Proto>. 
 
 =cut
-
 

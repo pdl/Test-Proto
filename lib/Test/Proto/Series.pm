@@ -5,11 +5,11 @@ use Moo;
 
 has 'contents',
 	is      => 'rw',
-	default => sub {[]};
+	default => sub { [] };
 
 sub BUILDARGS {
 	my $class = shift;
-	return {contents=>[@_]};
+	return { contents => [@_] };
 }
 
 =head1 NAME

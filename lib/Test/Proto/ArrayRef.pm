@@ -29,5 +29,4 @@ For author, version, bug reports, support, etc, please see L<Test::Proto>.
 
 =cut
 
-
 1;

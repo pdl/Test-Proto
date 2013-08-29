@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Moo;
 use base 'Test::Builder::Module';
-my $CLASS= __PACKAGE__;
+my $CLASS = __PACKAGE__;
 
 =pod
 
@@ -36,13 +36,15 @@ There are two supported events, 'new' and 'done'. The formatter reads the test r
 =cut
 
 sub event {
-	my $self = shift;
-	my $target = shift;
+	my $self      = shift;
+	my $target    = shift;
 	my $eventType = shift;
-	if ('new' eq $eventType) {
+	if ( 'new' eq $eventType ) {
+
 		# ...
 	}
-	elsif ('done' eq $eventType) {
+	elsif ( 'done' eq $eventType ) {
+
 		# ...
 	}
 	return $self;
@@ -56,21 +58,17 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-
 sub format {
-	my $self = shift;
+	my $self   = shift;
 	my $target = shift;
 	return $self;
 }
 
-
 1;
-
 
 =head1 OTHER INFORMATION
 
 For author, version, bug reports, support, etc, please see L<Test::Proto>. 
 
 =cut
-
 

@@ -30,28 +30,33 @@ Performs the relevant string comparison on the subject, comparing against the te
 =cut
 
 sub eq {
-	my ($self, $expected, $reason) = @_;
-	$self->add_test('eq', { expected => $expected }, $reason);
+	my ( $self, $expected, $reason ) = @_;
+	$self->add_test( 'eq', { expected => $expected }, $reason );
 }
+
 sub ne {
-	my ($self, $expected, $reason) = @_;
-	$self->add_test('ne', { expected => $expected }, $reason);
+	my ( $self, $expected, $reason ) = @_;
+	$self->add_test( 'ne', { expected => $expected }, $reason );
 }
+
 sub gt {
-	my ($self, $expected, $reason) = @_;
-	$self->add_test('gt', { expected => $expected }, $reason);
+	my ( $self, $expected, $reason ) = @_;
+	$self->add_test( 'gt', { expected => $expected }, $reason );
 }
+
 sub lt {
-	my ($self, $expected, $reason) = @_;
-	$self->add_test('lt', { expected => $expected }, $reason);
+	my ( $self, $expected, $reason ) = @_;
+	$self->add_test( 'lt', { expected => $expected }, $reason );
 }
+
 sub ge {
-	my ($self, $expected, $reason) = @_;
-	$self->add_test('ge', { expected => $expected }, $reason);
+	my ( $self, $expected, $reason ) = @_;
+	$self->add_test( 'ge', { expected => $expected }, $reason );
 }
+
 sub le {
-	my ($self, $expected, $reason) = @_;
-	$self->add_test('le', { expected => $expected }, $reason);
+	my ( $self, $expected, $reason ) = @_;
+	$self->add_test( 'le', { expected => $expected }, $reason );
 }
 
 =head3 num_eq, num_ne, num_gt, num_lt, num_ge, num_le
@@ -64,30 +69,34 @@ Performs the relevant string comparison on the subject, comparing against the nu
 =cut
 
 sub num_eq {
-	my ($self, $expected, $reason) = @_;
-	$self->add_test('num_eq', { expected => $expected }, $reason);
-}
-sub num_ne {
-	my ($self, $expected, $reason) = @_;
-	$self->add_test('num_ne', { expected => $expected }, $reason);
-}
-sub num_gt {
-	my ($self, $expected, $reason) = @_;
-	$self->add_test('num_gt', { expected => $expected }, $reason);
-}
-sub num_lt {
-	my ($self, $expected, $reason) = @_;
-	$self->add_test('num_lt', { expected => $expected }, $reason);
-}
-sub num_ge {
-	my ($self, $expected, $reason) = @_;
-	$self->add_test('num_ge', { expected => $expected }, $reason);
-}
-sub num_le {
-	my ($self, $expected, $reason) = @_;
-	$self->add_test('num_le', { expected => $expected }, $reason);
+	my ( $self, $expected, $reason ) = @_;
+	$self->add_test( 'num_eq', { expected => $expected }, $reason );
 }
 
+sub num_ne {
+	my ( $self, $expected, $reason ) = @_;
+	$self->add_test( 'num_ne', { expected => $expected }, $reason );
+}
+
+sub num_gt {
+	my ( $self, $expected, $reason ) = @_;
+	$self->add_test( 'num_gt', { expected => $expected }, $reason );
+}
+
+sub num_lt {
+	my ( $self, $expected, $reason ) = @_;
+	$self->add_test( 'num_lt', { expected => $expected }, $reason );
+}
+
+sub num_ge {
+	my ( $self, $expected, $reason ) = @_;
+	$self->add_test( 'num_ge', { expected => $expected }, $reason );
+}
+
+sub num_le {
+	my ( $self, $expected, $reason ) = @_;
+	$self->add_test( 'num_le', { expected => $expected }, $reason );
+}
 
 =head3 true, false
 
@@ -99,14 +108,14 @@ Tests if the subject returns true or false in boolean context.
 =cut
 
 sub true {
-	my ($self, $expected, $reason) = @_;
-	$self->add_test('true', { expected => 'true' }, $reason);
+	my ( $self, $expected, $reason ) = @_;
+	$self->add_test( 'true', { expected => 'true' }, $reason );
 }
 
 define_test 'true' => sub {
-	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
-	if($self->subject) {
-		return $self->pass; 
+	my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
+	if ( $self->subject ) {
+		return $self->pass;
 	}
 	else {
 		return $self->fail;
@@ -114,19 +123,19 @@ define_test 'true' => sub {
 };
 
 sub false {
-	my ($self, $expected, $reason) = @_;
-	$self->add_test('false', { expected => 'false' }, $reason);
+	my ( $self, $expected, $reason ) = @_;
+	$self->add_test( 'false', { expected => 'false' }, $reason );
 }
 
 define_test 'false' => sub {
-	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
-	if($self->subject) {
+	my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
+	if ( $self->subject ) {
 		return $self->fail;
 	}
 	else {
-		return $self->pass; 
+		return $self->pass;
 	}
-}; 
+};
 
 =head3 defined, undefined
 
@@ -144,35 +153,34 @@ Note that directly supplying undef into the protoype (as opposed to a variable c
 =cut
 
 sub defined {
-	my ($self, $expected, $reason) = @_;
-	$self->add_test('defined', { expected => 'defined' }, $reason);
+	my ( $self, $expected, $reason ) = @_;
+	$self->add_test( 'defined', { expected => 'defined' }, $reason );
 }
 
 define_test 'defined' => sub {
-	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
-	if(defined $self->subject) {
+	my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
+	if ( defined $self->subject ) {
 		return $self->pass;
 	}
 	else {
-		return $self->fail; 
+		return $self->fail;
 	}
-}; 
-
+};
 
 sub undefined {
-	my ($self, $expected, $reason) = @_;
-	$self->add_test('undefined', { expected => 'undefined' }, $reason);
+	my ( $self, $expected, $reason ) = @_;
+	$self->add_test( 'undefined', { expected => 'undefined' }, $reason );
 }
 
 define_test 'undefined' => sub {
-	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
-	if(defined $self->subject) {
+	my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
+	if ( defined $self->subject ) {
 		return $self->fail;
 	}
 	else {
-		return $self->pass; 
+		return $self->pass;
 	}
-}; 
+};
 
 =head3 like, unlike
 
@@ -184,37 +192,36 @@ The test subject is validated against the regular expression. Like tests for a m
 =cut
 
 sub like {
-	my ($self, $expected, $reason) = @_;
-	$self->add_test('like', { expected => $expected }, $reason);
+	my ( $self, $expected, $reason ) = @_;
+	$self->add_test( 'like', { expected => $expected }, $reason );
 }
 
 define_test 'like' => sub {
-	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
 	my $re = $data->{expected};
-	if($self->subject =~ m/$re/) {
-		return $self->pass;
-	}
-	else {
-		return $self->fail; 
-	}
-}; 
-
-sub unlike {
-	my ($self, $expected, $reason) = @_;
-	$self->add_test('unlike', { expected => $expected }, $reason);
-}
-
-define_test 'unlike' => sub {
-	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
-	my $re = $data->{expected};
-	if($self->subject !~ m/$re/) {
+	if ( $self->subject =~ m/$re/ ) {
 		return $self->pass;
 	}
 	else {
 		return $self->fail;
 	}
-}; 
+};
 
+sub unlike {
+	my ( $self, $expected, $reason ) = @_;
+	$self->add_test( 'unlike', { expected => $expected }, $reason );
+}
+
+define_test 'unlike' => sub {
+	my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
+	my $re = $data->{expected};
+	if ( $self->subject !~ m/$re/ ) {
+		return $self->pass;
+	}
+	else {
+		return $self->fail;
+	}
+};
 
 =head3 try
 
@@ -225,20 +232,19 @@ Used to execute arbitrary code. Passes if the return value is true.
 =cut
 
 sub try {
-	my ($self, $expected, $reason) = @_;
-	$self->add_test('try', { expected => $expected }, $reason);
+	my ( $self, $expected, $reason ) = @_;
+	$self->add_test( 'try', { expected => $expected }, $reason );
 }
 
 define_test 'try' => sub {
-	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
-	if($data->{expected}->($self->subject)) {
+	my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
+	if ( $data->{expected}->( $self->subject ) ) {
 		return $self->pass;
 	}
 	else {
 		return $self->fail;
 	}
-}; 
-
+};
 
 =head3 ref
 
@@ -251,19 +257,19 @@ Tests the result of the 'ref'. Any prototype will do here.
 =cut
 
 sub ref {
-	my ($self, $expected, $reason) = @_;
-	$self->add_test('ref', { expected => $expected }, $reason);
+	my ( $self, $expected, $reason ) = @_;
+	$self->add_test( 'ref', { expected => $expected }, $reason );
 }
 
 define_test 'ref' => sub {
-	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
-	if(CORE::ref($self->subject) eq $data->{expected}) {
-		return $self->pass; 
+	my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
+	if ( CORE::ref( $self->subject ) eq $data->{expected} ) {
+		return $self->pass;
 	}
 	else {
 		return $self->fail;
 	}
-}; 
+};
 
 =head3 is_a
 
@@ -282,36 +288,36 @@ If the subject is a blessed reference, then C<isa> is used.
 =cut
 
 sub is_a {
-	my ($self, $expected, $reason) = @_;
-	$self->add_test('is_a', { expected => $expected }, $reason);
+	my ( $self, $expected, $reason ) = @_;
+	$self->add_test( 'is_a', { expected => $expected }, $reason );
 }
 
 define_test is_a => sub {
-	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
-	if((CORE::ref $self->subject) =~ /^(SCALAR|ARRAY|HASH|CODE|REF|GLOB|LVALUE|FORMAT|IO|VSTRING|Regexp)$/) {
-		if($1 eq $data->{expected}) {
+	my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
+	if ( ( CORE::ref $self->subject ) =~ /^(SCALAR|ARRAY|HASH|CODE|REF|GLOB|LVALUE|FORMAT|IO|VSTRING|Regexp)$/ ) {
+		if ( $1 eq $data->{expected} ) {
 			return $self->pass;
 		}
 	}
-	elsif(Scalar::Util::blessed $self->subject) {		
-		if($self->subject->isa($data->{expected})) {
-			return $self->pass; 
+	elsif ( Scalar::Util::blessed $self->subject ) {
+		if ( $self->subject->isa( $data->{expected} ) ) {
+			return $self->pass;
 		}
 	}
-	elsif((!defined $data->{expected}) or $data->{expected} eq '') {
+	elsif ( ( !defined $data->{expected} ) or $data->{expected} eq '' ) {
 		return $self->pass;
 	}
 	return $self->fail;
 };
 {
 	my %num_eqv = qw(eq == ne != gt > lt < ge >= le <=);
-	foreach my $dir (keys %num_eqv){
-	
+	foreach my $dir ( keys %num_eqv ) {
+
 		define_test $dir => sub {
-			my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+			my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
 			my $result;
 			eval "\$result = \$self->subject $dir \$data->{expected}";
-			if($result) {
+			if ($result) {
 				return $self->pass;
 			}
 			else {
@@ -322,10 +328,10 @@ define_test is_a => sub {
 		my $num_dir = $num_eqv{$dir};
 
 		define_test "num_$dir" => sub {
-			my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+			my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
 			my $result;
 			eval "\$result = \$self->subject $num_dir \$data->{expected}";
-			if($result) {
+			if ($result) {
 				return $self->pass;
 			}
 			else {
@@ -347,13 +353,13 @@ Tests that the subject also matches the protoype given. If the argument given is
 =cut
 
 sub also {
-	my ($self, $expected, $reason) = @_;
-	$self->add_test('also', { expected => $expected }, $reason);
+	my ( $self, $expected, $reason ) = @_;
+	$self->add_test( 'also', { expected => $expected }, $reason );
 }
 
-define_test also => sub{
-	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
-	return upgrade($data->{expected})->validate($self->subject, $self); 
+define_test also => sub {
+	my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
+	return upgrade( $data->{expected} )->validate( $self->subject, $self );
 };
 
 =head3 any_of
@@ -369,15 +375,15 @@ Tests that the subject also matches one of the protoypes given in the arrayref. 
 =cut
 
 sub any_of {
-	my ($self, $expected, $reason) = @_;
-	$self->add_test('any_of', { expected => $expected }, $reason);
+	my ( $self, $expected, $reason ) = @_;
+	$self->add_test( 'any_of', { expected => $expected }, $reason );
 }
 
-define_test any_of => sub{
-	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+define_test any_of => sub {
+	my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
 	my $i = 0;
-	foreach my $candidate (@{ $data->{expected} }){
-		my $result = upgrade($candidate)->validate($self->subject, $self->subtest);
+	foreach my $candidate ( @{ $data->{expected} } ) {
+		my $result = upgrade($candidate)->validate( $self->subject, $self->subtest );
 		return $self->pass("Candidate $i was successful") if $result;
 		$i++;
 	}
@@ -397,21 +403,20 @@ Tests that the subject also matches one of the protoypes given in the arrayref. 
 =cut
 
 sub all_of {
-	my ($self, $expected, $reason) = @_;
-	$self->add_test('all_of', { expected => $expected }, $reason);
+	my ( $self, $expected, $reason ) = @_;
+	$self->add_test( 'all_of', { expected => $expected }, $reason );
 }
 
-define_test all_of => sub{
-	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+define_test all_of => sub {
+	my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
 	my $i = 0;
-	foreach my $candidate (@{ $data->{expected} }){
-		my $result = upgrade($candidate)->validate($self->subject, $self->subtest);
+	foreach my $candidate ( @{ $data->{expected} } ) {
+		my $result = upgrade($candidate)->validate( $self->subject, $self->subtest );
 		return $self->fail("Candidate $i was unsuccessful") unless $result;
 		$i++;
 	}
 	return $self->pass("All of the $i candidates were successful");
 };
-
 
 =head3 none_of
 
@@ -427,15 +432,15 @@ Tests that the subject does not match any of the protoypes given in the arrayref
 =cut
 
 sub none_of {
-	my ($self, $expected, $reason) = @_;
-	$self->add_test('none_of', { expected => $expected }, $reason);
+	my ( $self, $expected, $reason ) = @_;
+	$self->add_test( 'none_of', { expected => $expected }, $reason );
 }
 
-define_test none_of => sub{
-	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+define_test none_of => sub {
+	my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
 	my $i = 0;
-	foreach my $candidate (@{ $data->{expected} }){
-		my $result = upgrade($candidate)->validate($self->subject, $self->subtest);
+	foreach my $candidate ( @{ $data->{expected} } ) {
+		my $result = upgrade($candidate)->validate( $self->subject, $self->subtest );
 		return $self->fail("Candidate $i was successful") if $result;
 		$i++;
 	}
@@ -450,20 +455,26 @@ Tests that the subject some, all, or none of the protoypes given in the arrayref
 
 =cut
 
-
 sub some_of {
-	my ($self, $expected, $count, $reason) = @_;
+	my ( $self, $expected, $count, $reason ) = @_;
 	$count = p->gt(0) unless defined $count;
-	$self->add_test('some_of', { expected => $expected, count=>$count }, $reason);
+	$self->add_test(
+		'some_of',
+		{
+			expected => $expected,
+			count    => $count
+		},
+		$reason
+	);
 }
 
 define_test some_of => sub {
-	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+	my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
 	my $i = 0;
-	foreach my $candidate (@{ $data->{expected} }){
-		$i++ if upgrade($candidate)->validate($self->subject, $self->subtest);
+	foreach my $candidate ( @{ $data->{expected} } ) {
+		$i++ if upgrade($candidate)->validate( $self->subject, $self->subtest );
 	}
-	return $self->pass if upgrade($data->{count})->validate($i,$self->subtest);
+	return $self->pass if upgrade( $data->{count} )->validate( $i, $self->subtest );
 	return $self->fail;
 };
 
@@ -477,13 +488,13 @@ If the test subject looks like a number according to Perl's internal rules (spec
 =cut
 
 sub looks_like_number {
-	my ($self, $expected, $count, $reason) = @_;
-	$self->add_test('looks_like_number', $reason);
+	my ( $self, $expected, $count, $reason ) = @_;
+	$self->add_test( 'looks_like_number', $reason );
 }
 
 define_test looks_like_number => sub {
-	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
-	return $self->pass if Scalar::Util::looks_like_number($self->subject);
+	my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
+	return $self->pass if Scalar::Util::looks_like_number( $self->subject );
 	return $self->fail;
 };
 
@@ -497,13 +508,13 @@ If the test subject looks like a number according to Perl's internal rules (spec
 =cut
 
 sub looks_unlike_number {
-	my ($self, $expected, $count, $reason) = @_;
-	$self->add_test('looks_unlike_number', $reason);
+	my ( $self, $expected, $count, $reason ) = @_;
+	$self->add_test( 'looks_unlike_number', $reason );
 }
 
 define_test looks_unlike_number => sub {
-	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
-	return $self->fail if Scalar::Util::looks_like_number($self->subject);
+	my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
+	return $self->fail if Scalar::Util::looks_like_number( $self->subject );
 	return $self->pass;
 };
 
@@ -516,12 +527,12 @@ Tests that the subject is a weak reference using is_weak from L<Scalar::Util>.
 =cut
 
 sub is_weak_ref {
-	my ($self, $reason) = @_;
-	$self->add_test('is_weak_ref', {}, $reason);
+	my ( $self, $reason ) = @_;
+	$self->add_test( 'is_weak_ref', {}, $reason );
 }
 
-define_test is_weak_ref => sub{
-	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+define_test is_weak_ref => sub {
+	my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
 	return $self->fail("Not a reference") unless CORE::ref $self->subject;
 	return $self->fail("Not weak") unless isweak $self->subject;
 	return $self->pass("Weak reference");
@@ -536,12 +547,12 @@ Tests that the subject is not a weak reference using is_weak from L<Scalar::Util
 =cut
 
 sub is_strong_ref {
-	my ($self, $reason) = @_;
-	$self->add_test('is_strong_ref', {}, $reason);
+	my ( $self, $reason ) = @_;
+	$self->add_test( 'is_strong_ref', {}, $reason );
 }
 
-define_test is_strong_ref => sub{
-	my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
+define_test is_strong_ref => sub {
+	my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
 	return $self->fail("Not a reference") unless CORE::ref $self->subject;
 	return $self->fail("Weak reference") if isweak $self->subject;
 	return $self->pass("Not a weak reference");
@@ -557,7 +568,8 @@ eval {
 	require Data::DPath;
 	Data::DPath->import();
 };
-unless($@){
+unless ($@) {
+
 	#~ Data::DPath loaded ok
 
 =head3 dpath_true
@@ -567,8 +579,8 @@ Evaluates the dpath expression and passes if it finds a match.
 =cut
 
 	sub dpath_true {
-		my ($self, $path, $reason) = @_;
-		$self->add_test('dpath_true', { path =>$path }, $reason);
+		my ( $self, $path, $reason ) = @_;
+		$self->add_test( 'dpath_true', { path => $path }, $reason );
 	}
 
 =head3 dpath_false
@@ -578,8 +590,8 @@ Evaluates the dpath expression and passes if it does not find a match.
 =cut
 
 	sub dpath_false {
-		my ($self, $path, $reason) = @_;
-		$self->add_test('dpath_false', { path =>$path }, $reason);
+		my ( $self, $path, $reason ) = @_;
+		$self->add_test( 'dpath_false', { path => $path }, $reason );
 	}
 
 =head3 dpath_results
@@ -589,29 +601,36 @@ Evaluates the dpath expression and then uses the second argument (which should b
 =cut
 
 	sub dpath_results {
-		my ($self, $path, $expected, $reason) = @_;
-		$self->add_test('dpath_results', { path =>$path, expected=>$expected }, $reason);
+		my ( $self, $path, $expected, $reason ) = @_;
+		$self->add_test(
+			'dpath_results',
+			{
+				path     => $path,
+				expected => $expected
+			},
+			$reason
+		);
 	}
 
-	define_test dpath_true => sub{
-		my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
-		my $dpath = Data::DPath::build_dpath()->($data->{path});
-		my $result = scalar($dpath->match($self->subject));
+	define_test dpath_true => sub {
+		my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
+		my $dpath  = Data::DPath::build_dpath()->( $data->{path} );
+		my $result = scalar( $dpath->match( $self->subject ) );
 		return $self->pass if $result;
 		return $self->fail;
 	};
-	define_test dpath_false => sub{
-		my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
-		my $dpath = Data::DPath::build_dpath()->($data->{path});
-		my $result = scalar($dpath->match($self->subject));
+	define_test dpath_false => sub {
+		my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
+		my $dpath  = Data::DPath::build_dpath()->( $data->{path} );
+		my $result = scalar( $dpath->match( $self->subject ) );
 		return $self->fail if $result;
 		return $self->pass;
 	};
-	define_test dpath_results => sub{
-		my ($self, $data, $reason) = @_; # self is the runner, NOT the prototype
-		my $dpath = Data::DPath::build_dpath()->($data->{path});
-		my $result = [$dpath->match($self->subject)];
-		return upgrade($data->{expected})->validate($result, $self);
+	define_test dpath_results => sub {
+		my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
+		my $dpath  = Data::DPath::build_dpath()->( $data->{path} );
+		my $result = [ $dpath->match( $self->subject ) ];
+		return upgrade( $data->{expected} )->validate( $result, $self );
 	};
 
 }

@@ -8,8 +8,8 @@ sub BUILDARGS {
 	my $class = shift;
 	return {
 		summary => '<=>',
-		code => sub {$_[0] <=> $_[1]},
-		( exists ($_[0]) ? (code => $_[0]) : () )
+		code    => sub { $_[0] <=> $_[1] },
+		( exists( $_[0] ) ? ( code => $_[0] ) : () )
 	};
 }
 
