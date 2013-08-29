@@ -55,6 +55,8 @@ If you have an existing TestRunner, you can pass it that as well;
 
 	my $result = $p->validate($subject, $context);
 
+EXPERIMENTAL: If no argument is passed, $_ will be used.
+
 =cut
 
 sub validate {
@@ -76,6 +78,10 @@ sub validate {
 }
 
 =head3 ok
+
+	$p->ok($subject, $context)
+
+Works like validate, only produces a Test::Builder-compatible TAP output. 
 
 =cut
 

@@ -59,7 +59,7 @@ The idea behind Test::Proto is that test scripts for code written on modern, OO 
 
 Tests for deep structures and objects tend should not be repetitive and should be flexible. Test::Proto allows you to create objects "protoypes" intended to test structures which conform to a known type. 
 
-As in the example above, the way it works is: you create a prototype object, add test cases to the prototype using method calls, and then validate your string/arryref/object/etc. against the prototype using . 
+As in the example above, the way it works is: you create a prototype object, add test cases to the prototype using method calls, and then validate your string/arryref/object/etc. against the prototype using the validate or ok method.
 
 NB: The meaning of "prototype" used here is not related to subroutine prototypes (declaring the arguments expected by a given function or method). 
 

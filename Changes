@@ -1,8 +1,20 @@
 Revision history for Test-Proto
 
-Unreleased Changes	Undated
-		Near total rewrite.
-		Rewritten the underlying logic of running the tests: this is now done by a TestRunner. Pass/Fail objects are now TestRunners. Created more of a DSL for defining prototype classes. All classes use Moo. ArrayRef and HashRef refactored out as roles. 
+0.020	Undated
+		Near total rewrite. Major non-compatibility changes!
+		* Rewritten the underlying logic of running the tests: this is now done by a TestRunner. 
+		* Pass/Fail objects are now TestRunners. Created more of a DSL for defining prototype classes. 
+		* Formatting logic broken out.
+		* All classes use Moo. 
+		* Value, ArrayRef and HashRef refactored out as roles. Rewritten all of the tests.
+		* Many more features added and fixed
+		* Can tag prototypes
+		* gt, lt, ne, eq, ge, le are string by default
+		* is_like is now called like
+		* is_unlike is now called unlike
+		* is_also is now called also
+		* array_length is now called count_items
+		* key_has_values is now called superhash_of
 
 0.011	2012-06-14
 		Fixed prerequisites.
