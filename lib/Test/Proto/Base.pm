@@ -1,5 +1,5 @@
 package Test::Proto::Base;
-use 5.006;
+use 5.008;
 use strict;
 use warnings;
 use Test::Proto::Common;
@@ -15,7 +15,7 @@ use overload
 	;
 with('Test::Proto::Role::Value');
 with('Test::Proto::Role::Tagged');
-our $VERSION = '0.011';
+our $VERSION = '0.020';
 
 =pod
 
