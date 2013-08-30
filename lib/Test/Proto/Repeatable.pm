@@ -15,7 +15,7 @@ has 'max',
 	is      => 'rw',
 	default => sub { undef };
 
-around 'min', 'max' => \&Test::Proto::Common::chainable;
+around 'min', 'max', 'contents' => \&Test::Proto::Common::chainable;
 
 sub BUILDARGS {
 	my $class = shift;
@@ -43,13 +43,19 @@ Each argument is another element in the series. NB: A series is automatically cr
 
 	die unless exists $alternation->contents->[0];
 
-A getter/setter method for the contents of the series.
+A chainable getter/setter method for the contents of the series.
 
 =head3 min
+
+	my $pRepeatable = pRepeatable('foo')->min(2);
+	my $min = $pRepeatable->min;
 
 Sets and/or returns the minimum number of occurrences required.
 
 =head3 max
+
+	my $pRepeatable = pRepeatable('foo')->max(2);
+	my $max = $pRepeatable->max;
 
 Sets and/or returns the maximum number of occurrences permitted.
 

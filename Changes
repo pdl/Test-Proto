@@ -1,5 +1,9 @@
 Revision history for Test-Proto
 
+0.021	2012-08-30
+		Various documentation fixes
+		All attributes of Series, Repeatable, and Alternation are chainable
+
 0.020	2012-08-29
 		Near total rewrite. Major non-compatibility changes!
 		* Rewritten the underlying logic of running the tests: this is now done by a TestRunner. 

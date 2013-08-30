@@ -12,6 +12,8 @@ sub BUILDARGS {
 	return { alternatives => [@_] };
 }
 
+around 'alternatives' => \&Test::Proto::Common::chainable;
+
 =head1 NAME
 
 Test::Proto::Alternation - represent an alternation in array validation
@@ -35,7 +37,7 @@ Each argument is a different alternative.
 
 	die unless exists $alternation->alternatives->[0];
 
-A getter/setter method for the different alternatives available to the alternation.
+A chainable getter/setter method for the different alternatives available to the alternation.
 
 =cut
 

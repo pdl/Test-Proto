@@ -24,7 +24,7 @@ Test::Proto - OO test script golf sugar
 
 =head1 VERSION
 
-Version 0.020
+Version 0.021
 
 =cut
 

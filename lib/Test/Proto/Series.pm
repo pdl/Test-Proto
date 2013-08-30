@@ -12,16 +12,18 @@ sub BUILDARGS {
 	return { contents => [@_] };
 }
 
+around 'contents' => \&Test::Proto::Common::chainable;
+
 =head1 NAME
 
-Test::Proto::series - represent a series in array validation
+Test::Proto::Series - represent a series in array validation
 
 =head1 SYNOPSIS
 
 	pArray->contains_only(pSeries('a', 'b', 'c')); 
 	# will validate ['a', 'b', 'c'] as true
 
-Used in array validation to represent a sequence which must be present in its entirety. Only really useful when used in combination with <Test::Proto::Repeatable> and L<Test::Proto::Alternation>, which can be nested inside  a series, or can contain a series. 
+Used in array validation to represent a sequence which must be present in its entirety. Only really useful when used in combination with L<Test::Proto::Repeatable> and L<Test::Proto::Alternation>, which can be nested inside a series, or can contain a series. 
 
 =head1 METHODS
 
@@ -33,7 +35,7 @@ Each argument is another element in the series.
 
 	die unless exists $alternation->contents->[0];
 
-A getter/setter method for the contents of the series.
+A chainable getter/setter method for the contents of the series.
 
 =cut
 
