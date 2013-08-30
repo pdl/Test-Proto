@@ -148,4 +148,10 @@ define_test method_exists => sub {
 	return $self->fail;
 };
 
+=head1 OTHER INFORMATION
+
+For author, version, bug reports, support, etc, please see L<Test::Proto>. 
+
+=cut
+
 1;

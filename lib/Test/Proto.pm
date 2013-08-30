@@ -1,6 +1,6 @@
 package Test::Proto;
 
-use 5.006;
+use 5.008;
 use strict;
 use warnings;
 use Test::Proto::Base;
@@ -24,11 +24,11 @@ Test::Proto - OO test script golf sugar
 
 =head1 VERSION
 
-Version 0.011
+Version 0.020
 
 =cut
 
-our $VERSION = ${Test::Proto::Base::VERSION};
+our $VERSION = $Test::Proto::Base::VERSION;
 
 =head1 SYNOPSIS
 
@@ -110,7 +110,7 @@ sub pCode {
 
 =head2 pObject
 
-	pObject('')
+	pObject
 
 Returns a prototype for an object. See L<Test::Proto::Object>.
 
@@ -160,7 +160,7 @@ sub pRepeatable {
 
 =head2 pAlternation
 
-Returns an alternation for use in validating lists. See L<Test::Proto::Altenration>.
+Returns an alternation for use in validating lists. See L<Test::Proto::Alternation>.
 
 =cut
 
@@ -170,7 +170,7 @@ sub pAlternation {
 
 =head2 c
 
-Returns a comparison (string,by default). See L<Test::Proto::Compare>.
+Returns a comparison object (string, by default). See L<Test::Proto::Compare>.
 
 =cut
 
@@ -180,7 +180,7 @@ sub c {
 
 =head2 cNumeric
 
-Returns a numeric comparison. See L<Test::Proto::Compare::Numeric>.
+Returns a numeric comparison object. See L<Test::Proto::Compare::Numeric>.
 
 =cut
 
@@ -210,9 +210,7 @@ L<Validation::Class>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-test-proto at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Proto>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests to the github issues tracker at L<https://github.com/pdl/Test-Proto/issues>.  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 
 =head1 SUPPORT
@@ -225,24 +223,23 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker (report bugs here)
+=item * Github (please report bugs here)
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Proto>
+L<https://github.com/pdl/Test-Proto>
+
+=item * MetaCPAN
+
+L<https://metacpan.org/module/Test::Proto>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
 L<http://annocpan.org/dist/Test-Proto>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Test-Proto>
 
 =item * Search CPAN
 
 L<http://search.cpan.org/dist/Test-Proto/>
 
 =back
-
 
 
 =head1 LICENSE AND COPYRIGHT

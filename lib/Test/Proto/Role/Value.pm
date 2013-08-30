@@ -141,14 +141,14 @@ define_test 'false' => sub {
 
 Tests if the subject is defined/undefined. 
 
-	p->defined("Pretty much anything"); # passes
+	p->defined->ok("Pretty much anything"); # passes
 
-Note that directly supplying undef into the protoype (as opposed to a variable containing undef, a function which returns undef, etc.) will exhibit different behaviour: it will attempt to use C<$_> instead.
+Note that directly supplying undef into the protoype (as opposed to a variable containing undef, a function which returns undef, etc.) will exhibit different behaviour: it will attempt to use C<$_> instead. This is experimental behaviour.
 
 	$_ = 3;
 	$undef = undef;
-	p->undefined(undef); # fails
-	p->undefined($undef); # passes
+	p->undefined->ok(undef); # fails
+	p->undefined->ok($undef); # passes
 
 =cut
 
@@ -574,6 +574,8 @@ unless ($@) {
 
 =head3 dpath_true
 
+	p->dpath_true('//answer[ val == 42 ]')
+
 Evaluates the dpath expression and passes if it finds a match.
 
 =cut
@@ -585,6 +587,8 @@ Evaluates the dpath expression and passes if it finds a match.
 
 =head3 dpath_false
 
+	p->dpath_false('//answer[ !val ]')
+
 Evaluates the dpath expression and passes if it does not find a match.
 
 =cut
@@ -595,6 +599,8 @@ Evaluates the dpath expression and passes if it does not find a match.
 	}
 
 =head3 dpath_results
+
+	p->dpath_false('//answer', pArray->array_any(42))
 
 Evaluates the dpath expression and then uses the second argument (which should be upgradeable to a L<Test::Proto::ArrayRef>) to validate the list of matches.
 

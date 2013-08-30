@@ -1,5 +1,5 @@
 package Test::Proto::CodeRef;
-use 5.006;
+use 5.008;
 use strict;
 use warnings;
 use Moo;
@@ -104,5 +104,11 @@ define_test call_list_context => sub {
 	my $response = [ $self->subject->(@$args) ];
 	return $expected->validate( $response, $self );
 };
+
+=head1 OTHER INFORMATION
+
+For author, version, bug reports, support, etc, please see L<Test::Proto>. 
+
+=cut
 
 1;

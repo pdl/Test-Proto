@@ -233,12 +233,6 @@ sub run_tests {
 	return $self;
 }
 
-=head3 add_test_method
-
-	add_test_method 'is_uppercase', sub { $_[1]->subject =~ !/[a-z]/ }
-
-=cut
-
 =head1 OTHER INFORMATION
 
 For author, version, bug reports, support, etc, please see L<Test::Proto>. 
