@@ -7,7 +7,7 @@ use Exporter 'import';
 use Scalar::Util qw(blessed looks_like_number);
 our @EXPORT = qw(define_test define_simple_test simple_test upgrade upgrade_comparison);
 
-our $TEST_PREFIX = '_TEST_';
+our $TEST_PREFIX = '_TEST_'; #~ this is used when creating internal methods.
 
 =head1 NAME
 
@@ -48,10 +48,10 @@ sub define_test {
 	{
 		no strict 'refs';
 		my $fullName = $package . '::' . $TEST_PREFIX . $testName;
-		*$fullName = subname( $TEST_PREFIX . $testName, $testSub );    # Consider Sub::Install here, per Khisanth on irc.freenode.net#perl
+		*$fullName = subname( $TEST_PREFIX . $testName, $testSub );    #~ Consider Sub::Install here, per Khisanth on irc.freenode.net#perl
 	}
 
-	# return value of this not specified
+	#~ return value of this not specified
 }
 
 =head3 define_simple_test
@@ -119,6 +119,8 @@ sub simple_test {
 
 	upgrade('NONE'); # returns Test::Proto::Base->new()->eq('NONE')
 	upgrade(1); # returns Test::Proto::Base->new()->num_eq(1)
+	upgrade(['foo']); # returns Test::Proto::ArrayRef->new()->array_eq(['foo'])
+	upgrade({'foo'=>'bar'}); # returns Test::Proto::HashRef->new()->hash_of({'foo'=>'bar'})
 	upgrade(sub {return $_ * 2 == 4}); Test::Proto::Base->new()->try(...)
 
 Returns a Prototype which corresponds to the data in the first argument. 
@@ -156,15 +158,22 @@ sub upgrade {
 
 =head3 upgrade_comparison
 
+	upgrade_comparison(sub {lc shift cmp lc shift}, 'Lowercase Comparison');
+
+This creates a Test::Proto::Compare object using the code provided in the first argument. The second argument, if present, is used as the summary.
+
+If the first argument is either of the strings 'cmp' or '<=>', it will return the appropriate string or numeric comparison, as these are special-cased.
+
 =cut
 
 sub upgrade_comparison {
 	require Test::Proto::Compare;
 	require Test::Proto::Compare::Numeric;
-	my ($comparison) = @_;
+	my ($comparison, $summary) = @_;
+	$summary = 'Unknown comparison' unless defined $summary; #:5.8
 	if ( defined ref $comparison ) {
 		if ( ref $comparison eq 'CODE' ) {
-			return Test::Proto::Compare->new($comparison)->summary('Unknown comparison');
+			return Test::Proto::Compare->new($comparison)->summary($summary);
 		}
 		if ( blessed $comparison and $comparison->isa('Test::Proto::Compare') ) {
 			return $comparison;
