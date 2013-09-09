@@ -18,9 +18,11 @@ Test::Proto::Object - Test an object's behaviour
 	$p->method('open')->ok($subject); # i.e. method_exists
 	$p->method('open', ['test.txt','>'], [$fh])->ok($subject); # method_list_context
 
-Either with one argument, takes the method, and checks if it exists, or takes three arguments, a method, the arguments to use with the method, and the expected return value. Calls the method on the test subject, with the arguments, and tests the return value. 
+B<With one argument>, takes the method, and checks if it exists (using C<method_exists>). 
 
-The arguments and return value should be arrayrefs; the method is evaluated in list context.
+B<With three arguments>, takes takes a method, the arguments to use with the method, and the expected return value. Calls the method on the test subject, with the arguments, and tests the return value. 
+
+The arguments and return value should be arrayrefs; the method is evaluated in list context (it uses C<method_list_context>).
 
 =cut
 
