@@ -67,7 +67,12 @@ NB: The meaning of "prototype" used here is not related to subroutine prototypes
 
 =head2 p
 
-Returns a basic prototype. See L<Test::Proto::Base>.
+	p
+	p('foo')
+	p(['bar'])
+	p({foo=>'bar'})
+
+Returns a basic prototype. See L<Test::Proto::Base>. If an argument is passed, upgrades the argument and uses the resulting prototype.
 
 =cut
 
@@ -111,6 +116,7 @@ sub pCode {
 =head2 pObject
 
 	pObject
+	pObject('IO::Handle') # tests with is_a
 
 Returns a prototype for an object. See L<Test::Proto::Object>.
 
