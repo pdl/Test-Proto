@@ -38,11 +38,12 @@ not_ok_or_dump (runner->add_event(runner->fail)->done, 'Complete runner with fai
 not_ok_or_dump (runner->add_event(runner->fail)->add_event(runner->pass)->done, 'Complete runner with pass and fail fails');
 
 my $pass_runner = runner->pass('reason');
-
+diag ("Warnings follow, deliberately:");
 ok_or_dump($pass_runner->add_event(runner->fail('unreasonably')), 'Adding events to a complete runner does not change the value');
 is($pass_runner->status_message, 'reason', 'Re-Completing a completed runner does not change the status message');
 is(@{ $pass_runner->children }, 0, 'Adding events to a complete runner does not do anything at all');
 ok_or_dump($pass_runner->fail, 'Cannot change the value of a complete runner by doing ->fail');
+ok_or_dump($pass_runner->add_event(runner->done), 'Adding events to a complete runner still does not change the value if using done');
 
 my $statuses = {
 	INCOMPLETE=>runner,

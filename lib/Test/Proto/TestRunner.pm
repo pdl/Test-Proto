@@ -5,6 +5,7 @@ use warnings;
 use overload 'bool' => sub { $_[0]->value };
 use Moo;
 use Object::ID;
+use Test::Proto::Common ();
 
 sub _zero {
 	sub { 0; }
@@ -149,6 +150,8 @@ Returns the formatter used.
 =cut
 
 has 'formatter' => is => 'rw';    # Test::Proto::Common::Formatter->new;
+
+around qw(subject test_case parent is_complete skipped_tags required_tags children value is_exception is_info is_skipped children status_message ), \&Test::Proto::Common::chainable;
 
 =head3 complete
 
@@ -371,7 +374,7 @@ sub run_test {
 			last;
 		}
 	}
-	return $runner->skip( 'None of the required tags (' . join( '', @{ $self->required_tags() } ) . ')found' ) if @{ $self->required_tags() } and @{ $runner->required_tags() };
+	return $runner->skip( 'None of the required tags (' . join( '', @{ $self->required_tags() } ) . ') found' ) if @{ $self->required_tags() } and @{ $runner->required_tags() };
 	my $result = $test->code->($runner);
 	$runner->exception("Test execution did not complete.") unless $runner->is_complete;
 	return $runner;

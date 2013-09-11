@@ -27,12 +27,22 @@ foreach my $obj (Test::Proto::TestCase->new, Test::Proto::Base->new) {
 
 use Test::Proto::TestRunner;
 
-my $runner = Test::Proto::TestRunner->new;
+sub runner {Test::Proto::TestRunner->new};
 
-$runner->skipped_tags(['skip_me']);
+my $result = Test::Proto::Base->new->eq('b')->validate('a', runner->skipped_tags(['skip_me']));
 
-my $result = Test::Proto::Base->new->eq('b')->add_tag('skip_me')->validate('a', $runner);
+ok(!$result, 'With skipped_tags set, doesn\'t skip normally');
 
-ok($result, 'Skips failing test ok');
+$result = Test::Proto::Base->new->eq('b')->add_tag('skip_me')->validate('a', runner->skipped_tags(['skip_me']));
+
+ok($result, 'Skips failing test ok with skipped_tags');
+
+$result = Test::Proto::Base->new->eq('b')->validate('a', runner->required_tags(['need_me']));
+
+ok($result, 'Skips failing test ok with required_tags');
+
+$result = Test::Proto::Base->new->eq('b')->add_tag('need_me')->validate('a', runner->required_tags(['need_me']));
+
+ok(!$result, 'With required_tags, does not skip when requirement is met');
 
 done_testing();
