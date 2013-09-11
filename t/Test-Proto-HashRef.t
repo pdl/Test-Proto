@@ -45,10 +45,22 @@ is_a_good_pass(pHr->count_keys(0)->validate({}), "count_keys should pass when th
 is_a_good_fail(pHr->count_keys(5)->validate({'a'=>'b'}), "count_keys should fail when the number does not match");
 
 # keys
-is_a_good_pass(pHr->keys(['a'])->validate({'a'=>'b'}), "count_keys should pass when there is one key");
+is_a_good_pass(pHr->keys(['a'])->validate({'a'=>'b'}), "keys should pass when there is one key");
 is_a_good_pass(pHr->keys([])->validate({}), "keys should pass with [] when the hash is empty");
 is_a_good_pass(pHr->keys(Test::Proto::ArrayRef->new->bag_of(['a','c']))->validate({a=>'b',c=>'d'}), "keys should pass there is more than one key, using bag_of");
-is_a_good_fail(pHr->keys(['b'])->validate({'a'=>'b'}), "count_keys should fail when appropriate");
+is_a_good_fail(pHr->keys(['b'])->validate({'a'=>'b'}), "keys should fail when appropriate");
+
+# values
+is_a_good_pass(pHr->values(['b'])->validate({'a'=>'b'}), "values should pass when there is one value");
+is_a_good_pass(pHr->values([])->validate({}), "values should pass with [] when the hash is empty");
+is_a_good_pass(pHr->values(Test::Proto::ArrayRef->new->bag_of(['b','d']))->validate({a=>'b',c=>'d'}), "values should pass there is more than one value, using bag_of");
+is_a_good_fail(pHr->values(['a'])->validate({'a'=>'b'}), "values should fail when appropriate");
+
+# enumerated
+is_a_good_pass(pHr->enumerated([[a=>'b']])->validate({'a'=>'b'}), "enumerated should pass when there is one value");
+is_a_good_pass(pHr->enumerated([])->validate({}), "enumerated should pass with [] when the hash is empty");
+is_a_good_pass(pHr->enumerated(Test::Proto::ArrayRef->new->bag_of([[a=>'b'],[c=>'d']]))->validate({a=>'b',c=>'d'}), "enumerated should pass there is more than one value, using bag_of");
+is_a_good_fail(pHr->enumerated([['a'=>'c']])->validate({'a'=>'b'}), "enumerated should fail when appropriate");
 
 
 # superhash_of
