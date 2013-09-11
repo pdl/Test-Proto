@@ -37,6 +37,23 @@ ok_or_dump (runner->add_event(runner->pass)->done, 'Complete runner with pass pa
 not_ok_or_dump (runner->add_event(runner->fail)->done, 'Complete runner with fail fails');
 not_ok_or_dump (runner->add_event(runner->fail)->add_event(runner->pass)->done, 'Complete runner with pass and fail fails');
 
+my $pass_runner = runner->pass('reason');
 
+ok_or_dump($pass_runner->add_event(runner->fail('unreasonably')), 'Adding events to a complete runner does not change the value');
+is($pass_runner->status_message, 'reason', 'Re-Completing a completed runner does not change the status message');
+is(@{ $pass_runner->children }, 0, 'Adding events to a complete runner does not do anything at all');
+ok_or_dump($pass_runner->fail, 'Cannot change the value of a complete runner by doing ->fail');
+
+my $statuses = {
+	INCOMPLETE=>runner,
+	EXCEPTION=>runner->exception,
+	SKIPPED=>runner->skip,
+	INFO=>runner->diag,
+	PASS=>runner->pass,
+	FAIL=>runner->fail
+};
+for my $want (keys %$statuses) {
+	is ($statuses->{$want}->status, $want, "Can get status $want");
+}
 done_testing;
 

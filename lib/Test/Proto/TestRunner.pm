@@ -246,8 +246,8 @@ Declares that the test run is complete, and declares the result to be a pass, ir
 =cut
 
 sub pass {
-	my $self = shift;
-	$self->complete(1);
+	my ( $self, $message ) = @_;
+	$self->complete(1, $message);
 	return $self;
 }
 
