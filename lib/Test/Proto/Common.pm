@@ -171,15 +171,13 @@ sub upgrade_comparison {
 	require Test::Proto::Compare::Numeric;
 	my ($comparison, $summary) = @_;
 	$summary = 'Unknown comparison' unless defined $summary; #:5.8
-	if ( defined ref $comparison ) {
-		if ( ref $comparison eq 'CODE' ) {
-			return Test::Proto::Compare->new($comparison)->summary($summary);
-		}
-		if ( blessed $comparison and $comparison->isa('Test::Proto::Compare') ) {
-			return $comparison;
-		}
+	if ( ref $comparison eq 'CODE' ) {
+		return Test::Proto::Compare->new($comparison)->summary($summary);
 	}
-	elsif ( defined $comparison ) {
+	elsif ( blessed $comparison and $comparison->isa('Test::Proto::Compare') ) {
+		return $comparison;
+	}
+	elsif ( defined $comparison and ! ref $comparison) {
 		return Test::Proto::Compare->new          if $comparison eq 'cmp';
 		return Test::Proto::Compare::Numeric->new if $comparison eq '<=>';
 	}

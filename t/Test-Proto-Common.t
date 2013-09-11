@@ -25,4 +25,10 @@ ok(upgrade(['a'])->validate(['a']));
 ok(upgrade({'a'=>'b'})->validate({'a'=>'b'}));
 ok(!upgrade(2)->validate(1));
 
+isa_ok(upgrade_comparison(), 'Test::Proto::Compare');
+isa_ok(upgrade_comparison('cmp'), 'Test::Proto::Compare');
+isa_ok(upgrade_comparison('<=>'), 'Test::Proto::Compare::Numeric');
+isa_ok(upgrade_comparison(sub{shift cmp shift}), 'Test::Proto::Compare');
+is(upgrade_comparison(sub{shift cmp shift}, 'cmp')->summary, 'cmp');
+
 done_testing();

@@ -243,7 +243,7 @@ define_test count_items => sub {
 
 Produces the indices and values of the subject as an array reference, and tests them against the prototype provided in the argument.
 
-In the above example, the prototype C<$tests_enumerated> should return a pass for C<[[1,'a'],[2,'b']]>.
+In the above example, the prototype C<$tests_enumerated> should return a pass for C<[[0,'a'],[1,'b']]>.
 
 =cut
 
@@ -255,7 +255,7 @@ sub enumerated {
 define_test 'enumerated' => sub {
 	my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
 	my $subject = [];
-	push @$subject, [ $_, $self->subject->{$_} ] foreach ( 0 .. $#{ $self->subject } );
+	push @$subject, [ $_, $self->subject->[$_] ] foreach ( 0 .. $#{ $self->subject } );
 	return upgrade( $data->{expected} )->validate( $subject, $self );
 };
 

@@ -79,6 +79,12 @@ is_a_good_fail(pAr->array_eq(['a','b'])->validate(['a']), "['a'] is not ['a','b'
 is_a_good_fail(pAr->array_eq(['a'])->validate(['a', 'b']), "['a','b'] is not ['a']");
 is_a_good_fail(pAr->array_eq(['a','b'])->validate(['b','a']), "['b','a'] is not ['a','b']");
 
+# enumerated
+is_a_good_pass(pAr->enumerated([[0,'a'],[1,'b']])->validate(['a','b']), "enumerated passes correctly");
+is_a_good_fail(pAr->enumerated([])->validate(['a','b']), "enumerated fails correctly");
+is_a_good_pass(pAr->enumerated([])->validate([]), "enumerated passes correctly when empty");
+is_a_good_fail(pAr->enumerated([[]])->validate([]), "enumerated fails correctly when empty");
+
 # in_groups
 is_a_good_pass(pAr->in_groups(2,[['a','b'],['c','d']])->validate(['a','b','c','d']), "in_groups works");
 is_a_good_pass(pAr->in_groups(2,[])->validate([]), "in_groups works with empty list");
