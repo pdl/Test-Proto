@@ -20,7 +20,9 @@ isa_ok(p(1), 'Test::Proto::Base');
 ok(p(1)->validate(1));
 ok(!(p(1)->validate(2)));
 
+isa_ok(p([]), 'Test::Proto::ArrayRef');
 isa_ok(pArray([]), 'Test::Proto::ArrayRef');
+isa_ok(p({}), 'Test::Proto::HashRef');
 isa_ok(pHash({}), 'Test::Proto::HashRef');
 
 isa_ok(c, 'Test::Proto::Compare');
@@ -48,6 +50,7 @@ my $hro = Test::Proto::Acme::HashRefObject->new;
 isa_ok(pObject([]), 'Test::Proto::Object');
 isa_ok(pObject({}), 'Test::Proto::Object');
 isa_ok(pObject('IO::Handle'), 'Test::Proto::Object');
+ok(pObject($aro)->validate($aro), 'refaddr comparison works');
 ok(pObject(['foo'])->validate($aro), 'pObject([\'foo\']) works');
 ok(pObject(['foo'])->validate(['foo']), 'pObject([\'foo\']) fails correctly');
 ok(pObject({foo=>'bar'})->validate($hro), 'pObject({foo=>\'bar\'}) works');

@@ -309,6 +309,45 @@ define_test is_a => sub {
 	}
 	return $self->fail;
 };
+
+=head3 refaddr
+
+	p->refaddr(undef)->ok('b');
+	p->refaddr(p->gt(5))->ok($obj);
+
+Tests the result of the 'refaddr' (from L<Scalar::Util>). Any prototype will do here.
+
+=cut
+
+sub refaddr {
+	my ( $self, $expected, $reason ) = @_;
+	$self->add_test( 'refaddr', { expected => $expected }, $reason );
+}
+
+define_test 'refaddr' => sub {
+	my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
+	upgrade($data->{expected})->validate( Scalar::Util::refaddr( $self->subject ), $self );
+};
+
+=head3 refaddr_of
+
+	$obj2 = $obj;
+	p->refaddr_of($obj)->ok($obj2); # passes
+	p->refaddr([])->ok([]); # fails
+
+Tests the result of the 'refaddr' (from L<Scalar::Util>) is the same as the refaddr of the object passed. Do not supply prototypes.
+
+Note: This always passes for strings.
+
+=cut
+
+sub refaddr_of {
+	my ( $self, $expected, $reason ) = @_;
+	my $refaddr = Scalar::Util::refaddr ($expected);
+	$refaddr = Test::Proto::Base->new->undefined unless defined $refaddr;
+	$self->add_test( 'refaddr', { expected => $refaddr }, $reason );
+}
+
 {
 	my %num_eqv = qw(eq == ne != gt > lt < ge >= le <=);
 	foreach my $dir ( keys %num_eqv ) {
