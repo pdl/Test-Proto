@@ -25,6 +25,7 @@ foreach my $obj (Test::Proto::TestCase->new, Test::Proto::Base->new) {
 		isa_ok($obj->remove_tag('another'), ref $obj, 'remove_tag returns the object');
 		is_deeply($obj->tags, ['yep'], 'remove_tag does indeed remove the tag');
 		isa_ok($obj->remove_tag('another'), ref $obj, 'remove_tag does not die when removing a tag which is no longer present');
+		isa_ok($obj->remove_tag('yep')->remove_tag('another'), ref $obj, 'remove_tag does not die when no tags');
 	});
 }
 

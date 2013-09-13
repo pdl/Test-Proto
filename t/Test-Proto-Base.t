@@ -47,6 +47,8 @@ is_a_good_fail(p->defined->validate($undef), "undef is defined should fail");
 is_a_good_pass(p->undefined->validate(undef), "undef is undefined should pass");
 is_a_good_fail(p->undefined->validate(0), "0 is undefined should fail");
 
+is_a_good_pass(p->true->validate('a', 'because'), 'can pass context as string'); # we ought to validate passing context as a string actually behaves correctly
+
 is_a_good_pass(p->eq('a')->validate('a'), "'a' eq 'a' should pass");
 is_a_good_fail(p->eq('a')->validate('b'), "'b' eq 'a' should fail");
 
