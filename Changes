@@ -1,10 +1,16 @@
 Revision history for Test-Proto
 
-0.021	2012-08-30
+0.022	2013-09-13
+		Added refaddr, refaddr_of
+		Bugs, including in hash enumerate
+		Test coverage improved
+		Version history dates corrected(!)
+
+0.021	2013-08-30
 		Various documentation fixes
 		All attributes of Series, Repeatable, and Alternation are chainable
 
-0.020	2012-08-29
+0.020	2013-08-29
 		Near total rewrite. Major non-compatibility changes!
 		* Rewritten the underlying logic of running the tests: this is now done by a TestRunner. 
 		* Pass/Fail objects are now TestRunners. Created more of a DSL for defining prototype classes. 
