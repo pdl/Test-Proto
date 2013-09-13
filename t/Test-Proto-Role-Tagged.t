@@ -16,12 +16,15 @@ foreach my $obj (Test::Proto::TestCase->new, Test::Proto::Base->new) {
 		ok($obj->has_tag('yep'), 'add_tag does indeed add the tag');
 		ok(!$obj->has_tag('nope'), 'add_tag does not add any other tag');
 		ok(!$obj->has_tag('YEP'), 'add_tag is case sensitive');
-		is_deeply($obj->tags, ['yep']);
+		isa_ok($obj->add_tag('yep'), ref $obj, 'add_tag returns the object when you do it again with a tag already added');
+		is_deeply($obj->tags, ['yep'], 're-adding a tag does not create a new one');
 
 		# remove_tag
+		$obj->add_tag('another');
 		can_ok($obj, 'remove_tag');
-		isa_ok($obj->remove_tag('yep'), ref $obj, 'remove_tag returns the object');
-		is_deeply($obj->tags, [], 'remove_tag does indeed remove the tag');
+		isa_ok($obj->remove_tag('another'), ref $obj, 'remove_tag returns the object');
+		is_deeply($obj->tags, ['yep'], 'remove_tag does indeed remove the tag');
+		isa_ok($obj->remove_tag('another'), ref $obj, 'remove_tag does not die when removing a tag which is no longer present');
 	});
 }
 
