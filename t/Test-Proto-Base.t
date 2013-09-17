@@ -182,6 +182,11 @@ TODO:{
 isa_ok(p->clone, 'Test::Proto::Base');
 is_a_good_pass(p->eq('a')->clone->validate('a'));
 is_a_good_fail(p->eq('a')->clone->validate('b'));
+my $pLTZ = p->lt('z');
+my $pA = $pLTZ->clone->eq('a');
+is_a_good_pass($pLTZ->validate('b'));
+is_a_good_fail($pA->validate('b'));
+
 
 is_a_good_pass((p->ne('a') & p->ne('b'))->validate('c'), 'overload & works: pass');
 is_a_good_fail((p->ne('a') & p->ne('b'))->validate('b'), 'overload & works: fail');
