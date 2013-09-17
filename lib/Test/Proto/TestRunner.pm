@@ -35,6 +35,8 @@ sub BUILD {
 
 =head2 ATTRIBUTES
 
+All of these attributes are chainable as setters.
+
 =cut
 
 =head3 subject
@@ -152,6 +154,8 @@ Returns the formatter used.
 has 'formatter' => is => 'rw';    # Test::Proto::Common::Formatter->new;
 
 around qw(subject test_case parent is_complete skipped_tags required_tags children value is_exception is_info is_skipped children status_message ), \&Test::Proto::Common::chainable;
+
+=head2 METHODS
 
 =head3 complete
 
