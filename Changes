@@ -1,8 +1,12 @@
 Revision history for Test-Proto
 
+Unreleased changes
+		Bug in clone method fixed
+		Small documentation fixes
+
 0.022	2013-09-13
 		Added refaddr, refaddr_of
-		Bugs, including in hash enumerate
+		Bugs, including in hash enumerate, fixed
 		Test coverage improved
 		Version history dates corrected(!)
 
