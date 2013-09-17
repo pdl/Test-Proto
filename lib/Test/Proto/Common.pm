@@ -7,7 +7,7 @@ use Exporter 'import';
 use Scalar::Util qw(blessed looks_like_number);
 our @EXPORT = qw(define_test define_simple_test simple_test upgrade upgrade_comparison);
 
-our $TEST_PREFIX = '_TEST_'; #~ this is used when creating internal methods.
+our $TEST_PREFIX = '_TEST_';    #~ this is used when creating internal methods.
 
 =head1 NAME
 
@@ -169,15 +169,15 @@ If the first argument is either of the strings 'cmp' or '<=>', it will return th
 sub upgrade_comparison {
 	require Test::Proto::Compare;
 	require Test::Proto::Compare::Numeric;
-	my ($comparison, $summary) = @_;
-	$summary = 'Unknown comparison' unless defined $summary; #:5.8
+	my ( $comparison, $summary ) = @_;
+	$summary = 'Unknown comparison' unless defined $summary;    #:5.8
 	if ( ref $comparison eq 'CODE' ) {
 		return Test::Proto::Compare->new($comparison)->summary($summary);
 	}
 	elsif ( blessed $comparison and $comparison->isa('Test::Proto::Compare') ) {
 		return $comparison;
 	}
-	elsif ( defined $comparison and ! ref $comparison) {
+	elsif ( defined $comparison and !ref $comparison ) {
 		return Test::Proto::Compare->new          if $comparison eq 'cmp';
 		return Test::Proto::Compare::Numeric->new if $comparison eq '<=>';
 	}

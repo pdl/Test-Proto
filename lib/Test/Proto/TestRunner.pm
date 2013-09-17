@@ -250,7 +250,7 @@ Declares that the test run is complete, and declares the result to be a pass, ir
 
 sub pass {
 	my ( $self, $message ) = @_;
-	$self->complete(1, $message);
+	$self->complete( 1, $message );
 	return $self;
 }
 

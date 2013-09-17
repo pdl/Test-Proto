@@ -326,7 +326,7 @@ sub refaddr {
 
 define_test 'refaddr' => sub {
 	my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
-	upgrade($data->{expected})->validate( Scalar::Util::refaddr( $self->subject ), $self );
+	upgrade( $data->{expected} )->validate( Scalar::Util::refaddr( $self->subject ), $self );
 };
 
 =head3 refaddr_of
@@ -343,7 +343,7 @@ Note: This always passes for strings.
 
 sub refaddr_of {
 	my ( $self, $expected, $reason ) = @_;
-	my $refaddr = Scalar::Util::refaddr ($expected);
+	my $refaddr = Scalar::Util::refaddr($expected);
 	$refaddr = Test::Proto::Base->new->undefined unless defined $refaddr;
 	$self->add_test( 'refaddr', { expected => $refaddr }, $reason );
 }
