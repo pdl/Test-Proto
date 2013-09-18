@@ -99,6 +99,23 @@ is_a_good_fail(p->is_a('ARRAY')->validate({}), "{} is_a ARRAY should fail");
 is_a_good_pass(p->ref('ARRAY')->validate([]), "[] ref ARRAY should pass");
 is_a_good_fail(p->ref('ARRAY')->validate({}), "{} ref ARRAY should fail");
 
+# todo: for completeness try with blessed object which overloads all these things.
+
+is_a_good_pass(p->array->validate([]), "array [] should pass");
+is_a_good_fail(p->array->validate({}), "array {} should fail");
+
+is_a_good_pass(p->hash->validate({}), "hash {} should pass");
+is_a_good_fail(p->hash->validate([]), "hash [] should fail");
+
+is_a_good_pass(p->scalar->validate('a'), "scalar_ref 'a' should pass");
+is_a_good_fail(p->scalar->validate(\'a'), "scalar_ref \\'a' should fail");
+
+is_a_good_pass(p->scalar_ref->validate(\'a'), "scalar_ref \\'a' should pass");
+is_a_good_fail(p->scalar_ref->validate('a'), "scalar_ref 'a' should fail");
+
+is_a_good_pass(p->object->validate(bless{},'example'), "object should pass");
+is_a_good_fail(p->object->validate([]), "object [] should fail");
+
 my $reference = [];
 
 is_a_good_pass(p->refaddr( Scalar::Util::refaddr $reference )->validate($reference), "refaddr works");

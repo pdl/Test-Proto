@@ -263,12 +263,7 @@ sub ref {
 
 define_test 'ref' => sub {
 	my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
-	if ( CORE::ref( $self->subject ) eq $data->{expected} ) {
-		return $self->pass;
-	}
-	else {
-		return $self->fail;
-	}
+	return upgrade($data->{expected})->validate(CORE::ref($self->subject), $self);
 };
 
 =head3 is_a
@@ -309,6 +304,76 @@ define_test is_a => sub {
 	}
 	return $self->fail;
 };
+
+=head3 array
+
+	p->array->ok([1..10]); # passes
+	p->array->ok($object); # fails, even if $object overloads @{}
+
+Passes if the subject is an unblessed array.
+
+=cut 
+
+sub array {
+	my $self = shift;
+	$self->ref('ARRAY', @_);
+}
+
+=head3 hash
+
+	p->hash->ok({a=>'1'}); # passes
+	p->hash->ok($object); # fails, even if $object overloads @{}
+
+Passes if the subject is an unblessed hash.
+
+=cut 
+
+sub hash {
+	my $self = shift;
+	$self->ref('HASH', @_);
+}
+
+=head3 scalar
+
+	p->scalar->ok('a'); # passes
+	p->scalar->ok(\''); # fails
+
+Passes if the subject is an unblessed scalar.
+
+=cut 
+
+sub scalar {
+	my $self = shift;
+	$self->ref('', @_);
+}
+
+=head3 scalar_ref
+
+	p->scalar_ref->ok(\'a'); # passes
+	p->scalar_ref->ok('a'); # fails
+
+Passes if the subject is an unblessed scalar ref.
+
+=cut 
+
+sub scalar_ref {
+	my $self = shift;
+	$self->ref('SCALAR', @_);
+}
+
+=head3 object
+
+	p->scalar->ok('a'); # passes
+	p->scalar->ok(\'');
+
+Passes if the subject is a blessed object.
+
+=cut
+
+sub object {
+	my $self = shift;
+	$self->ref(Test::Proto::Base->new->true->unlike(qr/ARRAY|HASH|SCALAR/),@_); # silly implementation; TODO: use blessed
+}
 
 =head3 refaddr
 
