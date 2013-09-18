@@ -99,6 +99,12 @@ is_a_good_fail(p->is_a('ARRAY')->validate({}), "{} is_a ARRAY should fail");
 is_a_good_pass(p->ref('ARRAY')->validate([]), "[] ref ARRAY should pass");
 is_a_good_fail(p->ref('ARRAY')->validate({}), "{} ref ARRAY should fail");
 
+is_a_good_pass(p->blessed->validate(bless [], 'foo'), "blessed should pass on an object");
+is_a_good_pass(p->blessed(qr/foo/)->validate(bless [], 'foo'), "blessed should pass on an object when the prototype matches");
+is_a_good_fail(p->blessed(qr/bar/)->validate(bless [], 'foo'), "blessed should fail on an object when the prototype doesn't match");
+is_a_good_fail(p->blessed->validate([]), "blessed should fail on []");
+is_a_good_fail(p->blessed('ARRAY')->validate([]), "blessed should fail on [] even if it has ARRAY");
+
 # todo: for completeness try with blessed object which overloads all these things.
 
 is_a_good_pass(p->array->validate([]), "array [] should pass");

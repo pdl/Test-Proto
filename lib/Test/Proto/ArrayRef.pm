@@ -29,4 +29,6 @@ For author, version, bug reports, support, etc, please see L<Test::Proto>.
 
 =cut
 
+# after new => sub {shift->array};
+
 1;

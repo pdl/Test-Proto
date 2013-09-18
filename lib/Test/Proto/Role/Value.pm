@@ -3,7 +3,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::Proto::Common;
-use Scalar::Util qw(blessed weaken isweak);
+use Scalar::Util qw(weaken isweak);
 use Moo::Role;
 
 =head1 NAME
@@ -303,6 +303,27 @@ define_test is_a => sub {
 		return $self->pass;
 	}
 	return $self->fail;
+};
+
+=head3 blessed 
+
+	p->blessed->ok($object); # passes
+	p->blessed('Correct::Class')->ok($object); # passes
+	p->blessed->ok([]); # fails
+
+Compares the prototype to the result of running C<blessed> from L<Scalar::Util> on the test subject. 
+
+=cut
+
+sub blessed {
+	my ( $self, $expected, $reason ) = @_;
+	$expected = Test::Proto::Base->new()->ne('') unless defined $expected;
+	$self->add_test('blessed', { expected => $expected }, $reason );	
+}
+
+define_test blessed => sub {
+	my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
+	return upgrade($data->{expected})->validate(Scalar::Util::blessed($self->subject), $self);
 };
 
 =head3 array
