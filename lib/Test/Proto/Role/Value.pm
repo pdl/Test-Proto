@@ -392,8 +392,7 @@ Passes if the subject is a blessed object.
 =cut
 
 sub object {
-	my $self = shift;
-	$self->ref(Test::Proto::Base->new->true->unlike(qr/ARRAY|HASH|SCALAR/),@_); # silly implementation; TODO: use blessed
+	shift->blessed;
 }
 
 =head3 refaddr
