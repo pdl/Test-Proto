@@ -2,6 +2,7 @@ Revision history for Test-Proto
 
 Unreleased changes
 		Bug in clone method fixed
+		Added methods blessed, array, hash, object, scalar, scalar_ref
 		Small documentation fixes
 
 0.022	2013-09-13
