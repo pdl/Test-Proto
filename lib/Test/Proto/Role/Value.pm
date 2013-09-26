@@ -263,7 +263,7 @@ sub ref {
 
 define_test 'ref' => sub {
 	my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
-	return upgrade($data->{expected})->validate(CORE::ref($self->subject), $self);
+	return upgrade( $data->{expected} )->validate( CORE::ref( $self->subject ), $self );
 };
 
 =head3 is_a
@@ -318,12 +318,12 @@ Compares the prototype to the result of running C<blessed> from L<Scalar::Util> 
 sub blessed {
 	my ( $self, $expected, $reason ) = @_;
 	$expected = Test::Proto::Base->new()->ne('') unless defined $expected;
-	$self->add_test('blessed', { expected => $expected }, $reason );	
+	$self->add_test( 'blessed', { expected => $expected }, $reason );
 }
 
 define_test blessed => sub {
 	my ( $self, $data, $reason ) = @_;    # self is the runner, NOT the prototype
-	return upgrade($data->{expected})->validate(Scalar::Util::blessed($self->subject), $self);
+	return upgrade( $data->{expected} )->validate( Scalar::Util::blessed( $self->subject ), $self );
 };
 
 =head3 array
@@ -337,7 +337,7 @@ Passes if the subject is an unblessed array.
 
 sub array {
 	my $self = shift;
-	$self->ref('ARRAY', @_);
+	$self->ref( 'ARRAY', @_ );
 }
 
 =head3 hash
@@ -351,7 +351,7 @@ Passes if the subject is an unblessed hash.
 
 sub hash {
 	my $self = shift;
-	$self->ref('HASH', @_);
+	$self->ref( 'HASH', @_ );
 }
 
 =head3 scalar
@@ -365,7 +365,7 @@ Passes if the subject is an unblessed scalar.
 
 sub scalar {
 	my $self = shift;
-	$self->ref('', @_);
+	$self->ref( '', @_ );
 }
 
 =head3 scalar_ref
@@ -379,7 +379,7 @@ Passes if the subject is an unblessed scalar ref.
 
 sub scalar_ref {
 	my $self = shift;
-	$self->ref('SCALAR', @_);
+	$self->ref( 'SCALAR', @_ );
 }
 
 =head3 object
