@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Moo;
 with('Test::Proto::Role::Tagged');
+use Test::Proto::Common ();
 
 =head1 NAME
 
@@ -11,10 +12,11 @@ Test::Proto::TestCase - an individual test case
 
 =head1 SYNOPSIS
 
+Holds attributes to describe the test - the name of the test, the parameters (data) and the code to be executed. 
 
-Note that it is a Moo class.
+All the attributes are chainable when used as setters (they return the TestCase). 
 
-Unless otherwise specified, the return value is itself.
+In addition to those documented below, the TestCase can have tags - see L<Test::Proto::Role::Tagged> for details.
 
 =cut
 
@@ -47,5 +49,7 @@ Returns the data.
 
 has 'data'  => is  => 'rw',
 	default => sub { {}; };
+
+around qw(name code data) => \&Test::Proto::Common::chainable;
 
 1;
