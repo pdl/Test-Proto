@@ -214,7 +214,7 @@ define_test nth => sub {
 		return upgrade( $data->{expected} )->validate( $subject, $self );
 	}
 	else {
-		return $self->exception( 'The index ' . $data->{'index'} . ' does not exist.' );
+		return $self->fail( 'The index ' . $data->{'index'} . ' does not exist.' );
 	}
 };
 
@@ -287,13 +287,13 @@ define_test in_groups => sub {
 	my $currentGroup = [];
 	foreach my $item ( @{ $self->subject } ) {
 		if ( 0 == ( $i % $data->{'groups'} ) ) {
-			push @$newArray, $currentGroup if defined $currentGroup and @$currentGroup;
+			push @$newArray, $currentGroup if defined @$currentGroup;
 			$currentGroup = [];
 		}
 		push @$currentGroup, $item;
 		$i++;
 	}
-	push @$newArray, $currentGroup if defined $currentGroup and @$currentGroup;
+	push @$newArray, $currentGroup if @$currentGroup;
 	return upgrade( $data->{expected} )->validate( $newArray, $self );
 };
 

@@ -32,7 +32,7 @@ sub pAr { Test::Proto::ArrayRef->new(); }
 # nth
 is_a_good_pass(pAr->nth(1, 'b')->validate(['a','b']), "nth: item 1 of ['a','b'] is 'b'");
 is_a_good_fail(pAr->nth(1, 'a')->validate(['a','b']), "nth: item 1 of ['a','b'] is not 'a'");
-# is_a_good_exception(pAr->nth(2, 'b')->validate(['a','b']), "item 2 of ['a','b'] does not exist"); # or should it fail with an out of bounds message?
+is_a_good_fail(pAr->nth(2, 'b')->validate(['a','b']), "item 2 of ['a','b'] does not exist"); #~ it should fail with an out of bounds message, not be an exception
 
 # map
 is_a_good_pass(pAr->map(sub {uc shift;}, ['A','B'])->validate(['a','b']), "map passes with a transform");
@@ -53,6 +53,10 @@ is_a_good_fail(pAr->indexes_of(sub {$_[0] eq uc $_[0]}, [0,2])->validate(['A','b
 # grep (1 arg form)
 is_a_good_pass(pAr->grep(sub {$_[0] eq uc $_[0]})->validate(['A','b']), "boolean grep passes when something matches");
 is_a_good_fail(pAr->grep(sub {$_[0] eq uc $_[0]})->validate(['a','b']), "boolean grep fails when nothing matches");
+
+# grep (1 arg form with expected)
+is_a_good_pass(pAr->grep(sub {$_[0] eq uc $_[0]}, 'because')->validate(['A','b']), "boolean grep (w/reason) passes when something matches");
+is_a_good_fail(pAr->grep(sub {$_[0] eq uc $_[0]}, 'because')->validate(['a','b']), "boolean grep (w/reason) fails when nothing matches");
 
 # array_any
 is_a_good_pass(pAr->array_any(sub {$_[0] eq uc $_[0]})->validate(['A','b']), "array_any passes when something matches");
@@ -111,15 +115,21 @@ is_a_good_fail(pAr->count_items(p->num_gt(5))->validate(['a','b']), "count_items
 
 # range
 is_a_good_pass(pAr->range(1, ['b'])->validate(['a','b']), "range: item 1 of ['a','b'] is 'b'");
-is_a_good_fail(pAr->range(1, ['a'])->validate(['a','b','c','d']), "range: item 1 of ['a','b'] is not 'a'");
+is_a_good_fail(pAr->range(1, ['a'])->validate(['a','b']), "range: item 1 of ['a','b'] is not 'a'");
+is_a_good_fail(pAr->range(2, ['a'])->validate(['a','b']), "range: item 2 of ['a','b'] does not exist");
+is_a_good_exception(pAr->range('', ['a'])->validate(['a','b','c','d']), "range: exception if range is empty");
+is_a_good_exception(pAr->range('a', ['a'])->validate(['a','b','c','d']), "range: exception if range is not a range");
 is_a_good_pass(pAr->range('1,3', ['b','d'])->validate(['a','b','c','d']), "range: comma");
 is_a_good_pass(pAr->range('0,1,3', ['a','b','d'])->validate(['a','b','c','d']), "range: multiple commas");
 is_a_good_pass(pAr->range('1,1,3', ['b','b','d'])->validate(['a','b','c','d']), "range: repeated elements");
+is_a_good_pass(pAr->range('1,-4,-1', ['b','a','d'])->validate(['a','b','c','d']), "range: negative");
 is_a_good_pass(pAr->range('0..2', ['a','b','c'])->validate(['a','b','c','d']), "range: .. operator from beginning");
 is_a_good_pass(pAr->range('1..3', ['b','c','d'])->validate(['a','b','c','d']), "range: .. operator to end");
+is_a_good_pass(pAr->range('1..-1', ['b','c','d'])->validate(['a','b','c','d']), "range: .. operator to -1");
 is_a_good_pass(pAr->range('0..1,3', ['a','b','d'])->validate(['a','b','c','d']), "range: .. and comma");
 is_a_good_pass(pAr->range('0..1,2..3', ['a','b','c','d'])->validate(['a','b','c','d']), "range: multiple ..");
 is_a_good_pass(pAr->range('0..1,1..3', ['a','b','b','c','d'])->validate(['a','b','c','d']), "range: overlapping ..");
+is_a_good_pass(pAr->range('0..1,1..-1', ['a','b','b','c','d'])->validate(['a','b','c','d']), "range: overlapping .. with negatives");
 
 # reverse
 is_a_good_pass(pAr->reverse([qw (d c b a)])->validate(['a','b','c','d']), "reverse passes when expected matches");
@@ -128,21 +138,25 @@ is_a_good_fail(pAr->reverse([qw (a b c d)])->validate(['a','b','c','d']), "rever
 # array_before
 is_a_good_pass(pAr->array_before('c', ['a','b'])->validate(['a','b','c','d']), "array_before passes when expected matches");
 is_a_good_pass(pAr->array_before('a',[])->validate(['a','b','c','d']), "array_before passes when expected matches and is empty");
+is_a_good_fail(pAr->array_before('x',[])->validate(['a','b','c','d']), "array_before fails when match does not match");
 is_a_good_fail(pAr->array_before('c',[])->validate(['a','b','c','d']), "array_before fails when expected does not match");
 
 # array_before_inclusive
 is_a_good_pass(pAr->array_before_inclusive('c', ['a','b','c'])->validate(['a','b','c','d']), "array_before_inclusive passes when expected matches");
 is_a_good_pass(pAr->array_before_inclusive('a',['a'])->validate(['a','b','c','d']), "array_before_inclusive passes when expected matches and is alone");
+is_a_good_fail(pAr->array_before_inclusive('x',[])->validate(['a','b','c','d']), "array_before_inclusive fails when match does not match");
 is_a_good_fail(pAr->array_before_inclusive('c',[])->validate(['a','b','c','d']), "array_before_inclusive fails when expected does not match");
 
 # array_after
 is_a_good_pass(pAr->array_after('b', ['c','d'])->validate(['a','b','c','d']), "array_after passes when expected matches");
 is_a_good_pass(pAr->array_after('d',[])->validate(['a','b','c','d']), "array_after passes when expected matches and is empty");
+is_a_good_fail(pAr->array_after('x',[])->validate(['a','b','c','d']), "array_after fails when match does not match");
 is_a_good_fail(pAr->array_after('c',[])->validate(['a','b','c','d']), "array_after fails when expected does not match");
 
 # array_after
 is_a_good_pass(pAr->array_after_inclusive('b', ['b','c','d'])->validate(['a','b','c','d']), "array_after_inclusive passes when expected matches");
 is_a_good_pass(pAr->array_after_inclusive('d',['d'])->validate(['a','b','c','d']), "array_after_inclusive passes when expected matches and is alone");
+is_a_good_fail(pAr->array_after_inclusive('x',[])->validate(['a','b','c','d']), "array_after_inclusive fails when match does not match");
 is_a_good_fail(pAr->array_after_inclusive('c',[])->validate(['a','b','c','d']), "array_after_inclusive fails when expected does not match");
 
 # functions requiring comparison
@@ -235,13 +249,13 @@ is_a_good_fail(pAr->array_index_of_min(1, $cmp_lc)->validate([]), "array_index_o
 # array_all_unique
 is_a_good_pass(pAr->array_all_unique->validate(['a','b','c','d']), "array_all_unique passes correctly");
 is_a_good_pass(pAr->array_all_unique->validate([]), "array_all_unique passes correctly for []");
-is_a_good_pass(pAr->array_all_unique->validate([]), "array_all_unique passes correctly for ['a']");
+is_a_good_pass(pAr->array_all_unique->validate(['a']), "array_all_unique passes correctly for ['a']");
 is_a_good_fail(pAr->array_all_unique->validate(['a','a','a','a']), "array_all_unique fails correctly");
 
 # array_all_same
 is_a_good_pass(pAr->array_all_same->validate(['a','a','a','a']), "array_all_same passes correctly");
 is_a_good_pass(pAr->array_all_same->validate([]), "array_all_same passes correctly for []");
-is_a_good_pass(pAr->array_all_same->validate([]), "array_all_same passes correctly for ['a']");
+is_a_good_pass(pAr->array_all_same->validate(['a']), "array_all_same passes correctly for ['a']");
 is_a_good_fail(pAr->array_all_same->validate(['a','b','c','d']), "array_all_same fails correctly");
 
 # subset_of, superset_of, subbag_of, superbag_of

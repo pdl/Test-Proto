@@ -8,6 +8,7 @@ Unreleased changes
 		Added methods blessed, array, hash, object, scalar, scalar_ref
 		TestCase attributes are now chainable
 		Small documentation fixes
+		Test coverage improvements
 		Fixed versioning so CPAN installation should work, at expense of duplication.
 
 0.022	2013-09-13
