@@ -2,7 +2,7 @@ Revision history for Test-Proto
 
 Unreleased changes
 
-0.023	Unreleased
+0.023	2013-09-26
 		Bug in clone method fixed
 		ref now takes a prototype, as per docs
 		Added methods blessed, array, hash, object, scalar, scalar_ref
