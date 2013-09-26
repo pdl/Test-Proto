@@ -1,11 +1,14 @@
 Revision history for Test-Proto
 
 Unreleased changes
+
+0.023	Unreleased
 		Bug in clone method fixed
 		ref now takes a prototype, as per docs
 		Added methods blessed, array, hash, object, scalar, scalar_ref
 		TestCase attributes are now chainable
 		Small documentation fixes
+		Fixed versioning so CPAN installation should work, at expense of duplication.
 
 0.022	2013-09-13
 		Added refaddr, refaddr_of

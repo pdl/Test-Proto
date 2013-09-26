@@ -15,7 +15,7 @@ use overload
 	;
 with('Test::Proto::Role::Value');
 with('Test::Proto::Role::Tagged');
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 
 =pod
 
