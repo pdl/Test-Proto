@@ -42,4 +42,4 @@ t/Test-Proto-Object.t
 t/Test-Proto-TestRunner.t
 t/Test-Proto-TestCase.t
 t/Test-Proto-Role-Tagged.t
-
+t/version.t
