@@ -287,7 +287,7 @@ define_test in_groups => sub {
 	my $currentGroup = [];
 	foreach my $item ( @{ $self->subject } ) {
 		if ( 0 == ( $i % $data->{'groups'} ) ) {
-			push @$newArray, $currentGroup if defined @$currentGroup;
+			push @$newArray, $currentGroup if @$currentGroup;
 			$currentGroup = [];
 		}
 		push @$currentGroup, $item;
