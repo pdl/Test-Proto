@@ -2,6 +2,9 @@ Revision history for Test-Proto
 
 Unreleased changes
 
+0.024	2013-10-02
+		Bug causing install fail on 5.16+ fixed (use of defined on array)
+
 0.023	2013-09-26
 		Bug in clone method fixed
 		ref now takes a prototype, as per docs
