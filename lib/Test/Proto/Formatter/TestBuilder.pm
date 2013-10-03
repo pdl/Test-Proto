@@ -103,6 +103,7 @@ Outputs information from a test runner that is already complete but did not expe
 sub format {
 	my $self   = shift;
 	my $runner = shift;
+	$self->event( $runner, 'new' );
 	$self->event( $runner, 'done' );
 	return $self;
 }
