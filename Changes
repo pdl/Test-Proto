@@ -1,6 +1,8 @@
 Revision history for Test-Proto
 
 Unreleased changes
+
+0.025	2013-10-07
 		Fixed gh # 42 (using Formatter on validate results)
 
 0.024	2013-10-02
