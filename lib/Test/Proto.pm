@@ -124,7 +124,7 @@ Returns a prototype for an object. See L<Test::Proto::Object>.
 
 sub pObject {
 	if ( 1 == scalar @_ ) {
-		my $p = Test::Proto::Object->new();
+		my $p = Test::Proto::Object->new()->blessed;
 		if ( !ref $_[0] ) {
 			$p->is_a( $_[0] );
 		}
@@ -137,7 +137,7 @@ sub pObject {
 		else {
 			$p->refaddr( refaddr $_[0] ) if blessed $_[0];
 		}
-		return $p->blessed;
+		return $p;
 	}
 	else {
 		return Test::Proto::Object->new(@_)->blessed;

@@ -52,9 +52,9 @@ isa_ok(pObject({}), 'Test::Proto::Object');
 isa_ok(pObject('IO::Handle'), 'Test::Proto::Object');
 ok(pObject($aro)->validate($aro), 'refaddr comparison works');
 ok(pObject(['foo'])->validate($aro), 'pObject([\'foo\']) works');
-ok(pObject(['foo'])->validate(['foo']), 'pObject([\'foo\']) fails correctly');
+ok(! ( pObject(['foo'])->validate(['foo'] ) ), 'pObject([\'foo\']) fails correctly');
 ok(pObject({foo=>'bar'})->validate($hro), 'pObject({foo=>\'bar\'}) works');
-ok(pObject({foo=>'bar'})->validate({foo=>'bar'}), 'pObject({foo=>\'bar\'}) fails correctly');
+ok(! ( pObject({foo=>'bar'})->validate({foo=>'bar'} ) ), 'pObject({foo=>\'bar\'}) fails correctly');
 use Data::Dumper; 
 ok(pObject('Test::Proto::Acme::ArrayRefObject')->validate($aro), 'pObject($class) passes');
 
