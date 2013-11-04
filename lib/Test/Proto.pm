@@ -89,7 +89,7 @@ Returns a prototype for an array/ArrayRef. See L<Test::Proto::ArrayRef>.
 
 sub pArray {
 	return Test::Proto::Common::upgrade( $_[0] ) if 1 == scalar @_;
-	return Test::Proto::ArrayRef->new(@_);
+	return Test::Proto::ArrayRef->new(@_)->array;
 }
 
 =head2 pHash
@@ -100,7 +100,7 @@ Returns a prototype for a hash/HashRef. See L<Test::Proto::HashRef>.
 
 sub pHash {
 	return Test::Proto::Common::upgrade( $_[0] ) if 1 == scalar @_;
-	return Test::Proto::HashRef->new(@_);
+	return Test::Proto::HashRef->new(@_)->hash;
 }
 
 =head2 pCode
@@ -137,10 +137,10 @@ sub pObject {
 		else {
 			$p->refaddr( refaddr $_[0] ) if blessed $_[0];
 		}
-		return $p;
+		return $p->blessed;
 	}
 	else {
-		return Test::Proto::Object->new(@_);
+		return Test::Proto::Object->new(@_)->blessed;
 	}
 }
 
