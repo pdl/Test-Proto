@@ -132,7 +132,7 @@ Use this when you have a parameter and want to validate data against it, but you
 =cut
 
 sub upgrade {
-	my ($expected) = @_;
+	my ($expected, $noref) = @_;
 	{
 		require Test::Proto::Base;
 		require Test::Proto::HashRef;
@@ -140,19 +140,20 @@ sub upgrade {
 
 		if ( defined ref $expected ) {
 			if ( blessed $expected) {
-				return Test::Proto::ArrayRef->new()->contains_only($expected)
+				return Test::Proto::ArrayRef->new()->array->contains_only($expected)
 					if $expected->isa('Test::Proto::Series')
 					or $expected->isa('Test::Proto::Repeatable')
 					or $expected->isa('Test::Proto::Alternation');
 				return $expected if $expected->isa('Test::Proto::Base');
 			}
-			return Test::Proto::ArrayRef->new()->array_eq($expected)    if ref $expected eq 'ARRAY';
-			return Test::Proto::HashRef->new()->superhash_of($expected) if ref $expected eq 'HASH';
+			return Test::Proto::ArrayRef->new()->array->array_eq($expected)    if ref $expected eq 'ARRAY';
+			return Test::Proto::HashRef->new()->hash->superhash_of($expected) if ref $expected eq 'HASH';
 			return Test::Proto::Base->new()->like($expected)            if ref $expected eq 'Regexp';
 			return Test::Proto::Base->new()->try($expected)             if ref $expected eq 'CODE';
 		}
-		return Test::Proto::Base->new()->num_eq($expected) if Scalar::Util::looks_like_number($expected);
-		return Test::Proto::Base->new()->eq($expected);
+		return Test::Proto::Base->new()->scalar->num_eq($expected) if Scalar::Util::looks_like_number($expected);
+		#return Test::Proto::Base->new()->eq($expected) if $noref;
+		return Test::Proto::Base->new()->scalar->eq($expected);
 	}
 }
 

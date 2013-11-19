@@ -333,11 +333,11 @@ define_test blessed => sub {
 
 Passes if the subject is an unblessed array.
 
-=cut 
+=cut
 
 sub array {
 	my $self = shift;
-	$self->ref( 'ARRAY', @_ );
+	$self->ref( Test::Proto::Base->new->eq('ARRAY'), @_ );
 }
 
 =head3 hash
@@ -347,11 +347,11 @@ sub array {
 
 Passes if the subject is an unblessed hash.
 
-=cut 
+=cut
 
 sub hash {
 	my $self = shift;
-	$self->ref( 'HASH', @_ );
+	$self->ref( Test::Proto::Base->new->eq('HASH'), @_ );
 }
 
 =head3 scalar
@@ -361,11 +361,11 @@ sub hash {
 
 Passes if the subject is an unblessed scalar.
 
-=cut 
+=cut
 
 sub scalar {
 	my $self = shift;
-	$self->ref( '', @_ );
+	$self->ref( Test::Proto::Base->new->eq(''), @_ );
 }
 
 =head3 scalar_ref
@@ -375,11 +375,11 @@ sub scalar {
 
 Passes if the subject is an unblessed scalar ref.
 
-=cut 
+=cut
 
 sub scalar_ref {
 	my $self = shift;
-	$self->ref( 'SCALAR', @_ );
+	$self->ref( Test::Proto::Base->new->eq('SCALAR'), @_ );
 }
 
 =head3 object

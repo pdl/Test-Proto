@@ -38,6 +38,15 @@ has '_object_id_register',
 	is      => 'rw',
 	default => sub { {} };
 
+sub _explain_value {
+	my $v = shift;
+	return 'undef' unless defined $v;
+	return $v unless ref $v;
+	return 'Arrayref with '.($#$v+1).' values' if ref $v eq 'ARRAY';
+	return 'Hashref with '.(scalar keys %$v).' keys' if ref $v eq 'HASH';
+	return ref $v;
+}
+
 sub _explain_test_case {
 	my $self      = shift;
 	my $test_case = shift;
@@ -45,7 +54,7 @@ sub _explain_test_case {
 		if ( $test_case->isa('Test::Proto::TestCase') ) {
 			my $report = '';
 			$report .= $test_case->name;
-			$report .= "\nexpected: " . $test_case->data->{expected} if defined( $test_case->data->{expected} );
+			$report .= "\nexpected: " . _explain_value($test_case->data->{expected}) if defined( $test_case->data->{expected} );
 			if ( scalar keys %{ $test_case->data } > 1 ) {
 				$report .= "\nOther data:";
 				foreach my $key ( grep { 'expected' ne $_ } keys %{ $test_case->data } ) {
