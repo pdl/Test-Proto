@@ -1,6 +1,7 @@
 Revision history for Test-Proto
 
 Unreleased changes
+		Fixed gh #39 (type checking for pArray etc.)
 
 0.025	2013-10-07
 		Fixed gh # 42 (using Formatter on validate results)
