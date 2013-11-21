@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Moo;
 extends 'Test::Proto::Base';
-with('Test::Proto::Role::Value','Test::Proto::Role::HashRef');
+with( 'Test::Proto::Role::Value', 'Test::Proto::Role::HashRef' );
 
 =head1 NAME
 

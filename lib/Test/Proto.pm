@@ -28,7 +28,7 @@ Version 0.025
 
 =cut
 
-our $VERSION = '0.025'; #~ must keep in sync with $Test::Proto::Base::VERSION;
+our $VERSION = '0.025';                                                                                     #~ must keep in sync with $Test::Proto::Base::VERSION;
 
 =head1 SYNOPSIS
 
