@@ -38,7 +38,7 @@ sub method {
 
 =head3 method_void_context
 
-	$p->method('open', ['test.txt','>'])->ok($subject);
+	$p->method_void_context('open', ['test.txt','>'])->ok($subject);
 
 Takes two arguments, a method, and the arguments to use with the method. Calls the method on the test subject, with the arguments. 
 
