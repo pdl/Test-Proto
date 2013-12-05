@@ -17,6 +17,7 @@ use Test::Proto::Common ();
 use Scalar::Util qw(blessed refaddr);
 use base "Exporter";
 our @EXPORT_OK = qw(&p &pArray &pHash &pCode &pObject &pSeries &pRepeatable &pAlternation &c &cNumeric);    # symbols to export on request
+our %EXPORT_TAGS = (all => [@EXPORT_OK]);
 
 =head1 NAME
 

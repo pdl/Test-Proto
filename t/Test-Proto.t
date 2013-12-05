@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::Proto qw(p pArray pHash pCode pObject pSeries pRepeatable pAlternation c cNumeric);
+use Test::Proto ':all'; # i.e. p pArray pHash pCode pObject pSeries pRepeatable pAlternation c cNumeric
 
 isa_ok(p, 'Test::Proto::Base');
 
