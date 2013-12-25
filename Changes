@@ -1,6 +1,8 @@
 Revision history for Test-Proto
 
 Unreleased changes
+
+0.027	2013-12-25
 		Added ':all' import option: use Test::Proto ':all';
 		All .pm files now "use 5.008;" and not 5.006
 		Some docs fixes

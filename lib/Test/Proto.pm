@@ -25,11 +25,11 @@ Test::Proto - OO test script golf sugar
 
 =head1 VERSION
 
-Version 0.026
+Version 0.027
 
 =cut
 
-our $VERSION = '0.026';                                                                                     #~ must keep in sync with $Test::Proto::Base::VERSION;
+our $VERSION = '0.027';                                                                                     #~ must keep in sync with $Test::Proto::Base::VERSION;
 
 =head1 SYNOPSIS
 
