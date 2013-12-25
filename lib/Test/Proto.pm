@@ -35,7 +35,7 @@ our $VERSION = '0.026';                                                         
 
 This module provides an expressive interface for validating deep structures and objects.
 
-	use Test::Proto qw(p pArray pHash pSeries);
+	use Test::Proto ':all';
 	
 	pArray	->contains_only(pSeries('', pHash), 
 			"ArrayRef must contain only an empty string followed by a hashref")

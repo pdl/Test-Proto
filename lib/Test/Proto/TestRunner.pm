@@ -1,5 +1,5 @@
 package Test::Proto::TestRunner;
-use 5.006;
+use 5.008;
 use strict;
 use warnings;
 use overload 'bool' => sub { $_[0]->value };

@@ -11,6 +11,8 @@ use Test::Proto::Common;
 
 Test::Proto::CodeRef - Test a coderef's behaviour
 
+=head1 METHODS
+
 =head3 call
 
 	$p->call(['test.txt','>'], [$fh])->ok($subject);

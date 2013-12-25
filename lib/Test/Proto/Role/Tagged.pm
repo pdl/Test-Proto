@@ -1,5 +1,5 @@
 package Test::Proto::Role::Tagged;
-use 5.006;
+use 5.008;
 use strict;
 use warnings;
 use Moo::Role;
@@ -10,7 +10,9 @@ Test::Proto::Role::Tags - Role containing methods for tagging cases and prototyp
 
 =head1 SYNOPSIS
 
-This class is not for public consumption, only its methods are.
+This class is not for public consumption, only its methods are. 
+
+It is a role used to provide for accessing 'tags', which are flags associated with a test case (L<Test::Proto::TestCase>) or prototype (L<Test::Proto::Base>) to give clues to the runner or formatter to indicate how to deal with the object.
 
 =head1 METHODS
 

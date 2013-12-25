@@ -1,5 +1,5 @@
 package Test::Proto::ArrayRef;
-use 5.006;
+use 5.008;
 use strict;
 use warnings;
 use Moo;
@@ -22,6 +22,19 @@ Use this class for validating arrays, arrayrefs and lists. If you have arrays or
 =head1 METHODS
 
 All methods are provided by L<Test::Proto::Base> or L<Test::Proto::Role::ArrayRef>.
+
+=head1 CAUTION
+
+Remember that you are dealing with array references here:
+
+	pArray->num_gt(1)->validate( [] )
+
+will not test the number of elements, it will do 
+
+	[] > 1
+
+not 
+	@{[]} > 1
 
 =head1 OTHER INFORMATION
 

@@ -1,5 +1,5 @@
 package Test::Proto::TestCase;
-use 5.006;
+use 5.008;
 use strict;
 use warnings;
 use Moo;
